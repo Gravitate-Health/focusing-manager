@@ -1,13 +1,12 @@
 {
   "name": "focusing-manager",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Gravitate-Health Focusing Manager",
+  "main": "build/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev ./src/index.ts",
-    "build": "tsc",
-    "build:watch": "nodemon --exec node --loader ts-node/esm src/index.ts",
+    "build": "tsc --incremental",
     "start": "node build/index.js"
   },
   "repository": {
@@ -22,7 +21,7 @@
   "homepage": "https://github.com/Gravitate-Health/focusing-manager#readme",
   "devDependencies": {
     "@types/express": "^4.17.17",
-    "nodemon": "^2.0.22",
+    "ts-node": "^10.9.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.0.4"
   },

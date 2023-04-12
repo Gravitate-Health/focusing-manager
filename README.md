@@ -45,6 +45,11 @@ curl --location 'https://fosps.gravitatehealth.eu/focusing'
 
 ## Development
 
+The service can be executed listening for changes under the `src` directory with:
+```bash
+npm run dev
+```
+
 This service uses the [Kubernetes javascript client](https://github.com/kubernetes-client/javascript) to query the kubernetes cluster
 
 In production, the service uses the service account to query the cluster. Outside the cluster this is not possible. To develop this service outside the cluster, set the the following enviornment variables (or create a `.env` file) so the kubernetes client can connect to the cluster:
