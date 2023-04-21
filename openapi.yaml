@@ -1,0 +1,262 @@
+openapi: "3.0.1"
+info:
+  title: Gravitate Health Focusing API Interface
+  version: MVP2
+  description: Gravitate Health focusing. Preprocessing and lens selection
+  contact: {}
+servers:
+  - url: https://fosps.gravitatehealth.eu
+paths:
+  /epi/api/fhir/Bundle/:
+    get:
+      tags:
+        - ePI
+      description: List all ePIs.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                #$ref: "#/components/schemas/epiBundle"
+  /ips/api/fhir/Patient/{patientId]}/$summary:
+    get:
+      tags:
+        - IPS
+      description: List all IPS.
+      parameters:
+        - $ref: "#/components/parameters/patientId"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                #$ref: "#/components/schemas/ipsList"
+                type: object
+  /focusing/preprocessing:
+    get:
+      tags:
+        - Preprocessing
+      description: Lists all available preprocessors.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PreprocessingList"
+  /focusing/preprocessing/{epiId}:
+    post:
+      tags:
+        - Preprocessing
+      description: Executes preprocessing on an ePI, adding semantic annotation to the ePI's leaflet sections. Desired response "Content-Type" (JSON or HTML) must be sent in the "Accept" header.
+      parameters:
+        - $ref: "#/components/parameters/epiId"
+        - $ref: "#/components/parameters/preprocessorsList"
+        #- $ref: "#/components/parameters/responseContentType"
+      responses:
+        "200":
+          $ref: "#/components/responses/200focus"
+        "422":
+          $ref: "#/components/responses/422InvalidData"
+  /focusing/lenses:
+    get:
+      tags:
+        - Lenses
+      description: Lists all available lenses.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LensesList"
+  /focusing/focus/{epiId}:
+    post:
+      tags:
+        - Lenses
+      description: Preprocesses and focuses an ePI based on an IPS. Desired response "Content-Type" (JSON or HTML) must be sent in the "Accept" header.
+      parameters:
+        - $ref: "#/components/parameters/epiId"
+        - $ref: "#/components/parameters/preprocessorsList"
+        - $ref: "#/components/parameters/lensesList"
+        - $ref: "#/components/parameters/ipsId"
+        #- $ref: "#/components/parameters/responseContentType"
+      responses:
+        "200":
+          $ref: "#/components/responses/200focus"
+        "422":
+          $ref: "#/components/responses/422InvalidData"
+
+components:
+  schemas:
+    PreprocessingList:
+      type: object
+      properties:
+        preprocessors:
+          type: array
+          items:
+            type: string
+          example: ["preprocessor1", "preprocessor2", "preprocessor3"]
+    LensesList:
+      type: object
+      properties:
+        lenses:
+          type: array
+          items:
+            type: string
+          example: ["lense-name1", "lense-name2", "lense-name3"]
+    ips:
+      type: object
+      properties:
+        fullUrl:
+          type: string
+        resource:
+          type: object
+          properties:
+            resourceType:
+              type: string
+              default: "Medication"
+            id:
+              type: string
+              default: "1234567890ABCDEF"
+            type:
+              type: string
+              default: document
+            entry:
+              type: array
+              items:
+                type: object
+    ePI-html:
+      type: string
+      example: "<html> ePI in HTML format </html>"
+    ePI-json:
+      type: object
+      properties:
+        epiKey:
+          type: string
+          example: "ePI-Value"
+    #epiList:
+    #  type: object
+    #  properties:
+    #    resourceType:
+    #      type: string
+    #      default: "Bundle"
+    #    id:
+    #      type: string
+    #      default: "1234567890ABCDEF"
+    #    total:
+    #      type: number
+    #      default: 3
+    #    entry:
+    #      type: array
+    #      items:
+    #        type: object
+    #        $ref: "#/components/schemas/epiBundle"
+    #epiBundle:
+    #  type: object
+    #  properties:
+    #        fullUrl:
+    #          type: string
+    #        resource:
+    #          type: object
+    #          properties:
+    #            resourceType:
+    #              type: string
+    #              default: "Bundle"
+    #            id:
+    #              type: string
+    #              default: "1234567890ABCDEF"
+    #            type:
+    #              type: string
+    #              default: document
+    #            entry:
+    #              type: array
+    #              items:
+    #                type: object
+    #                properties:
+    #                  fullUrl:
+    #                    type: string
+    #                  resource:
+    #                    type: object
+    #                    properties:
+    #                      resourceType: 
+    #                        type: string
+    #                        default: "composition"
+    #                      title: 
+    #                        type: string
+    #                        default: "Medicine name"
+  parameters:
+    epiId:
+      in: path
+      name: epiId
+      description: ePI id to preprocess.
+      required: true
+      schema:
+        type: string
+    patientId:
+      in: path
+      name: patientId
+      description: patient id.
+      required: true
+      schema:
+        type: string
+    ipsId:
+      in: query
+      name: ipsId
+      description: IPS id.
+      required: true
+      schema:
+        type: string
+    preprocessorsList:
+      in: query
+      name: preprocessors
+      description: List of preprocessors to be executed on the ePI. If parameter is absent, all preprocessors will be executed.
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+    lensesList:
+      in: query
+      name: lenses
+      description: List of lenses to be applied.
+      required: true
+      schema:
+        type: array
+        items:
+          type: string
+    responseContentType:
+      in: query
+      name: responseContentType
+      description: Select response format in JSON or HTML.
+      required: true
+      schema:
+        type: string
+        enum: [html, json]
+
+  responses:
+    200focus:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ePI-json"
+        text/html:
+          schema:
+            $ref: "#/components/schemas/ePI-html"
+    422InvalidData:
+      description: Invalid Data
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              messsage:
+                type: string
+                default: "Given data is invalid"
+              reason:
+                type: string
+                default: "Reason"
