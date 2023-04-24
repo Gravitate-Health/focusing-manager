@@ -1,11 +1,11 @@
-import axios from "axios";
+import axios, { HttpStatusCode } from "axios";
 import { Logger } from "./Logger";
 
 let FHIR_IPS_URL = process.env.FHIR_IPS_URL;
 let FHIR_EPI_URL = process.env.FHIR_EPI_URL;
 
 
-export async function getResourceById(type: string, id: string) {
+export function getFhirResourceById(type: string, id: string) {
     let url: string;
     if (type === "ips") {
         url = FHIR_IPS_URL + "/Patient/" + id + "/$summary"
@@ -14,15 +14,5 @@ export async function getResourceById(type: string, id: string) {
     } else {
         return null
     }
-    let response
-    try {
-        response = await axios.get(url)
-    } catch (error) {
-        Logger.logError('fhirClient.ts', 'getResourceById', `Error querying FHIR id: ${id}  --  url: ${url}`)
-        console.error(error)
-        return
-
-    }
-    console.log(response.data);
-    return response.data
+    return axios.get(url)
 }
