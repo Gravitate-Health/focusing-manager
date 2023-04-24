@@ -35,6 +35,10 @@ spec:
           env:
             - name: ENVIRONMENT
               value: "prod"
+            - name: PREPROCESSING_LABEL_SELECTOR
+              value: eu.gravitate-health.fosps.preprocessing=true
+            - name: FOCUSING_LABEL_SELECTOR
+              value: eu.gravitate-health.fosps.focusing=true
           ports:
             - containerPort: 3000
               protocol: TCP

@@ -30,4 +30,21 @@ if (environment === "dev") {
   kc.loadFromCluster();
 }
 
-export const coreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+const coreV1Api = kc.makeApiClient(k8s.CoreV1Api);
+
+export async function getK8sServicesByLabel(labelSelector: string) {
+  const services = await coreV1Api.listNamespacedService(
+    "default",
+    undefined,
+    false,
+    undefined,
+    undefined,
+    labelSelector
+  );
+  let serviceList: string[] = [];
+  for (const service of services.body.items) {
+    let serviceName = service.metadata!.name as string;
+    serviceList.push(serviceName);
+  }
+  return serviceList;
+}

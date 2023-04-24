@@ -31,6 +31,10 @@ kubectl apply -f kubernetes-yaml/003_focusing-manager-role-binding.yml
 
 ## Deployment
 
+The service needs the following environment variables:
+- `FOCUSING_LABEL_SELECTOR`: The focusing label selector. Kubernetes cluster will filter the services with this label selector. (E.g: FOCUSING_LABEL_SELECTOR="eu.gravitate-health.fosps.focusing=true")
+- `PREPROCESSING_LABEL_SELECTOR`: The preprocessing label selector. Kubernetes cluster will filter the services with this label selector. (E.g: PREPROCESSING_LABEL_SELECTOR="eu.gravitate-health.fosps.preprocessing=true")
+
 To deploy the service, create the `service`, `deployment` and `virtual service`:
 ```bash
 kubectl apply -f kubernetes-yaml/004_focusing-manager-service.yml
