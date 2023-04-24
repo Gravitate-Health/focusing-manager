@@ -77,12 +77,12 @@ paths:
     post:
       tags:
         - Lenses
-      description: Preprocesses and focuses an ePI based on an IPS. Desired response "Content-Type" (JSON or HTML) must be sent in the "Accept" header.
+      description: Preprocesses and focuses an ePI based on a Patient's IPS. Desired response "Content-Type" (JSON or HTML) must be sent in the "Accept" header.
       parameters:
         - $ref: "#/components/parameters/epiId"
         - $ref: "#/components/parameters/preprocessorsList"
         - $ref: "#/components/parameters/lensesList"
-        - $ref: "#/components/parameters/ipsId"
+        - $ref: "#/components/parameters/patientId"
         #- $ref: "#/components/parameters/responseContentType"
       responses:
         "200":
@@ -199,14 +199,7 @@ components:
     patientId:
       in: path
       name: patientId
-      description: patient id.
-      required: true
-      schema:
-        type: string
-    ipsId:
-      in: query
-      name: ipsId
-      description: IPS id.
+      description: Patient id.
       required: true
       schema:
         type: string
