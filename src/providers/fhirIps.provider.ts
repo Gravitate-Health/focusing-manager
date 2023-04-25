@@ -3,17 +3,17 @@ import AxiosController from '../utils/axios';
 import { Logger } from '../utils/Logger';
 
 
-export class FhirEpiProvider extends AxiosController {
+export class FhirIpsProvider extends AxiosController {
     constructor(baseUrl: string) {
         super(baseUrl);
     }
 
-    getEpiById = async (id: string): Promise<AxiosResponse> => {
+    getIpsByPatientId = async (id: string): Promise<AxiosResponse> => {
         try {
-            let url = `${this.baseUrl}/Bundle/${id}`;
+            let url = `${this.baseUrl}/Patient/${id}/$summary`;
             return await this.request.get(url);
         } catch (error) {
-            Logger.logError('FhirProvider.ts', "getEpiById", '[FHIR Provider][Create Patient] Error');
+            Logger.logError('FhirIpsProvider.ts', "getIpsByPatientId", `Error getting IPS for patient Id: ${id}`);
             throw error;
         }
     }

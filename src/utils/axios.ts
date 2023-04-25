@@ -19,15 +19,18 @@ class AxiosController {
   }
 
   private _createAxiosConfig = (baseUrl: string): AxiosRequestConfig => {
-    return {
-      baseURL: baseUrl,
+    let config: AxiosRequestConfig = {
       timeout: 10 * 1000,
       headers: {
         Accept: '*/*',
         Authorization: '',
       },
     };
-  };
+    if (baseUrl) {
+      config.baseURL = baseUrl
+    };
+    return config
+  }
   private _initializeRequestInterceptor = () => { };
 
   private _initializeResponseInterceptor = () => {
@@ -106,7 +109,11 @@ class AxiosController {
     } else if (error.request) {
       // The request was made but no response was received. `error.request` is an instance of http.ClientRequest
       console.log('error.request');
-      Logger.logError("axios.ts", "Handle error response", JSON.stringify(error));
+      if(error.message.startsWith("getaddrinfo ENOTFOUND")) {
+        Logger.logError("axios.ts", "Handle error response", "URL NOT FOUND")
+      } else {
+        Logger.logError("axios.ts", "Handle error response", JSON.stringify(error));
+      }
     } else {
       console.log('error');
       Logger.logError("axios.ts", "Handle error response", `Error: ${error.message}`);
