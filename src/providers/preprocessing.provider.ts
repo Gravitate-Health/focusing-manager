@@ -1,5 +1,4 @@
-import { Axios, AxiosError,  AxiosRequestConfig, AxiosResponse } from 'axios';
-import { Request } from "express";
+import { AxiosError } from 'axios';
 import AxiosController from '../utils/axios';
 import { Logger } from '../utils/Logger';
 import { getK8sServicesByLabel } from '../utils/k8sClient';
@@ -32,7 +31,7 @@ export class PreprocessingProvider extends AxiosController {
     }
 
     callPreprocessingService = async (serviceName: string, epi: any) => {
-        let url = `http://${serviceName}.default.svc.cluster.local/preprocessing`;
+        let url = `http://${serviceName}.default.svc.cluster.local:3000/preprocess`;
         Logger.logInfo('preprocessingProvider.ts', 'callPreprocessingService', `Querying preprocessing service: ${url}`)
         try {
             let response = await this.request.post(url, epi)
@@ -44,7 +43,8 @@ export class PreprocessingProvider extends AxiosController {
     }
 
     callServicesFromList = async (preprocessors: string[], epi: any)/* : Promise<AxiosResponse> */ => {
-        preprocessors.forEach(async serviceName => {
+        for (let i in preprocessors) {
+            let serviceName = preprocessors[i]
             try {
                 epi = await this.callPreprocessingService(serviceName, epi)
             } catch (error) {
@@ -54,7 +54,7 @@ export class PreprocessingProvider extends AxiosController {
                     }
                 }
             }
-        });
+        };
         return epi
     }
 }

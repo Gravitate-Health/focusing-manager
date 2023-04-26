@@ -68,10 +68,11 @@ export const preprocess = async (req: Request, res: Response) => {
   console.log(`Requested ePI ID: ${epiId}`);
   console.log(`Requested preprocessors: ${preprocessors}`);
 
+  let preprocessedEpi
   // Call preprocessors
   if (preprocessors) {
-    epi = await preprocessingProvider.callServicesFromList(preprocessors, epi)
+    preprocessedEpi = await preprocessingProvider.callServicesFromList(preprocessors, epi)
   }
 
-  res.status(200).send(epi)
+  res.status(200).send(preprocessedEpi)
 }
