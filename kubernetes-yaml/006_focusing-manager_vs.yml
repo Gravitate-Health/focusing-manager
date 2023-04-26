@@ -24,7 +24,9 @@ spec:
   http:
     - match:
         - uri:
-            prefix: /focusing
+            prefix: /focusing/
+      rewrite:
+        uri: "/"
       route:
         - destination:
             host: focusing-manager.default.svc.cluster.local

@@ -39,6 +39,10 @@ spec:
               value: eu.gravitate-health.fosps.preprocessing=true
             - name: FOCUSING_LABEL_SELECTOR
               value: eu.gravitate-health.fosps.focusing=true
+            - name: FHIR_IPS_URL
+              value: https://fosps.gravitatehealth.eu/ips/api/fhir
+            - name: FHIR_EPI_URL
+              value: https://fosps.gravitatehealth.eu/epi/api/fhir
           ports:
             - containerPort: 3000
               protocol: TCP
