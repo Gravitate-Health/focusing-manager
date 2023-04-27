@@ -17,10 +17,18 @@ let fhirIpsProvider = new FhirIpsProvider(FHIR_IPS_URL)
 
 
 export const getLensesNames = async (_req: Request, res: Response) => {
-    Logger.logInfo("lensesController.ts", "focus", "\n\n\n_____________ GET  LENSES ____________")
-    let lensesList: string[];
+    Logger.logInfo("lensesController.ts", "focus", "\n\n\n_____________ GET LENSES ____________")
+    let lensesList: string[] = [];
     try {
-        lensesList = await lensesProvider.getLenseNames()
+        // Get lensSelectors
+        let lensSelectorList = await lensesProvider.getLensSelectors()
+        for (let i in lensSelectorList) {
+            let lensSelectorName = lensSelectorList[i]
+            // Get available lenses from lensSelector
+            let response = await lensesProvider.getLensSelectorAvailableLenses(lensSelectorName)
+            let lensSelectorAvailableLensesList = response["lenses"]
+            lensesList.push(lensSelectorAvailableLensesList)
+        }
     } catch (error) {
         res.status(HttpStatusCode.InternalServerError).send({
             error: "There was an error"
@@ -92,18 +100,17 @@ export const focus = async (req: Request, res: Response) => {
     }
 
     // Parse lenses
+    let parsedLensesNames: any[] = []
     try {
-        lensesNames = await lensesProvider.parseLenses(reqLensesNames)
+        parsedLensesNames = await lensesProvider.parseLenses(reqLensesNames)
     } catch (error) {
         res.status(HttpStatusCode.InternalServerError).send({
-            error: "There was an error"
+            error: error
         })
         return
     }
 
-    Logger.logDebug("lensesController.ts", "focus", `Starting Focusing with: EpiId ${reqEpiId} -- patientId: ${reqPatientId} -- preprocessors: ${preprocessors} -- lenses: ${lensesNames} -- `)
-
-    //console.log(`Requested lenses: ${lenses}`);
+    Logger.logDebug("lensesController.ts", "focus", `Starting Focusing with: EpiId ${reqEpiId} -- patientId: ${reqPatientId} -- preprocessors: ${preprocessors} -- lenses: ${JSON.stringify(parsedLensesNames)} -- `)
 
     // Call preprocessors
     if (preprocessors) {
@@ -114,18 +121,28 @@ export const focus = async (req: Request, res: Response) => {
         }
     }
 
-    let lenses: any[] = []
-    if (lensesNames) {
-        try {
-            lenses = await lensesProvider.getLenseByName(lensesNames, epi)
-        } catch (error) {
+    let lenses: string[] = []
+    if (parsedLensesNames) {
+        for (let i in parsedLensesNames) {
+            let lensObj = parsedLensesNames[i]
+            try {
+                let lens = await lensesProvider.getLensFromSelector(lensObj["lensSelector"], lensObj["lensName"])
+                lenses.push(lens)
+            } catch (error) {
+                console.log(error);
+            }
         }
     }
-    console.log(lenses);
-    lenses.forEach(lense => { console.log(lense);})
-        lenses.forEach(async lense => {
+    console.log(`Found the following lenses: ${JSON.stringify(lenses)}`);
+    let leeBody = {
+        epi: epi,
+        ips: ips,
+        lenses: lenses
+    }
+    parsedLensesNames.forEach(async lense => {
         try {
-            epi = await lensesProvider.callLensExecutionEnvironment(lense, epi)
+            // COMMENTED UNTIL LEE IS IMPLEMENTED
+            //epi = await lensesProvider.callLensExecutionEnvironment(lense, epi)
         } catch (error) {
             //console.log(error);
         }
