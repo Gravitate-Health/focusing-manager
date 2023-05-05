@@ -197,7 +197,7 @@ components:
       schema:
         type: string
     patientId:
-      in: path
+      in: query
       name: patientId
       description: Patient id.
       required: true
