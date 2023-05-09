@@ -32,3 +32,13 @@ spec:
             host: focusing-manager.default.svc.cluster.local
             port:
               number: 3000
+      corsPolicy:
+        allowMethods:
+          - GET
+          - POST
+          - OPTIONS
+        allowOrigins:
+          - exact: "*"
+        allowHeaders:
+          - "content-type"
+          - "Accept"
