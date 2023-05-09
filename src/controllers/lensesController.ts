@@ -141,12 +141,20 @@ export const focus = async (req: Request, res: Response) => {
     }
     parsedLensesNames.forEach(async lense => {
         try {
-            // COMMENTED UNTIL LEE IS IMPLEMENTED
+            // FUTURE EXTERNAL SVC CALL
             //epi = await lensesProvider.callLensExecutionEnvironment(lense, epi)
+
+            let lensFunction = new Function(epi,ips,lense)
+            let resObject = lensFunction()
+            
+            resObject.enhanceEpiFunction()
+            console.log(resObject.lensVersion())
+
         } catch (error) {
-            //console.log(error);
+            console.log(error);
+            res.status(HttpStatusCode.InternalServerError).send(error)
         }
     })
 
-    res.status(HttpStatusCode.Ok).send(epi)
+    res.status(HttpStatusCode.Ok).send(epi) //Response with e(ePi)
 }
