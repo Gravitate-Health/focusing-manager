@@ -26,8 +26,9 @@ export const getLensesNames = async (_req: Request, res: Response) => {
             let lensSelectorName = lensSelectorList[i]
             // Get available lenses from lensSelector
             let response = await lensesProvider.getLensSelectorAvailableLenses(lensSelectorName)
-            let lensSelectorAvailableLensesList = response["lenses"]
-            lensesList.push(lensSelectorAvailableLensesList)
+            response["lenses"].forEach((lens: string) => {
+                lensesList.push(lens)
+            });
         }
     } catch (error) {
         res.status(HttpStatusCode.InternalServerError).send({
