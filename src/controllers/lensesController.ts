@@ -147,8 +147,8 @@ export const focus = async (req: Request, res: Response) => {
             let lensFunction = new Function(epi,ips,lense)
             let resObject = lensFunction()
             
-            resObject.enhanceEpiFunction()
-            console.log(resObject.lensVersion())
+            epi = resObject.enhance()
+            console.log(resObject.getSpecification())
 
         } catch (error) {
             console.log(error);
