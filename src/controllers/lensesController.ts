@@ -26,8 +26,9 @@ export const getLensesNames = async (_req: Request, res: Response) => {
             let lensSelectorName = lensSelectorList[i]
             // Get available lenses from lensSelector
             let response = await lensesProvider.getLensSelectorAvailableLenses(lensSelectorName)
-            let lensSelectorAvailableLensesList = response["lenses"]
-            lensesList.push(lensSelectorAvailableLensesList)
+            response["lenses"].forEach((lens: string) => {
+                lensesList.push(lens)
+            });
         }
     } catch (error) {
         res.status(HttpStatusCode.InternalServerError).send({
@@ -144,9 +145,8 @@ export const focus = async (req: Request, res: Response) => {
             // FUTURE EXTERNAL SVC CALL
             //epi = await lensesProvider.callLensExecutionEnvironment(lense, epi)
 
-            let lensFunction = new Function(epi,ips,lense)
-            let resObject = lensFunction()
-            
+            let lensFunction = new Function("epi, ips",lense.lens)
+            let resObject = lensFunction(epi, ips)
             epi = resObject.enhance()
             console.log(resObject.getSpecification())
 
