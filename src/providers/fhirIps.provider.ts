@@ -10,7 +10,7 @@ export class FhirIpsProvider extends AxiosController {
 
     getIpsByPatientId = async (id: string): Promise<AxiosResponse> => {
         try {
-            let url = `${this.baseUrl}/Patient/${id}/$summary`;
+            let url = `${this.baseUrl}/Patient/${id}/$summary?_format=json`;
             return await this.request.get(url);
         } catch (error) {
             Logger.logError('FhirIpsProvider.ts', "getIpsByPatientId", `Error getting IPS for patient Id: ${id}`);
