@@ -14,7 +14,17 @@ let lensesProvider = new LensesProvider("")
 let fhirEpiProvider = new FhirEpiProvider(FHIR_EPI_URL)
 let fhirIpsProvider = new FhirIpsProvider(FHIR_IPS_URL)
 
+const getLeaflet = (epi: any) => {
+    // This is assuming that the "Composition" resource is the first one of the bundle. It might break in the future
+    let leafletSectionList = epi['entry'][0]['resource']['section'][0]['section']
+    return leafletSectionList
+}
 
+const writeLeaflet = (epi: any, leafletSectionList: any[]) => {
+    // This is assuming that the "Composition" resource is the first one of the bundle. It might break in the future
+    epi['entry'][0]['resource']['section'][0]['section'] = leafletSectionList
+    return epi
+}
 
 export const getLensesNames = async (_req: Request, res: Response) => {
     Logger.logInfo("lensesController.ts", "focus", "\n\n\n_____________ GET LENSES ____________")
@@ -43,7 +53,7 @@ export const getLensesNames = async (_req: Request, res: Response) => {
 
 export const focus = async (req: Request, res: Response) => {
     Logger.logInfo("lensesController.ts", "focus", "\n\n\n_____________ POST FOCUS ____________")
-    let epiId: string, patientId: string, preprocessors: string[] | undefined, lensesNames: string[], epi: any, ips: any
+    let epiId: string, patientId: string, preprocessors: string[] | undefined, lensesNames: string[], epi: any, ips: any, pv: any
 
     let reqEpiId = req.params.epiId as string
     let reqPatientId = req.query.patientId as string
@@ -88,6 +98,12 @@ export const focus = async (req: Request, res: Response) => {
             res.status(HttpStatusCode.NotFound).send(error)
             return
         }
+    }
+
+    // TODO: get PV
+    try {
+        pv = {}
+    } catch (error: any) {
     }
 
     // Parse preprocessors
@@ -135,26 +151,35 @@ export const focus = async (req: Request, res: Response) => {
         }
     }
     console.log(`Found the following lenses: ${JSON.stringify(lenses)}`);
-    let leeBody = {
-        epi: epi,
-        ips: ips,
-        lenses: lenses
-    }
+
+    // Get leaflet sectoins from ePI
+    let leafletSectionList = getLeaflet(epi)
+
+    // Iterate lenses
     lenses.forEach(async lense => {
         try {
-            // FUTURE EXTERNAL SVC CALL
-            //epi = await lensesProvider.callLensExecutionEnvironment(lense, epi)
+            // Iterate on leaflet sections
+            for (let index in leafletSectionList) {
+                console.log(`Executing lens ${JSON.stringify(lense.metadata)} on leaflet section number: ${index}`);
+                // Get HTML text
+                let sectionObject = leafletSectionList[index]
+                let html = sectionObject['text']['div']
 
-            let lensFunction = new Function("epi, ips",lense.lens)
-            let resObject = lensFunction(epi, ips)
-            epi = resObject.enhance()
-            console.log(resObject.getSpecification())
+                // Create enhance function from lens
+                let lensFunction = new Function("epi, ips, pv, html", lense.lens)
+                let resObject = lensFunction(epi, ips, pv, html)
+
+                // Execute lense and save result on ePI leaflet section
+                let enhancedHtml = resObject.enhance()
+                leafletSectionList[index]['text']['div'] = enhancedHtml
+            }
 
         } catch (error) {
             console.log(error);
             res.status(HttpStatusCode.InternalServerError).send(error)
         }
     })
+    epi = writeLeaflet(epi, leafletSectionList)
 
     res.status(HttpStatusCode.Ok).send(epi) //Response with e(ePi)
 }
