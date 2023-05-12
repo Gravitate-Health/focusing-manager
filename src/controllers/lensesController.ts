@@ -122,7 +122,7 @@ export const focus = async (req: Request, res: Response) => {
         }
     }
 
-    let lenses: string[] = []
+    let lenses = []
     if (parsedLensesNames) {
         for (let i in parsedLensesNames) {
             let lensObj = parsedLensesNames[i]
@@ -140,7 +140,7 @@ export const focus = async (req: Request, res: Response) => {
         ips: ips,
         lenses: lenses
     }
-    parsedLensesNames.forEach(async lense => {
+    lenses.forEach(async lense => {
         try {
             // FUTURE EXTERNAL SVC CALL
             //epi = await lensesProvider.callLensExecutionEnvironment(lense, epi)
