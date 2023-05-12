@@ -37,6 +37,10 @@ export const getLensesNames = async (_req: Request, res: Response) => {
             // Get available lenses from lensSelector
             let response = await lensesProvider.getLensSelectorAvailableLenses(lensSelectorName)
             response["lenses"].forEach((lens: string) => {
+                if (lens.endsWith('.js')) {
+                    // Remove .js extension of the lens
+                    lens = lens.slice(0, lens.length-3)
+                }
                 lensesList.push(lens)
             });
         }
