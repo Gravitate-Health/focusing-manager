@@ -43,6 +43,8 @@ spec:
               value: https://fosps.gravitatehealth.eu/ips/api/fhir
             - name: FHIR_EPI_URL
               value: https://fosps.gravitatehealth.eu/epi/api/fhir
+            - name: PROFILE_URL
+              value: https://fosps.gravitatehealth.eu/profiles
           ports:
             - containerPort: 3000
               protocol: TCP

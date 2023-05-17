@@ -5,14 +5,17 @@ import { PreprocessingProvider } from "../providers/preprocessing.provider";
 import { FhirEpiProvider } from "../providers/fhirEpi.provider";
 import { FhirIpsProvider } from "../providers/fhirIps.provider";
 import { LensesProvider } from "../providers/lenses.provider";
+import { ProfileProvider } from "../providers/profile.provider";
 
 const FHIR_IPS_URL = process.env.FHIR_IPS_URL as string;
 const FHIR_EPI_URL = process.env.FHIR_EPI_URL as string;
+const PROFILE_URL = process.env.PROFILE_URL as string;
 
 let preprocessingProvider = new PreprocessingProvider("")
 let lensesProvider = new LensesProvider("")
 let fhirEpiProvider = new FhirEpiProvider(FHIR_EPI_URL)
 let fhirIpsProvider = new FhirIpsProvider(FHIR_IPS_URL)
+let profileProvider = new ProfileProvider(PROFILE_URL)
 
 const getLeaflet = (epi: any) => {
     // This is assuming that the "Composition" resource is the first one of the bundle. It might break in the future
@@ -104,10 +107,12 @@ export const focus = async (req: Request, res: Response) => {
         }
     }
 
-    // TODO: get PV
+    // TODO: change g-lens profile for PersonaVector
     try {
-        pv = {}
+        pv = await profileProvider.getProfileById(reqPatientId)
+        Logger.logDebug("lensesController.ts", "focus", `Got G-Lens profile: ${JSON.stringify(pv)}} -- `)
     } catch (error: any) {
+        console.log(`Cpuld not find G-Lens Profile por Patient id: ${reqPatientId}`);
     }
 
     // Parse preprocessors
@@ -160,7 +165,8 @@ export const focus = async (req: Request, res: Response) => {
     let leafletSectionList = getLeaflet(epi)
 
     // Iterate lenses
-    lenses.forEach(async lense => {
+    for (let i in lenses) {
+        let lense = lenses[i]
         try {
             // Iterate on leaflet sections
             for (let index in leafletSectionList) {
@@ -177,13 +183,18 @@ export const focus = async (req: Request, res: Response) => {
                 let enhancedHtml = resObject.enhance()
                 leafletSectionList[index]['text']['div'] = enhancedHtml
             }
-
         } catch (error) {
             console.log(error);
-            res.status(HttpStatusCode.InternalServerError).send(error)
+            res.status(HttpStatusCode.InternalServerError).send({
+                message: "Error in lens execution",
+                reason: error
+            })
+            return
         }
-    })
+    }
     epi = writeLeaflet(epi, leafletSectionList)
+
+    //TODO: integrate ePI to HTML
 
     res.status(HttpStatusCode.Ok).send(epi) //Response with e(ePi)
 }
