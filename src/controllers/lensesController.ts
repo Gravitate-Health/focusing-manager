@@ -6,6 +6,9 @@ import { FhirEpiProvider } from "../providers/fhirEpi.provider";
 import { FhirIpsProvider } from "../providers/fhirIps.provider";
 import { LensesProvider } from "../providers/lenses.provider";
 import { ProfileProvider } from "../providers/profile.provider";
+import { Liquid } from "liquidjs";
+import { readFileSync } from "fs";
+import { HTML } from "liquidjs/dist/src/template";
 
 const FHIR_IPS_URL = process.env.FHIR_IPS_URL as string;
 const FHIR_EPI_URL = process.env.FHIR_EPI_URL as string;
@@ -42,7 +45,7 @@ export const getLensesNames = async (_req: Request, res: Response) => {
             response["lenses"].forEach((lens: string) => {
                 if (lens.endsWith('.js')) {
                     // Remove .js extension of the lens
-                    lens = lens.slice(0, lens.length-3)
+                    lens = lens.slice(0, lens.length - 3)
                 }
                 lensesList.push(lens)
             });
@@ -194,7 +197,27 @@ export const focus = async (req: Request, res: Response) => {
     }
     epi = writeLeaflet(epi, leafletSectionList)
 
-    //TODO: integrate ePI to HTML
+    //Check if is HTML response
+    if (req.accepts('html') == 'html') {
 
-    res.status(HttpStatusCode.Ok).send(epi) //Response with e(ePi)
+        try {
+            const epiTemplate = readFileSync("./templates/epi.liquid", "utf-8")
+
+            const engine = new Liquid()
+            engine.parseAndRender(epiTemplate, epi)
+                .then(html => {
+                    res.set('Content-Type', 'text/html').status(HttpStatusCode.Ok).send(html)
+                });
+
+        } catch (error) {
+            console.log(error);
+            res.status(HttpStatusCode.InternalServerError).send({
+                message: "Error converting to html",
+                reason: error
+            })
+        }    
+    }
+    else {//Response with e(ePi)
+        res.status(HttpStatusCode.Ok).send(epi)
+    }
 }

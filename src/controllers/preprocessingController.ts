@@ -5,6 +5,8 @@ import axios, { AxiosError, HttpStatusCode } from "axios";
 import { Response, Request } from "express";
 import { FhirEpiProvider } from "../providers/fhirEpi.provider";
 import { PreprocessingProvider } from "../providers/preprocessing.provider";
+import { readFileSync } from "fs";
+import { Liquid } from "liquidjs";
 
 const FHIR_BASE_URL = process.env.FHIR_EPI_URL as string;
 
@@ -74,5 +76,26 @@ export const preprocess = async (req: Request, res: Response) => {
     preprocessedEpi = await preprocessingProvider.callServicesFromList(preprocessors, epi)
   }
 
-  res.status(200).send(preprocessedEpi)
+  if (req.accepts('html') == 'html') {
+
+    try {
+      const epiTemplate = readFileSync("./templates/epi.liquid", "utf-8")
+
+      const engine = new Liquid()
+      engine.parseAndRender(epiTemplate, preprocessedEpi)
+        .then(html => {
+          res.set('Content-Type', 'text/html').status(HttpStatusCode.Ok).send(html)
+        });
+
+    } catch (error) {
+      console.log(error);
+      res.status(HttpStatusCode.InternalServerError).send({
+        message: "Error converting to html",
+        reason: error
+      })
+    }
+  }
+  else {//Response with e(ePi)
+    res.status(200).send(preprocessedEpi)
+  }
 }
