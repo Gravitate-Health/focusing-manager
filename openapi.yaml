@@ -20,7 +20,7 @@ paths:
               schema:
                 type: object
                 #$ref: "#/components/schemas/epiBundle"
-  /ips/api/fhir/Patient/{patientId]}/$summary:
+  /ips/api/fhir/Composition/{patientId}/$document:
     get:
       tags:
         - IPS
@@ -77,7 +77,12 @@ paths:
     post:
       tags:
         - Lenses
-      description: Preprocesses and focuses an ePI based on a Patient's IPS. Desired response "Content-Type" (JSON or HTML) must be sent in the "Accept" header.
+      description: >
+        Preprocesses and focuses an ePI based on a Patient's IPS.
+        Desired response "Content-Type" (JSON or HTML) must be sent in the "Accept" header.
+        The response contains the ePI with HTML tags and the following CSS classes: "highlight", "collapse".
+        "Highlight" CSS class is used to remark information. It has precedence over the collapse class.
+        "Collapse" CSS class is used to hide information.
       parameters:
         - $ref: "#/components/parameters/epiId"
         - $ref: "#/components/parameters/preprocessorsList"
