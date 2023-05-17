@@ -79,7 +79,7 @@ export const preprocess = async (req: Request, res: Response) => {
   if (req.accepts('html') == 'html') {
 
     try {
-      const epiTemplate = readFileSync("./templates/epi.liquid", "utf-8")
+      const epiTemplate = readFileSync(`${process.cwd()}/build/templates/epi.liquid`, "utf-8")
 
       const engine = new Liquid()
       engine.parseAndRender(epiTemplate, preprocessedEpi)

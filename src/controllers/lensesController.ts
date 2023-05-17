@@ -180,7 +180,7 @@ export const focus = async (req: Request, res: Response) => {
 
                 // Create enhance function from lens
                 let lensFunction = new Function("epi, ips, pv, html", lense.lens)
-                let resObject = lensFunction(epi, ips, pv, html)
+                let resObject = lensFunction(epi, ips, {}, html)
 
                 // Execute lense and save result on ePI leaflet section
                 let enhancedHtml = resObject.enhance()
@@ -201,7 +201,7 @@ export const focus = async (req: Request, res: Response) => {
     if (req.accepts('html') == 'html') {
 
         try {
-            const epiTemplate = readFileSync("./templates/epi.liquid", "utf-8")
+            const epiTemplate = readFileSync(`${process.cwd()}/templates/epi.liquid`, "utf-8")
 
             const engine = new Liquid()
             engine.parseAndRender(epiTemplate, epi)
