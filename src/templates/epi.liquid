@@ -3,7 +3,7 @@
 
 <link href="./lenses.css" rel="stylesheet" />
 
-{% comment %}
+
 <div>
   {% if composition.category[0].coding[0].code == "E" %}
     <link href="assets/css/lenses.css" rel="stylesheet" />
@@ -41,7 +41,6 @@
   {% endfor %}
 
 </div>
-{% endcomment %}
 
 <h2>Product Information</h2>
 {% assign mpdr = entry | where: "resource.resourceType", "MedicinalProductDefinition" | first %}
