@@ -224,15 +224,22 @@ export const focus = async (req: Request, res: Response) => {
 
 export const baseRequest = (req: Request, res: Response) => {
     Logger.logInfo("lensesController.ts", "baseRequest", "\n\n\n_____________ BASE REQUEST ____________");
+    
+    console.log(req.body);
 
-    if (req.query.epiId && req.body.ips) {
+    if (req.body.epi != undefined && req.body.ips != undefined) {
         focusFullEpiFullIps(req, res);
-    } else if (req.query.ipsId && req.body.epi) {
+    } else if (req.query.patientId && req.body.epi != undefined) {
         focusFullEpiIpsId(req, res);
-    } else if (req.query.epiId && req.body.ips) {
+    } else if (req.params.epiId && req.body.ips != undefined) {
         focusEpiIdFullIps(req, res);
-    } else {
+    } else if (req.params.epiId && req.query.patientId) {
         focus(req, res)
+    } else {
+        res.status(HttpStatusCode.BadRequest).send({
+            message: "Bad request",
+            reason: "Missing parameters"
+        })
     }
 }
 
@@ -248,7 +255,7 @@ const focusFullEpiFullIps = async (req: Request, res: Response) => {
 }
 
 const focusFullEpiIpsId = async (req: Request, res: Response) => {
-    const reqPatientId = req.query.patientId;
+    const reqPatientId = req.query.patientId as string;
     let epi = req.body.epi;
     let ips: any;
 
@@ -260,7 +267,7 @@ const focusFullEpiIpsId = async (req: Request, res: Response) => {
     }
 
     try {
-        let ipsResponse = await fhirIpsProvider.getIpsByPatientId(reqPatientId as string)
+        let ipsResponse = await fhirIpsProvider.getIpsByPatientId(reqPatientId)
         ips = ipsResponse.data
     } catch (error: any) {
         if (error.statusCode === 404) {
@@ -277,7 +284,7 @@ const focusFullEpiIpsId = async (req: Request, res: Response) => {
 }
 
 const focusEpiIdFullIps = async (req: Request, res: Response) => {
-    const epiId = req.query.epiId;
+    const epiId = req.params.epiId;
     let epi: any;
     let ips = req.body.ips;
 
