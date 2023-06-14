@@ -98,6 +98,8 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/200focus"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
         "422":
           $ref: "#/components/responses/422InvalidData"
   /focusing/focus:
@@ -279,21 +281,8 @@ components:
         type: object
         properties:
           ips:
-            type: object
-            properties:
-              resourceType:
-                type: string
-                default: "Medication"
-              id:
-                type: string
-                default: "1234567890ABCDEF"
-              type:
-                type: string
-                default: document
-              entry:
-                type: array
-                items:
-                  type: object
+            type: string
+            example: Full IPS JSON Document should be inside this parameter
     epi:
       in: body
       name: defaultBodyWithoutIPS
@@ -303,11 +292,8 @@ components:
         type: object
         properties: 
           epi:
-            type: object
-            properties:
-              ePI-Value:
-                type: string
-                example: ePI JSON Document on this object
+            ype: string
+            example: Full ePI JSON Document should be inside this parameter
     bodyWithIPSandEPI:
       in: body
       name: bodyWithIPSandEPI
@@ -317,27 +303,11 @@ components:
         type: object
         properties:
           epi:
-            type: object
-            properties:
-              ePI-Value:
-                type: string
-                example: ePI JSON Document on this object
+            type: string
+            example: Full ePI JSON Document should be inside this parameter
           ips:
-            type: object
-            properties:
-              resourceType:
-                type: string
-                default: "Medication"
-              id:
-                type: string
-                default: "1234567890ABCDEF"
-              type:
-                type: string
-                default: document
-              entry:
-                type: array
-                items:
-                  type: object
+            type: string
+            example: Full IPS JSON Document should be inside this parameter
         
 
   responses:
