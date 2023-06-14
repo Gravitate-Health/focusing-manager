@@ -225,13 +225,14 @@ export const focus = async (req: Request, res: Response) => {
 export const baseRequest = (req: Request, res: Response) => {
     Logger.logInfo("lensesController.ts", "baseRequest", "\n\n\n_____________ BASE REQUEST ____________");
     
-    console.log(req.body);
+    let bodyIPS = req.query.patientId ? undefined : req.body.ips;
+    let bodyEPI = req.params.epiId? undefined : req.body.epi;
 
-    if (req.body.epi != undefined && req.body.ips != undefined) {
+    if (bodyEPI != undefined && bodyIPS != undefined) {
         focusFullEpiFullIps(req, res);
-    } else if (req.query.patientId && req.body.epi != undefined) {
+    } else if (req.query.patientId && bodyEPI != undefined) {
         focusFullEpiIpsId(req, res);
-    } else if (req.params.epiId && req.body.ips != undefined) {
+    } else if (req.params.epiId && bodyIPS != undefined) {
         focusEpiIdFullIps(req, res);
     } else if (req.params.epiId && req.query.patientId) {
         focus(req, res)
