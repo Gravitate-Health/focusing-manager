@@ -20,7 +20,7 @@ paths:
               schema:
                 type: object
                 #$ref: "#/components/schemas/epiBundle"
-  /ips/api/fhir/Composition/{patientId}/$document:
+  /ips/api/fhir/Patient/{patientId}/$summary:
     get:
       tags:
         - IPS
@@ -79,6 +79,11 @@ paths:
         - Lenses
       description: >
         Preprocesses and focuses an ePI based on a Patient's IPS.
+        The epiId must exist, and you can specify the Patient's IPS in 2 ways:
+          
+          1. Writing the patientId on query param.
+          2. Passing all the IPS JSON Document through the request's body.
+
         Desired response "Content-Type" (JSON or HTML) must be sent in the "Accept" header.
         The response contains the ePI with HTML tags and the following CSS classes: "highlight", "collapse".
         "Highlight" CSS class is used to remark information. It has precedence over the collapse class.
@@ -88,12 +93,45 @@ paths:
         - $ref: "#/components/parameters/preprocessorsList"
         - $ref: "#/components/parameters/lensesList"
         - $ref: "#/components/parameters/patientId"
+        - $ref: '#/components/parameters/ips'
         #- $ref: "#/components/parameters/responseContentType"
       responses:
         "200":
           $ref: "#/components/responses/200focus"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
         "422":
           $ref: "#/components/responses/422InvalidData"
+  /focusing/focus:
+    post:
+      tags:
+        - Lenses
+      description: >
+        Preprocesses and focuses an ePI based on a Patients's IPS.
+        You must introduce the full ePI JSON Document on the request's body, and you can specify the Patient's IPS in 2 ways:
+
+          1. Writing the patientId on query param.
+          2. Passing all the IPS JSON Document through the request's body.
+
+        Desired response "Content-Type" (JSON or HTML) must be sent in the "Accept" header.
+        The response contains the ePI with HTML tags and the following CSS classes: "highlight", "collapse".
+        "Highlight" CSS class is used to remark information. It has precedence over the collapse class.
+        "Collapse" CSS class is used to hide information.
+      parameters:
+        - $ref: "#/components/parameters/epi"
+        - $ref: "#/components/parameters/preprocessorsList"
+        - $ref: "#/components/parameters/lensesList"
+        - $ref: "#/components/parameters/patientId"
+        - $ref: '#/components/parameters/bodyWithIPSandEPI'
+        #- $ref: "#/components/parameters/responseContentType"
+      responses:
+        "200":
+          $ref: "#/components/responses/200focus"
+        "400":
+          $ref: "#/components/responses/400BadRequest"
+        "422":
+          $ref: "#/components/responses/422InvalidData"
+
 
 components:
   schemas:
@@ -205,7 +243,7 @@ components:
       in: query
       name: patientId
       description: Patient id.
-      required: true
+      required: false
       schema:
         type: string
     preprocessorsList:
@@ -234,6 +272,43 @@ components:
       schema:
         type: string
         enum: [html, json]
+    ips:
+      in: body
+      name: body
+      description: IPS JSON Document
+      required: false
+      schema:
+        type: object
+        properties:
+          ips:
+            type: string
+            example: Full IPS JSON Document should be inside this parameter
+    epi:
+      in: body
+      name: defaultBodyWithoutIPS
+      description: ePI JSON Document
+      required: true
+      schema:
+        type: object
+        properties: 
+          epi:
+            ype: string
+            example: Full ePI JSON Document should be inside this parameter
+    bodyWithIPSandEPI:
+      in: body
+      name: bodyWithIPSandEPI
+      description: Body JSON with full IPS and ePI
+      required: false
+      schema:
+        type: object
+        properties:
+          epi:
+            type: string
+            example: Full ePI JSON Document should be inside this parameter
+          ips:
+            type: string
+            example: Full IPS JSON Document should be inside this parameter
+        
 
   responses:
     200focus:
@@ -255,6 +330,19 @@ components:
               messsage:
                 type: string
                 default: "Given data is invalid"
+              reason:
+                type: string
+                default: "Reason"
+    400BadRequest:
+      description: Bad Request
+      content: 
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                default: "Bad request"
               reason:
                 type: string
                 default: "Reason"

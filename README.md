@@ -9,6 +9,7 @@
   - [Requirements](#requirements)
   - [Deployment](#deployment)
   - [Development](#development)
+  - [Focusing Flows](#focusing-flows)
   - [Getting help](#getting-help)
   - [Contributing](#contributing)
   - [License](#license)
@@ -64,6 +65,15 @@ In production, the service uses the service account to query the cluster. Outsid
 - `USER_NAME`: User
 - `USER_TOKEN`: User token
 - `CONTEXT_NAME`: Context name
+
+## Focusing Flows
+
+According to the specified schema, this service has 4 ways (flows) of focusing the ePIs, depending on which parameters do you use:
+
+1. ePI id and IPS id (this is the only flow that is currently implemented and working)
+2. ePI id and IPS JSON object.
+3. ePI JSON object and IPS id.
+4. ePI JSON object and IPS JSON object.
 
 Getting help
 ------------
