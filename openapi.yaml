@@ -88,12 +88,17 @@ paths:
         The response contains the ePI with HTML tags and the following CSS classes: "highlight", "collapse".
         "Highlight" CSS class is used to remark information. It has precedence over the collapse class.
         "Collapse" CSS class is used to hide information.
+      requestBody:
+        description: This could have an IPS JSON Document
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ipsFocusing"
       parameters:
         - $ref: "#/components/parameters/epiId"
         - $ref: "#/components/parameters/preprocessorsList"
         - $ref: "#/components/parameters/lensesList"
         - $ref: "#/components/parameters/patientId"
-        - $ref: '#/components/parameters/ips'
         #- $ref: "#/components/parameters/responseContentType"
       responses:
         "200":
@@ -117,12 +122,17 @@ paths:
         The response contains the ePI with HTML tags and the following CSS classes: "highlight", "collapse".
         "Highlight" CSS class is used to remark information. It has precedence over the collapse class.
         "Collapse" CSS class is used to hide information.
+      requestBody:
+        description: The body must have an ePI JSON Document, and could have an IPS JSON Document in case you dont specify a patientID on query params. Body should be written this way in case you have ePI and IPS Documents. In case you write a patientId on query parameter, you should delete IPS field from body.
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/bodyWithIPSandEPI"
       parameters:
-        - $ref: "#/components/parameters/epi"
         - $ref: "#/components/parameters/preprocessorsList"
         - $ref: "#/components/parameters/lensesList"
-        - $ref: "#/components/parameters/patientId"
-        - $ref: '#/components/parameters/bodyWithIPSandEPI'
+        - $ref: "#/components/parameters/patientIdquery"
         #- $ref: "#/components/parameters/responseContentType"
       responses:
         "200":
@@ -135,6 +145,15 @@ paths:
 
 components:
   schemas:
+    bodyWithIPSandEPI:
+        type: object
+        properties:
+          epi:
+            type: string
+            example: Full ePI JSON Document should be inside this parameter
+          ips:
+            type: string
+            example: Full IPS JSON Document should be inside this parameter
     PreprocessingList:
       type: object
       properties:
@@ -151,27 +170,12 @@ components:
           items:
             type: string
           example: ["lense-name1", "lense-name2", "lense-name3"]
-    ips:
+    ipsFocusing:
       type: object
       properties:
-        fullUrl:
+        ips:
           type: string
-        resource:
-          type: object
-          properties:
-            resourceType:
-              type: string
-              default: "Medication"
-            id:
-              type: string
-              default: "1234567890ABCDEF"
-            type:
-              type: string
-              default: document
-            entry:
-              type: array
-              items:
-                type: object
+          example: Full IPS JSON Document should be inside this parameter
     ePI-html:
       type: string
       example: "<html> ePI in HTML format </html>"
@@ -239,11 +243,18 @@ components:
       required: true
       schema:
         type: string
-    patientId:
+    patientIdquery:
       in: query
       name: patientId
       description: Patient id.
       required: false
+      schema:
+        type: string
+    patientId:
+      in: path
+      name: patientId
+      description: Patient id.
+      required: true
       schema:
         type: string
     preprocessorsList:
@@ -272,42 +283,6 @@ components:
       schema:
         type: string
         enum: [html, json]
-    ips:
-      in: body
-      name: body
-      description: IPS JSON Document
-      required: false
-      schema:
-        type: object
-        properties:
-          ips:
-            type: string
-            example: Full IPS JSON Document should be inside this parameter
-    epi:
-      in: body
-      name: defaultBodyWithoutIPS
-      description: ePI JSON Document
-      required: true
-      schema:
-        type: object
-        properties: 
-          epi:
-            ype: string
-            example: Full ePI JSON Document should be inside this parameter
-    bodyWithIPSandEPI:
-      in: body
-      name: bodyWithIPSandEPI
-      description: Body JSON with full IPS and ePI
-      required: false
-      schema:
-        type: object
-        properties:
-          epi:
-            type: string
-            example: Full ePI JSON Document should be inside this parameter
-          ips:
-            type: string
-            example: Full IPS JSON Document should be inside this parameter
         
 
   responses:
