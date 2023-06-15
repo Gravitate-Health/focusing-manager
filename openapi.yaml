@@ -89,7 +89,7 @@ paths:
         "Highlight" CSS class is used to remark information. It has precedence over the collapse class.
         "Collapse" CSS class is used to hide information.
       requestBody:
-        description: This could have an IPS JSON Document
+        description: This could have an IPS JSON Document if you dont specify patientId
         content:
           application/json:
             schema:

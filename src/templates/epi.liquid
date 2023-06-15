@@ -1,8 +1,19 @@
 {% assign compositionResource = entry | when: "resource.id", "Composition" | first %}
 {% assign composition = compositionResource.resource %}
 
-<link href="./lenses.css" rel="stylesheet" />
+<!-- <link href="./lenses.css" rel="stylesheet" /> -->
 
+
+<style>
+  .highlight {
+    background-color: yellow;
+    color: black;
+}
+.collapsed {
+    background-color: lightgray;
+    color: grey;
+}
+</style>
 
 <div>
   {% if composition.category[0].coding[0].code == "E" %}
