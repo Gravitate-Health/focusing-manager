@@ -182,9 +182,20 @@ components:
     ePI-json:
       type: object
       properties:
-        epiKey:
+        resourceType:
+          type: object
+        id:
           type: string
-          example: "ePI-Value"
+        meta:
+          type: object
+        identifier:
+          type: object
+        type:
+          type: string
+        timestamp:
+          type: string
+        entry:
+          type: object
     #epiList:
     #  type: object
     #  properties:
