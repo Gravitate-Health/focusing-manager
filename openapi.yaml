@@ -257,15 +257,15 @@ components:
     patientIdquery:
       in: query
       name: patientId
-      description: Patient id.
+      description: Patient id, that is required only if you dont't specify a full IPS JSON Document on request's body.
       required: false
       schema:
         type: string
     patientId:
       in: path
       name: patientId
-      description: Patient id.
-      required: true
+      description: Patient id, that is required only if you dont't specify a full IPS JSON Document on request's body.
+      required: false
       schema:
         type: string
     preprocessorsList:
