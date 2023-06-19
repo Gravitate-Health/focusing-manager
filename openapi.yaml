@@ -265,7 +265,7 @@ components:
       in: path
       name: patientId
       description: Patient id, that is required only if you dont't specify a full IPS JSON Document on request's body.
-      required: false
+      required: true
       schema:
         type: string
     preprocessorsList:
