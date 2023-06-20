@@ -7,34 +7,6 @@ info:
 servers:
   - url: https://fosps.gravitatehealth.eu
 paths:
-  /epi/api/fhir/Bundle/:
-    get:
-      tags:
-        - ePI
-      description: List all ePIs.
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                #$ref: "#/components/schemas/epiBundle"
-  /ips/api/fhir/Patient/{patientId}/$summary:
-    get:
-      tags:
-        - IPS
-      description: List all IPS.
-      parameters:
-        - $ref: "#/components/parameters/patientId"
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                #$ref: "#/components/schemas/ipsList"
-                type: object
   /focusing/preprocessing:
     get:
       tags:
@@ -55,7 +27,6 @@ paths:
       parameters:
         - $ref: "#/components/parameters/epiId"
         - $ref: "#/components/parameters/preprocessorsList"
-        #- $ref: "#/components/parameters/responseContentType"
       responses:
         "200":
           $ref: "#/components/responses/200focus"
@@ -98,8 +69,7 @@ paths:
         - $ref: "#/components/parameters/epiId"
         - $ref: "#/components/parameters/preprocessorsList"
         - $ref: "#/components/parameters/lensesList"
-        - $ref: "#/components/parameters/patientId"
-        #- $ref: "#/components/parameters/responseContentType"
+        - $ref: "#/components/parameters/patientIdquery"
       responses:
         "200":
           $ref: "#/components/responses/200focus"
@@ -133,7 +103,6 @@ paths:
         - $ref: "#/components/parameters/preprocessorsList"
         - $ref: "#/components/parameters/lensesList"
         - $ref: "#/components/parameters/patientIdquery"
-        #- $ref: "#/components/parameters/responseContentType"
       responses:
         "200":
           $ref: "#/components/responses/200focus"
@@ -141,7 +110,6 @@ paths:
           $ref: "#/components/responses/400BadRequest"
         "422":
           $ref: "#/components/responses/422InvalidData"
-
 
 components:
   schemas:
@@ -196,56 +164,6 @@ components:
           type: string
         entry:
           type: object
-    #epiList:
-    #  type: object
-    #  properties:
-    #    resourceType:
-    #      type: string
-    #      default: "Bundle"
-    #    id:
-    #      type: string
-    #      default: "1234567890ABCDEF"
-    #    total:
-    #      type: number
-    #      default: 3
-    #    entry:
-    #      type: array
-    #      items:
-    #        type: object
-    #        $ref: "#/components/schemas/epiBundle"
-    #epiBundle:
-    #  type: object
-    #  properties:
-    #        fullUrl:
-    #          type: string
-    #        resource:
-    #          type: object
-    #          properties:
-    #            resourceType:
-    #              type: string
-    #              default: "Bundle"
-    #            id:
-    #              type: string
-    #              default: "1234567890ABCDEF"
-    #            type:
-    #              type: string
-    #              default: document
-    #            entry:
-    #              type: array
-    #              items:
-    #                type: object
-    #                properties:
-    #                  fullUrl:
-    #                    type: string
-    #                  resource:
-    #                    type: object
-    #                    properties:
-    #                      resourceType: 
-    #                        type: string
-    #                        default: "composition"
-    #                      title: 
-    #                        type: string
-    #                        default: "Medicine name"
   parameters:
     epiId:
       in: path
@@ -259,13 +177,6 @@ components:
       name: patientId
       description: Patient id, that is required only if you dont't specify a full IPS JSON Document on request's body.
       required: false
-      schema:
-        type: string
-    patientId:
-      in: path
-      name: patientId
-      description: Patient id, that is required only if you dont't specify a full IPS JSON Document on request's body.
-      required: true
       schema:
         type: string
     preprocessorsList:
@@ -294,7 +205,6 @@ components:
       schema:
         type: string
         enum: [html, json]
-        
 
   responses:
     200focus:
