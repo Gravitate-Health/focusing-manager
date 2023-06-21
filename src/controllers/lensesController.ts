@@ -32,24 +32,31 @@ const writeLeaflet = (epi: any, leafletSectionList: any[]) => {
     return epi
 }
 
+const getAllLensesNames = async (): Promise<string[]> => {
+    let lensesList: string[] = [];
+    // Get lensSelectors
+    let lensSelectorList = await lensesProvider.getLensSelectors()
+    for (let i in lensSelectorList) {
+        let lensSelectorName = lensSelectorList[i]
+        // Get available lenses from lensSelector
+        let response = await lensesProvider.getLensSelectorAvailableLenses(lensSelectorName)
+        response["lenses"].forEach((lens: string) => {
+            if (lens.endsWith('.js')) {
+                // Remove .js extension of the lens
+                lens = lens.slice(0, lens.length - 3)
+            }
+            lensesList.push(lens)
+        });
+    }
+    return lensesList
+}
+
 export const getLensesNames = async (_req: Request, res: Response) => {
     Logger.logInfo("lensesController.ts", "focus", "\n\n\n_____________ GET LENSES ____________")
     let lensesList: string[] = [];
     try {
-        // Get lensSelectors
-        let lensSelectorList = await lensesProvider.getLensSelectors()
-        for (let i in lensSelectorList) {
-            let lensSelectorName = lensSelectorList[i]
-            // Get available lenses from lensSelector
-            let response = await lensesProvider.getLensSelectorAvailableLenses(lensSelectorName)
-            response["lenses"].forEach((lens: string) => {
-                if (lens.endsWith('.js')) {
-                    // Remove .js extension of the lens
-                    lens = lens.slice(0, lens.length - 3)
-                }
-                lensesList.push(lens)
-            });
-        }
+        lensesList = await getAllLensesNames()
+        
     } catch (error) {
         res.status(HttpStatusCode.InternalServerError).send({
             error: "There was an error"
@@ -63,7 +70,7 @@ export const getLensesNames = async (_req: Request, res: Response) => {
 
 export const focus = async (req: Request, res: Response) => {
     Logger.logInfo("lensesController.ts", "focus", "\n\n\n_____________ POST FOCUS ____________")
-    let epiId: string, patientId: string, preprocessors: string[] | undefined, lensesNames: string[], epi: any, ips: any, pv: any
+    let preprocessors: string[] | undefined, lensesNames: string[] | string, epi: any, ips: any, pv: any
 
     let reqEpiId = req.params.epiId as string
     let reqPatientId = req.query.patientId as string
@@ -80,12 +87,8 @@ export const focus = async (req: Request, res: Response) => {
             message: "Provide valid patientId value."
         })
         return
-    } else if (!reqLensesNames || reqLensesNames === undefined) {
-        res.status(HttpStatusCode.BadRequest).send({
-            message: "Provide valid lenses list."
-        })
-        return
     }
+
     Logger.logDebug("lensesController.ts", "focus", `epiId: ${reqEpiId} -- patientId: ${reqPatientId} -- preprocessors: ${reqPreprocessors} -- lenses: ${reqLensesNames} -- `)
 
     // get epiId
@@ -110,116 +113,19 @@ export const focus = async (req: Request, res: Response) => {
         }
     }
 
+    if (req.query.lenses) {
+        lensesNames = req.query.lenses as string;
+    } else {
+        lensesNames = await getAllLensesNames();
+    }
+
+
     // TODO: change g-lens profile for PersonaVector
-    try {
-        pv = await profileProvider.getProfileById(reqPatientId)
-        Logger.logDebug("lensesController.ts", "focus", `Got G-Lens profile: ${JSON.stringify(pv)}} -- `)
-    } catch (error: any) {
-        console.log(`Could not find G-Lens Profile por Patient id: ${reqPatientId}`);
-    }
+    pv = await personaVectorParser(reqPatientId);
+    preprocessors = await parsePreprocessors(reqPreprocessors, res);
+    let parsedLensesNames: any[] | undefined = await parseLenses(lensesNames, res);
 
-    // Parse preprocessors
-    try {
-        preprocessors = await preprocessingProvider.parsePreprocessors(reqPreprocessors)
-    } catch (error) {
-        res.status(HttpStatusCode.InternalServerError).send({
-            error: "There was an error"
-        })
-        return
-    }
-
-    // Parse lenses
-    let parsedLensesNames: any[] = []
-    try {
-        parsedLensesNames = await lensesProvider.parseLenses(reqLensesNames)
-    } catch (error) {
-        res.status(HttpStatusCode.InternalServerError).send({
-            error: error
-        })
-        return
-    }
-
-    Logger.logDebug("lensesController.ts", "focus", `Starting Focusing with: EpiId ${reqEpiId} -- patientId: ${reqPatientId} -- preprocessors: ${preprocessors} -- lenses: ${JSON.stringify(parsedLensesNames)} -- `)
-
-    // Call preprocessors
-    if (preprocessors) {
-        try {
-            epi = await preprocessingProvider.callServicesFromList(preprocessors, epi)
-        } catch (error) {
-
-        }
-    }
-
-    let lenses = []
-    if (parsedLensesNames) {
-        for (let i in parsedLensesNames) {
-            let lensObj = parsedLensesNames[i]
-            try {
-                let lens = await lensesProvider.getLensFromSelector(lensObj["lensSelector"], lensObj["lensName"])
-                lenses.push(lens)
-            } catch (error) {
-                console.log(error);
-            }
-        }
-    }
-    console.log(`Found the following lenses: ${JSON.stringify(lenses)}`);
-
-    // Get leaflet sectoins from ePI
-    let leafletSectionList = getLeaflet(epi)
-
-    // Iterate lenses
-    for (let i in lenses) {
-        let lense = lenses[i]
-        try {
-            // Iterate on leaflet sections
-            for (let index in leafletSectionList) {
-                console.log(`Executing lens ${JSON.stringify(lense.metadata)} on leaflet section number: ${index}`);
-                // Get HTML text
-                let sectionObject = leafletSectionList[index]
-                let html = sectionObject['text']['div']
-
-                // Create enhance function from lens
-                let lensFunction = new Function("epi, ips, pv, html", lense.lens)
-                let resObject = lensFunction(epi, ips, {}, html)
-
-                // Execute lense and save result on ePI leaflet section
-                let enhancedHtml = resObject.enhance()
-                leafletSectionList[index]['text']['div'] = enhancedHtml
-            }
-        } catch (error) {
-            console.log(error);
-            res.status(HttpStatusCode.InternalServerError).send({
-                message: "Error in lens execution",
-                reason: error
-            })
-            return
-        }
-    }
-    epi = writeLeaflet(epi, leafletSectionList)
-
-    //Check if is HTML response
-    if (req.accepts('html') == 'html') {
-
-        try {
-            const epiTemplate = readFileSync(`${process.cwd()}/templates/epi.liquid`, "utf-8")
-
-            const engine = new Liquid()
-            engine.parseAndRender(epiTemplate, epi)
-                .then(html => {
-                    res.set('Content-Type', 'text/html').status(HttpStatusCode.Ok).send(html)
-                });
-
-        } catch (error) {
-            console.log(error);
-            res.status(HttpStatusCode.InternalServerError).send({
-                message: "Error converting to html",
-                reason: error
-            })
-        }
-    }
-    else {//Response with e(ePi)
-        res.status(HttpStatusCode.Ok).send(epi)
-    }
+    focusProccess(req, res, epi, ips, pv, preprocessors, parsedLensesNames);
 }
 
 export const baseRequest = (req: Request, res: Response) => {
@@ -247,9 +153,15 @@ export const baseRequest = (req: Request, res: Response) => {
 const focusFullEpiFullIps = async (req: Request, res: Response) => {
     let ips = req.body.ips;
     let epi = req.body.epi;
+    let lenses;
 
+    if (req.query.lenses) {
+        lenses = req.query.lenses as string;
+    } else {
+        lenses = await getAllLensesNames();
+    }
 
-    let parsedLensesNames: any[] | undefined = await parseLenses(req.query.lenses as string, res);
+    let parsedLensesNames: any[] | undefined = await parseLenses(lenses, res);
     let preprocessors: string[] | undefined = await parsePreprocessors(req.query.preprocessors as string[], res);
     let pv = await personaVectorParser(req.query.patientId as string);
     focusProccess(req, res, epi, ips, pv, preprocessors, parsedLensesNames);
@@ -259,6 +171,7 @@ const focusFullEpiIpsId = async (req: Request, res: Response) => {
     const reqPatientId = req.query.patientId as string;
     let epi = req.body.epi;
     let ips: any;
+    let lenses;
 
     if (!reqPatientId || reqPatientId === "undefined") {
         res.status(HttpStatusCode.BadRequest).send({
@@ -277,7 +190,14 @@ const focusFullEpiIpsId = async (req: Request, res: Response) => {
         }
     }
 
-    let parsedLensesNames: any[] | undefined = await parseLenses(req.query.lenses as string, res);
+
+    if (req.query.lenses) {
+        lenses = req.query.lenses as string;
+    } else {
+        lenses = await getAllLensesNames();
+    }
+
+    let parsedLensesNames: any[] | undefined = await parseLenses(lenses, res);
     let preprocessors: string[] | undefined = await parsePreprocessors(req.query.preprocessors as string[], res);
     let pv = await personaVectorParser(req.query.patientId as string);
 
@@ -288,6 +208,7 @@ const focusEpiIdFullIps = async (req: Request, res: Response) => {
     const epiId = req.params.epiId;
     let epi: any;
     let ips = req.body.ips;
+    let lenses;
 
     if (!epiId || epiId === "undefined") {
         res.status(HttpStatusCode.BadRequest).send({
@@ -306,13 +227,20 @@ const focusEpiIdFullIps = async (req: Request, res: Response) => {
         }
     }
 
-    let parsedLensesNames: any[] | undefined = await parseLenses(req.query.lenses as string, res);
+
+    if (req.query.lenses) {
+        lenses = req.query.lenses as string;
+    } else {
+        lenses = await getAllLensesNames();
+    }
+
+    let parsedLensesNames: any[] | undefined = await parseLenses(lenses, res);
     let preprocessors: string[] | undefined = await parsePreprocessors(req.query.preprocessors as string[], res);
     let pv = await personaVectorParser(req.query.patientId as string);
     focusProccess(req, res, epi, ips, pv, preprocessors, parsedLensesNames);
 }
 
-const parseLenses = async (reqLensesNames: string, res: Response) => {
+const parseLenses = async (reqLensesNames: string[] | string, res: Response) => {
     // Parse lenses
     let parsedLensesNames: any[] = []
     try {
@@ -352,6 +280,7 @@ const personaVectorParser =  async (partientId: string) => {
 }
 
 const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv: any, preprocessors: string[] | undefined, parsedLensesNames: any[] | undefined) => {
+    Logger.logDebug("lensesController.ts", "focus", `Got ePI: ${JSON.stringify(epi)}} -- `)
     if (preprocessors) {
         try {
             epi = await preprocessingProvider.callServicesFromList(preprocessors, epi)
