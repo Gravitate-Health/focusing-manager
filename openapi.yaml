@@ -192,7 +192,7 @@ components:
       in: query
       name: lenses
       description: List of lenses to be applied.
-      required: true
+      required: false
       schema:
         type: array
         items:
