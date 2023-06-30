@@ -51,7 +51,7 @@ paths:
       description: >
         Preprocesses and focuses an ePI based on a Patient's IPS.
         The epiId must exist, and you can specify the Patient's IPS in 2 ways:
-          
+        
           1. Writing the patientId on query param.
           2. Passing all the IPS JSON Document through the request's body.
 
@@ -114,14 +114,14 @@ paths:
 components:
   schemas:
     bodyWithIPSandEPI:
-        type: object
-        properties:
-          epi:
-            type: string
-            example: Full ePI JSON Document should be inside this parameter
-          ips:
-            type: string
-            example: Full IPS JSON Document should be inside this parameter
+      type: object
+      properties:
+        epi:
+          type: string
+          example: Full ePI JSON Document should be inside this parameter
+        ips:
+          type: string
+          example: Full IPS JSON Document should be inside this parameter
     PreprocessingList:
       type: object
       properties:
@@ -142,28 +142,13 @@ components:
       type: object
       properties:
         ips:
-          type: string
+          type: object
           example: Full IPS JSON Document should be inside this parameter
     ePI-html:
       type: string
       example: "<html> ePI in HTML format </html>"
     ePI-json:
       type: object
-      properties:
-        resourceType:
-          type: object
-        id:
-          type: string
-        meta:
-          type: object
-        identifier:
-          type: object
-        type:
-          type: string
-        timestamp:
-          type: string
-        entry:
-          type: object
   parameters:
     epiId:
       in: path
@@ -231,7 +216,7 @@ components:
                 default: "Reason"
     400BadRequest:
       description: Bad Request
-      content: 
+      content:
         application/json:
           schema:
             type: object
