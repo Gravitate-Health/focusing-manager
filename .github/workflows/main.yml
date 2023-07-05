@@ -5,18 +5,14 @@ on:
     branches:
       - main
       - master
-      - develop
-      - development
   pull_request:
     branches:
       - main
       - master
-      - develop
-      - development
 
 
 env:
-  REPO_NAME: fhir-connector
+  REPO_NAME: ${{ github.repository }}
   REGISTRY_URL: gravitate-registry.cr.de-fra.ionos.com
 concurrency: production
 
