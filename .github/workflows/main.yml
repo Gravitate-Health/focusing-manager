@@ -5,6 +5,15 @@ on:
     branches:
       - main
       - master
+      - develop
+      - development
+  pull_request:
+    branches:
+      - main
+      - master
+      - develop
+      - development
+
 
 env:
   REPO_NAME: fhir-connector
