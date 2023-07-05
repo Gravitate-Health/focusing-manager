@@ -347,30 +347,31 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     // Iterate lenses
     for (let i in lenses) {
         let lense = lenses[i]
-        try {
             // Iterate on leaflet sections
             for (let index in leafletSectionList) {
-                console.log(`Executing lens ${JSON.stringify(lense.metadata)} on leaflet section number: ${index}`);
-                // Get HTML text
-                let sectionObject = leafletSectionList[index]
-                let html = sectionObject['text']['div']
+                try {
+                    console.log(`Executing lens ${JSON.stringify(lense.metadata)} on leaflet section number: ${index}`);
+                    // Get HTML text
+                    let sectionObject = leafletSectionList[index]
+                    let html = sectionObject['text']['div']
 
-                // Create enhance function from lens
-                let lensFunction = new Function("epi, ips, pv, html", lense.lens)
-                let resObject = lensFunction(epi, ips, {}, html)
+                    // Create enhance function from lens
+                    let lensFunction = new Function("epi, ips, pv, html", lense.lens)
+                    let resObject = lensFunction(epi, ips, {}, html)
 
-                // Execute lense and save result on ePI leaflet section
-                let enhancedHtml = resObject.enhance()
-                leafletSectionList[index]['text']['div'] = enhancedHtml
-            }
-        } catch (error) {
-            console.log(error);
-            res.status(HttpStatusCode.InternalServerError).send({
-                message: "Error in lens execution",
-                reason: error
-            })
-            return
-        }
+                    // Execute lense and save result on ePI leaflet section
+                    let enhancedHtml = resObject.enhance()
+                    leafletSectionList[index]['text']['div'] = enhancedHtml
+
+                } catch (error) {
+                    console.log(error);
+                    res.status(HttpStatusCode.InternalServerError).send({
+                        message: "Error in lens execution",
+                        reason: error
+                    })
+                    return
+                }
+            } 
     }
     epi = writeLeaflet(epi, leafletSectionList)
 
@@ -394,7 +395,8 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
             })
         }
     }
-    else {//Response with e(ePi)
+    else {
+        //Response with e(ePi)
         res.status(HttpStatusCode.Ok).send(epi)
     }
 }
