@@ -1,0 +1,150 @@
+name: Main CI/CD pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  REPO_NAME: ${{ github.event.repository.name }}
+  REGISTRY_URL: gravitate-registry.cr.de-fra.ionos.com
+concurrency: production
+
+jobs:
+  setup-environment:
+    runs-on: ubuntu-latest
+    steps:
+      - id: environment
+        run: |
+          echo "::set-output name=image::${REGISTRY_URL}/${REPO_NAME}"
+    outputs:
+      image: ${{ steps.environment.outputs.image }}
+
+  #example-job:
+  #  #if: ${{ github.event.act }} # Run only locally with 'act'
+  #  #if: ${{ !github.event.act }} # Run only in production
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #    -
+  #      name: Hello World
+  #      #if: ${{ env.ACT }} # Run only locally with 'act'
+  #      #if: ${{ !env.ACT }} # Run only in production
+  #      run: |
+  #        echo "$REPO_NAME" # Access to a variable
+  #        echo "${{ env.REPO_NAME }}" # Other way to acess to a variable
+
+  semantic-versioning-dry-run:
+    if: ${{ !github.event.act }}
+    runs-on: ubuntu-latest
+    steps:
+      - id: checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+      - name: Minor version for each merge
+        id: taggerDryRun
+        uses: anothrNick/github-tag-action@1.36.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+          DRY_RUN: true
+      - name: Print tags
+        run: |
+          echo "New tag is: ${{ steps.taggerDryRun.outputs.new_tag }}"
+          echo "Current tag is: ${{ steps.taggerDryRun.outputs.tag }}"
+          echo "Increment type is: ${{ steps.taggerDryRun.outputs.part }}"
+    outputs:
+      new-tag: ${{ steps.taggerDryRun.outputs.new_tag }}
+      current-tag: ${{ steps.taggerDryRun.outputs.tag }}
+      increment-type: ${{ steps.taggerDryRun.outputs.part }}
+
+  docker:
+    needs: [setup-environment, semantic-versioning-dry-run]
+    if: always()
+    env:
+      TAG: ${{ needs.semantic-versioning-dry-run.outputs.new-tag || 'latest' }}
+      IMAGE: ${{ needs.setup-environment.outputs.image }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Login to GH registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY_URL }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build local testing
+        uses: docker/build-push-action@v4
+        if: ${{ env.ACT }}
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: ${{ env.IMAGE }}:latest
+      - name: Build and Push image to registry
+        uses: docker/build-push-action@v4
+        if: ${{ !env.ACT }}
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ env.IMAGE }}:latest , ${{ env.IMAGE }}:${{ env.TAG }}
+
+  semantic-versioning:
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.act }}
+    needs: docker
+    steps:
+      - id: checkout
+        uses: actions/checkout@v2
+      - name: Minor version for each merge
+        id: taggerFinal
+        uses: anothrNick/github-tag-action@1.36.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
+
+  security-scan-trivy:
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [setup-environment, docker]
+    env:
+      TAG: ${{ needs.semantic-versioning-dry-run.outputs.new-tag || 'latest' }}
+      IMAGE: ${{ needs.setup-environment.outputs.image }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Login to GH registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY_URL }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+      - name: Trivy security scans local
+        if: ${{ env.ACT }} # Run only locally
+        run: |
+          export TRIVY_VERSION=$(wget -qO - "https://api.github.com/repos/aquasecurity/trivy/releases/latest" | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
+          echo $TRIVY_VERSION
+          wget --no-verbose https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz -O - | tar -zxvf -
+          ./trivy image --exit-code 0 --cache-dir .trivycache/ --no-progress --severity HIGH,CRITICAL ${{ env.IMAGE }}:${{ env.TAG }}
+      - name: Trivy security scans production
+        if: ${{ !env.ACT }} # Run only in production
+        run: |
+          export TRIVY_VERSION=$(wget -qO - "https://api.github.com/repos/aquasecurity/trivy/releases/latest" | grep '"tag_name":' | sed -E 's/.*"v([^"]+)".*/\1/')
+          echo $TRIVY_VERSION
+          wget --no-verbose https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.tar.gz -O - | tar -zxvf -
+          ./trivy image --cache-dir .trivycache/ --scanners vuln --no-progress --severity HIGH,CRITICAL --format template --template "@contrib/html.tpl" -o container-scanning-report.html ${{ env.IMAGE }}:${{ env.TAG }}
+          ./trivy image --cache-dir .trivycache/ --scanners secret --no-progress --severity HIGH,CRITICAL --format template --template "@contrib/html.tpl" -o secrets-scanning-report.html ${{ env.IMAGE }}:${{ env.TAG }}
+          ./trivy image --cache-dir .trivycache/ --scanners config --no-progress --severity HIGH,CRITICAL --format template --template "@contrib/html.tpl" -o misconfigurations-scanning-report.html ${{ env.IMAGE }}:${{ env.TAG }}
+      - name: Upload artifacts from trivy scanning
+        if: ${{ !env.ACT }} # Run only in production
+        uses: actions/upload-artifact@v3
+        with:
+          name: trivy-vuln-report
+          path: ./*-scanning-report.html

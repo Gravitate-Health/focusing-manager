@@ -10,10 +10,11 @@ RUN npm run build
 FROM node:19-slim 
 
 ENV PORT=3000 
-USER node
+USER root
 
 WORKDIR /usr/src/app
-COPY package*.json ./
+COPY --chown=node package*.json ./
+COPY . .
 RUN npm install
 COPY --from=buildstage /usr/src/app/build .
 
