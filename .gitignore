@@ -68,3 +68,7 @@ typings/
 
 # Cache used by TypeScript's incremental build
 *.tsbuildinfo
+
+# act tool
+event.json
+*.secrets
