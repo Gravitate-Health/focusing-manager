@@ -13,7 +13,7 @@ ENV PORT=3000
 USER node
 
 WORKDIR /usr/src/app
-COPY package*.json ./
+COPY --chown=node package*.json ./
 RUN npm install
 COPY --from=buildstage /usr/src/app/build .
 
