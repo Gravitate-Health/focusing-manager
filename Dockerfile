@@ -14,7 +14,7 @@ USER node
 
 WORKDIR /usr/src/app
 COPY --chown=node package*.json ./
-RUN mkdir node_modules
+COPY . .
 RUN npm install
 COPY --from=buildstage /usr/src/app/build .
 
