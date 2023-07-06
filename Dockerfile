@@ -3,8 +3,7 @@ FROM node:16-slim as buildstage
 WORKDIR /usr/src/app
 
 COPY --chown=node package*.json ./
-RUN mkdir node_modules
-RUN npm install
+RUN --chown=node npm install
 COPY --chown=node . .
 RUN npm run build
 
@@ -15,8 +14,7 @@ USER node
 
 WORKDIR /usr/src/app
 COPY package*.json ./
-RUN mkdir node_modules
-RUN npm install
+RUN --chown=node npm install
 COPY --from=buildstage /usr/src/app/build .
 
 EXPOSE ${PORT}
