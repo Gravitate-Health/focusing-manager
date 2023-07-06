@@ -37,5 +37,5 @@ jobs:
           password: ${{ secrets.REGISTRY_TOKEN }}
       - name: Build and push
         run: |
-          docker build -t ${{ env.IMAGE }}:${{ env.TAG }} .
+          sudo docker build -t ${{ env.IMAGE }}:${{ env.TAG }} .
           docker push ${{ env.IMAGE }}:${{ env.TAG }}
