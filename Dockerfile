@@ -3,7 +3,7 @@ FROM node:16-slim as buildstage
 WORKDIR /usr/src/app
 
 COPY --chown=node package*.json ./
-RUN --chown=node npm install
+RUN --security=insecure npm install
 COPY --chown=node . .
 RUN npm run build
 
@@ -14,7 +14,7 @@ USER node
 
 WORKDIR /usr/src/app
 COPY package*.json ./
-RUN --chown=node npm install
+RUN --security=insecure npm install
 COPY --from=buildstage /usr/src/app/build .
 
 EXPOSE ${PORT}
