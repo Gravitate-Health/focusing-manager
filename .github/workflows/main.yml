@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - main
-      - master
   pull_request:
     branches:
       - main
-      - master
 
 env:
   REPO_NAME: ${{ github.event.repository.name }}
