@@ -12,6 +12,7 @@ env:
 jobs:
   setup-environment:
     runs-on: ubuntu-latest
+    container: node:lts
     steps:
     - id: environment
       run: |
