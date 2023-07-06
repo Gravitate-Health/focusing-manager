@@ -10,7 +10,7 @@ RUN npm run build
 FROM node:19-slim 
 
 ENV PORT=3000 
-USER node
+USER root
 
 WORKDIR /usr/src/app
 COPY --chown=node package*.json ./
