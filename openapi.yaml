@@ -69,7 +69,7 @@ paths:
         - $ref: "#/components/parameters/epiId"
         - $ref: "#/components/parameters/preprocessorsList"
         - $ref: "#/components/parameters/lensesList"
-        - $ref: "#/components/parameters/patientIdquery"
+        - $ref: "#/components/parameters/patientIdentifierquery"
       responses:
         "200":
           $ref: "#/components/responses/200focus"
@@ -102,7 +102,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/preprocessorsList"
         - $ref: "#/components/parameters/lensesList"
-        - $ref: "#/components/parameters/patientIdquery"
+        - $ref: "#/components/parameters/patientIdentifierquery"
       responses:
         "200":
           $ref: "#/components/responses/200focus"
@@ -157,10 +157,10 @@ components:
       required: true
       schema:
         type: string
-    patientIdquery:
+    patientIdentifierquery:
       in: query
-      name: patientId
-      description: Patient id, that is required only if you dont't specify a full IPS JSON Document on request's body.
+      name: patientIdentifier
+      description: Patient identifier, that is required only if you dont't specify a full IPS JSON Document on request's body.
       required: false
       schema:
         type: string
