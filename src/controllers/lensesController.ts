@@ -84,7 +84,7 @@ export const focusEpiIdIpsId = async (req: Request, res: Response) => {
     let preprocessors: string[] | undefined, lensesNames: string[] | string, epi: any, ips: any, pv: any
 
     let reqEpiId = req.params.epiId as string
-    let reqPatientId = req.query.patientId as string
+    let reqPatientIdentifier = req.query.patientIdentifier as string
     let reqPreprocessors = req.query.preprocessors as string[]
     let reqLensesNames = req.query.lenses as string[]
 
@@ -93,18 +93,19 @@ export const focusEpiIdIpsId = async (req: Request, res: Response) => {
             message: "Provide valid epiId value."
         })
         return
-    } else if (!reqPatientId || reqPatientId === "undefined") {
+    } else if (!reqPatientIdentifier || reqPatientIdentifier === "undefined") {
         res.status(HttpStatusCode.BadRequest).send({
-            message: "Provide valid patientId value."
+            message: "Provide valid patientIdentifier value."
         })
         return
     }
 
-    Logger.logDebug("lensesController.ts", "focus", `epiId: ${reqEpiId} -- patientId: ${reqPatientId} -- preprocessors: ${reqPreprocessors} -- lenses: ${reqLensesNames} -- `)
+    Logger.logDebug("lensesController.ts", "focus", `epiId: ${reqEpiId} -- patientIdentifier: ${reqPatientIdentifier} -- preprocessors: ${reqPreprocessors} -- lenses: ${reqLensesNames} -- `)
 
     // get epiId
     try {
         let epiResponse = await fhirEpiProvider.getEpiById(reqEpiId)
+        Logger.logInfo("lensesController.ts", "focus", `Got ePI with id: ${reqEpiId} -- `)
         epi = epiResponse.data
     } catch (error: any) {
         if (error.statusCode === 404) {
@@ -115,11 +116,17 @@ export const focusEpiIdIpsId = async (req: Request, res: Response) => {
 
     // get IPS
     try {
-        let ipsResponse = await fhirIpsProvider.getIpsByPatientId(reqPatientId)
+        let ipsResponse = await fhirIpsProvider.getIpsByPatientIdentifier(reqPatientIdentifier)
+        Logger.logInfo("lensesController.ts", "focus", `Got IPS with patientIdentifier: ${reqPatientIdentifier} -- `)
         ips = ipsResponse.data
+        console.log(ips);
     } catch (error: any) {
-        if (error.statusCode === 404) {
-            res.status(HttpStatusCode.NotFound).send(error)
+        console.log(error);
+        if (error.status == 400 && error.body["issue"][0]["severity"] == "error") {
+            Logger.logInfo('FhirIpsProvider.ts', "getIpsByPatientIdentifier", `More than one patient found for the provided identifier: ${reqPatientIdentifier}`);
+            //throw new Error(`Multiple patient resources found matching provided identifier: ${reqPatientIdentifier}`);
+        } else {
+            res.status(error.statusCode).send(error.body.errorData)
             return
         }
     }
@@ -138,7 +145,7 @@ export const focusEpiIdIpsId = async (req: Request, res: Response) => {
 
 
     // TODO: change g-lens profile for PersonaVector
-    pv = await personaVectorParser(reqPatientId);
+    pv = await personaVectorParser(reqPatientIdentifier);
     preprocessors = await parsePreprocessors(reqPreprocessors, res);
     let parsedLensesNames: any[] | undefined = await parseLenses(lensesNames, res);
 
@@ -148,16 +155,16 @@ export const focusEpiIdIpsId = async (req: Request, res: Response) => {
 export const baseRequest = (req: Request, res: Response) => {
     Logger.logInfo("lensesController.ts", "baseRequest", "\n\n\n_____________ BASE REQUEST ____________");
     
-    let bodyIPS = req.query.patientId ? undefined : req.body.ips;
+    let bodyIPS = req.query.patientIdentifier ? undefined : req.body.ips;
     let bodyEPI = req.params.epiId? undefined : req.body.epi;
 
     if (bodyEPI != undefined && bodyIPS != undefined) {
         focusFullEpiFullIps(req, res);
-    } else if (req.query.patientId && bodyEPI != undefined) {
+    } else if (req.query.patientIdentifier && bodyEPI != undefined) {
         focusFullEpiIpsId(req, res);
     } else if (req.params.epiId && bodyIPS != undefined) {
         focusEpiIdFullIps(req, res);
-    } else if (req.params.epiId && req.query.patientId) {
+    } else if (req.params.epiId && req.query.patientIdentifier) {
         focusEpiIdIpsId(req, res)
     } else {
         res.status(HttpStatusCode.BadRequest).send({
@@ -187,26 +194,26 @@ const focusFullEpiFullIps = async (req: Request, res: Response) => {
 
     let parsedLensesNames: any[] | undefined = await parseLenses(lenses, res);
     let preprocessors: string[] | undefined = await parsePreprocessors(reqPreprocessors, res);
-    let pv = await personaVectorParser(req.query.patientId as string);
+    let pv = await personaVectorParser(req.query.patientIdentifier as string);
     focusProccess(req, res, epi, ips, pv, preprocessors, parsedLensesNames);
 }
 
 const focusFullEpiIpsId = async (req: Request, res: Response) => {
-    const reqPatientId = req.query.patientId as string;
+    const reqPatientIdentifier = req.query.patientIdentifier as string;
     let epi = req.body.epi;
     let ips: any;
     let lenses;
     let reqPreprocessors;
 
-    if (!reqPatientId || reqPatientId === "undefined") {
+    if (!reqPatientIdentifier || reqPatientIdentifier === "undefined") {
         res.status(HttpStatusCode.BadRequest).send({
-            message: "Provide valid patientId value."
+            message: "Provide valid patientIdentifier value."
         })
         return
     }
 
     try {
-        let ipsResponse = await fhirIpsProvider.getIpsByPatientId(reqPatientId)
+        let ipsResponse = await fhirIpsProvider.getIpsByPatientIdentifier(reqPatientIdentifier)
         ips = ipsResponse.data
     } catch (error: any) {
         if (error.statusCode === 404) {
@@ -230,7 +237,7 @@ const focusFullEpiIpsId = async (req: Request, res: Response) => {
 
     let parsedLensesNames: any[] | undefined = await parseLenses(lenses, res);
     let preprocessors: string[] | undefined = await parsePreprocessors(reqPreprocessors, res);
-    let pv = await personaVectorParser(req.query.patientId as string);
+    let pv = await personaVectorParser(req.query.patientIdentifier as string);
 
     focusProccess(req, res, epi, ips, pv, preprocessors, parsedLensesNames);
 }
@@ -274,7 +281,7 @@ const focusEpiIdFullIps = async (req: Request, res: Response) => {
 
     let parsedLensesNames: any[] | undefined = await parseLenses(lenses, res);
     let preprocessors: string[] | undefined = await parsePreprocessors(req.query.preprocessors as string[], res);
-    let pv = await personaVectorParser(req.query.patientId as string);
+    let pv = await personaVectorParser(req.query.patientIdentifier as string);
     focusProccess(req, res, epi, ips, pv, preprocessors, parsedLensesNames);
 }
 
@@ -318,7 +325,7 @@ const personaVectorParser =  async (partientId: string) => {
 }
 
 const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv: any, preprocessors: string[] | undefined, parsedLensesNames: any[] | undefined) => {
-    Logger.logDebug("lensesController.ts", "focus", `Got ePI: ${JSON.stringify(epi)}} -- `)
+    // Log too long Logger.logDebug("lensesController.ts", "focus", `Got ePI: ${JSON.stringify(epi)}} -- `)
     if (preprocessors) {
         try {
             epi = await preprocessingProvider.callServicesFromList(preprocessors, epi)
