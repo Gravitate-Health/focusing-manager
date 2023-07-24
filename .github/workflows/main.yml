@@ -13,31 +13,37 @@ env:
   REGISTRY_URL: gravitate-registry.cr.de-fra.ionos.com
 concurrency: production
 
-jobs:
+jobs:      
   setup-environment:
     runs-on: ubuntu-latest
     steps:
       - id: environment
         run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" || "${{ github.ref }}" == "refs/heads/master" ]; then
+            echo "::set-output name=environment::=prod"
+            echo "FOO=bar" >> $GITHUB_ENV
+          else
+            echo "::set-output name=environment::=dev"
+          fi
+      - id: image
+        run: |
           echo "::set-output name=image::${REGISTRY_URL}/${REPO_NAME}"
     outputs:
-      image: ${{ steps.environment.outputs.image }}
+      image: ${{ steps.image.outputs.image }}
+      environment: ${{ steps.environment.outputs.environment }}
 
-  #example-job:
-  #  #if: ${{ github.event.act }} # Run only locally with 'act'
-  #  #if: ${{ !github.event.act }} # Run only in production
-  #  runs-on: ubuntu-latest
-  #  steps:
-  #    -
-  #      name: Hello World
-  #      #if: ${{ env.ACT }} # Run only locally with 'act'
-  #      #if: ${{ !env.ACT }} # Run only in production
-  #      run: |
-  #        echo "$REPO_NAME" # Access to a variable
-  #        echo "${{ env.REPO_NAME }}" # Other way to acess to a variable
-
+  test:
+    env:
+      ENVIRONMENT: ${{ needs.setup-environment.outputs.environment || 'dev' }}
+      IMAGE: ${{ needs.setup-environment.outputs.image }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: adsasdaasdasda
+        run: |
+          echo "ENVIRONMENT: ${{ env.ENVIRONMENT }}"
+          echo "IMAGE: ${{ env.IMAGE }}"
   semantic-versioning-dry-run:
-    if: ${{ !github.event.act }}
+    if: ${{ !github.event.act && needs.setup-environment.outputs.environment == 'prod' }}
     runs-on: ubuntu-latest
     steps:
       - id: checkout
@@ -65,6 +71,7 @@ jobs:
     needs: [setup-environment, semantic-versioning-dry-run]
     if: always()
     env:
+      ENVIRONMENT: ${{ needs.setup-environment.outputs.environment || 'dev' }}
       TAG: ${{ needs.semantic-versioning-dry-run.outputs.new-tag || 'latest' }}
       IMAGE: ${{ needs.setup-environment.outputs.image }}
     runs-on: ubuntu-latest
@@ -79,40 +86,27 @@ jobs:
           password: ${{ secrets.REGISTRY_TOKEN }}
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      - name: Build local testing
+      - name: Build - dev
         uses: docker/build-push-action@v4
-        if: ${{ env.ACT }}
+        if: ${{ env.ENVIRONMENT != 'prod' }}
         with:
           context: .
           file: ./Dockerfile
           push: false
           tags: ${{ env.IMAGE }}:latest
-      - name: Build and Push image to registry
+      - name: Build and Push image to registry - prod
         uses: docker/build-push-action@v4
-        if: ${{ !env.ACT }}
+        if: ${{ env.ENVIRONMENT == 'prod' }}
         with:
           context: .
           file: ./Dockerfile
           push: true
           tags: ${{ env.IMAGE }}:latest , ${{ env.IMAGE }}:${{ env.TAG }}
 
-  semantic-versioning:
-    runs-on: ubuntu-latest
-    if: ${{ !github.event.act }}
-    needs: docker
-    steps:
-      - id: checkout
-        uses: actions/checkout@v2
-      - name: Minor version for each merge
-        id: taggerFinal
-        uses: anothrNick/github-tag-action@1.36.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          WITH_V: true
 
   security-scan-trivy:
     runs-on: ubuntu-latest
-    if: always()
+    if: ${{ needs.setup-environment.outputs.environment == 'prod'}}
     needs: [setup-environment, docker]
     env:
       TAG: ${{ needs.semantic-versioning-dry-run.outputs.new-tag || 'latest' }}
@@ -148,3 +142,17 @@ jobs:
         with:
           name: trivy-vuln-report
           path: ./*-scanning-report.html
+
+  semantic-versioning:
+    runs-on: ubuntu-latest
+    if: ${{ needs.setup-environment.outputs.environment == 'prod'}}
+    needs: docker
+    steps:
+      - id: checkout
+        uses: actions/checkout@v2
+      - name: Minor version for each merge
+        id: taggerFinal
+        uses: anothrNick/github-tag-action@1.36.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: true
