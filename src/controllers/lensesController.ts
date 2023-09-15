@@ -370,11 +370,10 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
                 let enhancedHtml = resObject.enhance()
                 leafletSectionList[index]['text']['div'] = enhancedHtml
             }
-        } catch (error) {
-            console.log(error);
+        } catch (error: any) {
             res.status(HttpStatusCode.InternalServerError).send({
                 message: "Error in lens execution",
-                reason: error
+                reason: error.message
             })
             return
         }
