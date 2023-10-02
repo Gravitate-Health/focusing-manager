@@ -362,6 +362,10 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
                 let sectionObject = leafletSectionList[index]
                 let html = sectionObject['text']['div']
 
+                if (html == undefined) {
+                    throw new Error("No HTML found in leaflet section")
+                }
+
                 // Create enhance function from lens
                 let lensFunction = new Function("epi, ips, pv, html", lense.lens)
                 let resObject = lensFunction(epi, ips, {}, html)
