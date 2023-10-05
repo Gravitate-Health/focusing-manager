@@ -371,7 +371,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
                 let resObject = lensFunction(epi, ips, {}, html)
 
                 // Execute lense and save result on ePI leaflet section
-                let enhancedHtml = resObject.enhance()
+                let enhancedHtml = await resObject.enhance()
                 leafletSectionList[index]['text']['div'] = enhancedHtml
             }
         } catch (error: any) {
