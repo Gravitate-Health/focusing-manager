@@ -40,7 +40,7 @@ To deploy the service, create the `service`, `deployment` and `virtual service`:
 ```bash
 kubectl apply -f kubernetes-yaml/004_focusing-manager-service.yaml
 kubectl apply -f kubernetes-yaml/005_focusing-manager-deployment.yaml
-kubectl apply -f kubernetes-yaml/006_profile_vs.yaml
+kubectl apply -f kubernetes-yaml/006_focusing-manager_vs.yml
 ```
 
 And try querying the focusing manager:
