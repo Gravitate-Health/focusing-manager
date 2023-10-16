@@ -25,9 +25,9 @@ To let this service to query a kubernetes cluster, the cluster needs a `role`, `
 
 To apply them: 
 ```bash
-kubectl apply -f kubernetes-yaml/001_focusing-manager-service-account.yml
-kubectl apply -f kubernetes-yaml/002_focusing-manager-role.yml
-kubectl apply -f kubernetes-yaml/003_focusing-manager-role-binding.yml
+kubectl apply -f kubernetes-yaml/001_focusing-manager-service-account.yaml
+kubectl apply -f kubernetes-yaml/002_focusing-manager-role.yaml
+kubectl apply -f kubernetes-yaml/003_focusing-manager-role-binding.yaml
 ```
 
 ## Deployment
@@ -38,9 +38,9 @@ The service needs the following environment variables:
 
 To deploy the service, create the `service`, `deployment` and `virtual service`:
 ```bash
-kubectl apply -f kubernetes-yaml/004_focusing-manager-service.yml
-kubectl apply -f kubernetes-yaml/005_focusing-manager-deployment.yml
-kubectl apply -f kubernetes-yaml/006_profile_vs.yml
+kubectl apply -f kubernetes-yaml/004_focusing-manager-service.yaml
+kubectl apply -f kubernetes-yaml/005_focusing-manager-deployment.yaml
+kubectl apply -f kubernetes-yaml/006_profile_vs.yaml
 ```
 
 And try querying the focusing manager:
