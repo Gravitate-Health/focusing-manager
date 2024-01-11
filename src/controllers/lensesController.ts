@@ -362,19 +362,22 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
                 let sectionObject = leafletSectionList[index]
                 let html = sectionObject['text']['div']
 
+                if (html == undefined) {
+                    throw new Error("No HTML found in leaflet section")
+                }
+
                 // Create enhance function from lens
                 let lensFunction = new Function("epi, ips, pv, html", lense.lens)
                 let resObject = lensFunction(epi, ips, {}, html)
 
                 // Execute lense and save result on ePI leaflet section
-                let enhancedHtml = resObject.enhance()
+                let enhancedHtml = await resObject.enhance()
                 leafletSectionList[index]['text']['div'] = enhancedHtml
             }
-        } catch (error) {
-            console.log(error);
+        } catch (error: any) {
             res.status(HttpStatusCode.InternalServerError).send({
                 message: "Error in lens execution",
-                reason: error
+                reason: error.message
             })
             return
         }

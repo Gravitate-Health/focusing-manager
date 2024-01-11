@@ -7,7 +7,7 @@ on:
 
 env:
   REPO_NAME:  ${{ github.event.repository.name }} 
-  REGISTRY_URL: gravitate-registry.cr.de-fra.ionos.com
+  REGISTRY_URL: ${{ secrets.REGISTRY_URL }} 
   
 jobs:
   setup-environment:
@@ -23,7 +23,7 @@ jobs:
   docker:
     needs: [setup-environment]
     env:
-      TAG: ${{ '1.1.0' }}
+      TAG: ${{ 'devserver' }}
       IMAGE: ${{ needs.setup-environment.outputs.image }}
     runs-on: ubuntu-latest
     steps:
