@@ -13,7 +13,7 @@ export class FhirEpiProvider extends AxiosController {
             let url = `${this.baseUrl}/Bundle/${id}?_format=json`;
             return await this.request.get(url);
         } catch (error) {
-            Logger.logError('FhirProvider.ts', "getEpiById", '[FHIR Provider][Create Patient] Error');
+            Logger.logError('FhirProvider.ts', "getEpiById", 'Error getting epi by id. Error: ' + error);
             throw error;
         }
     }

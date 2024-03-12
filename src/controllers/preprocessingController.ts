@@ -70,10 +70,10 @@ export const preprocess = async (req: Request, res: Response) => {
   console.log(`Requested ePI ID: ${epiId}`);
   console.log(`Requested preprocessors: ${preprocessors}`);
 
-  let preprocessedEpi
+  let preprocessedEpi, preprocessingErrors
   // Call preprocessors
   if (preprocessors) {
-    preprocessedEpi = await preprocessingProvider.callServicesFromList(preprocessors, epi)
+    [preprocessedEpi, preprocessingErrors] = await preprocessingProvider.callServicesFromList(preprocessors, epi)
   }
 
   if (req.accepts('html') == 'html') {

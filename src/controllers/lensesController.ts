@@ -67,7 +67,7 @@ export const getLensesNames = async (_req: Request, res: Response) => {
     let lensesList: string[] = [];
     try {
         lensesList = await getAllLensesNames()
-        
+
     } catch (error) {
         res.status(HttpStatusCode.InternalServerError).send({
             error: "There was an error"
@@ -154,9 +154,9 @@ export const focusEpiIdIpsId = async (req: Request, res: Response) => {
 
 export const baseRequest = (req: Request, res: Response) => {
     Logger.logInfo("lensesController.ts", "baseRequest", "\n\n\n_____________ BASE REQUEST ____________");
-    
+
     let bodyIPS = req.query.patientIdentifier ? undefined : req.body.ips;
-    let bodyEPI = req.params.epiId? undefined : req.body.epi;
+    let bodyEPI = req.params.epiId ? undefined : req.body.epi;
 
     if (bodyEPI != undefined && bodyIPS != undefined) {
         focusFullEpiFullIps(req, res);
@@ -313,7 +313,7 @@ const parsePreprocessors = async (reqPreprocessors: string[], res: Response) => 
     }
 }
 
-const personaVectorParser =  async (partientId: string) => {
+const personaVectorParser = async (partientId: string) => {
     // TODO: change g-lens profile for PersonaVector
     try {
         let pv = await profileProvider.getProfileById(partientId)
@@ -324,14 +324,56 @@ const personaVectorParser =  async (partientId: string) => {
     }
 }
 
+const logResponse = (responseMessage: any) => {
+    Logger.logInfo("lensesController.ts", "focus", `Result :`)
+    console.log(JSON.stringify(responseMessage))
+}
+
 const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv: any, preprocessors: string[] | undefined, parsedLensesNames: any[] | undefined) => {
     // Log too long Logger.logDebug("lensesController.ts", "focus", `Got ePI: ${JSON.stringify(epi)}} -- `)
+    var originalEpi = JSON.parse(JSON.stringify(epi));
+
+    let responseMessage:
+        {
+            request: object,
+            preprocessingErrors: object[],
+            focusingErrors: object[],
+            response: object
+        } = {
+        request: {
+            epi: epi,
+            ips: ips,
+            pv: pv,
+            preprocessors: preprocessors,
+            lenses: parsedLensesNames
+        },
+        preprocessingErrors: [],
+        focusingErrors: [],
+        response: {
+        }
+    }
+    let preprocessingErrors
+
     if (preprocessors) {
         try {
-            epi = await preprocessingProvider.callServicesFromList(preprocessors, epi)
+            [epi, preprocessingErrors] = await preprocessingProvider.callServicesFromList(preprocessors, epi)
         } catch (error) {
-            console.log(error);
+            Logger.logError("lensesController.ts", "focusProcess", `Error in preprocessing provider, with the following preprocessors: ` + preprocessors)
+            Logger.logError("lensesController.ts", "focusProcess", `Error in preprocessing provider: ` + JSON.stringify(error));
         }
+    }
+    responseMessage["preprocessingErrors"] = preprocessingErrors || null
+
+    // IF EPI IS NOT PREPROCESSED, RETURN RAW EPI AND STOP FOCUSING PROCESS. DO NOT EXECUTE LENSES
+    let epiWasNotPreprocessed = objectEquals(epi, originalEpi)
+    let epiCategoryCoding = epi['entry'][0]['resource']['category'][0]['coding'][0]["code"]
+    if (epiWasNotPreprocessed || epi == null || epiCategoryCoding == "R") {
+        preprocessors?.forEach(preprocessorName => {
+            responseMessage["preprocessingErrors"].push({ serviceName: preprocessorName, error: "Preprocessed version of ePI could not be handled by preprocessor." })
+        })
+        logResponse(responseMessage)
+        res.status(HttpStatusCode.Ok).send(epi)
+        return
     }
 
     let lenses = []
@@ -346,7 +388,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
             }
         }
     }
-    console.log(`Found the following lenses: ${JSON.stringify(lenses)}`);
+    Logger.logInfo("lensesController.ts", "focusProcess", `Found the following lenses: ${JSON.stringify(lenses)}`);
 
     // Get leaflet sectoins from ePI
     let leafletSectionList = getLeaflet(epi)
@@ -357,24 +399,50 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
         try {
             // Iterate on leaflet sections
             for (let index in leafletSectionList) {
-                console.log(`Executing lens ${JSON.stringify(lense.metadata)} on leaflet section number: ${index}`);
+                Logger.logInfo("lensesController.ts", "focusProcess", `Executing lens ${parsedLensesNames![i]} on leaflet section number: ${index}`);
                 // Get HTML text
-                let sectionObject = leafletSectionList[index]
-                let html = sectionObject['text']['div']
+                let html
+                try {
 
-                if (html == undefined) {
-                    throw new Error("No HTML found in leaflet section")
+                    let sectionObject = leafletSectionList[index]
+                    html = sectionObject['text']['div']
+
+                    if (html == undefined) {
+                        responseMessage.focusingErrors.push({
+                            message: "No HTML text found on leaflet section " + i,
+                            lensName: parsedLensesNames![i]
+                        })
+                        continue;
+                    }
+                } catch (error) {
+                    console.log(error)
+                    responseMessage.focusingErrors.push({
+                        message: "Error getting leaflet section " + i,
+                        lensName: parsedLensesNames![i]
+                    })
+
                 }
 
                 // Create enhance function from lens
                 let lensFunction = new Function("epi, ips, pv, html", lense.lens)
                 let resObject = lensFunction(epi, ips, {}, html)
 
-                // Execute lense and save result on ePI leaflet section
-                let enhancedHtml = await resObject.enhance()
-                leafletSectionList[index]['text']['div'] = enhancedHtml
+                try {
+                    // Execute lense and save result on ePI leaflet section
+                    let enhancedHtml = await resObject.enhance()
+                    leafletSectionList[index]['text']['div'] = enhancedHtml
+                } catch (error) {
+                    Logger.logError("lensesController.ts", "focusProcess", `Error executing lens ${parsedLensesNames![i]} on leaflet section number: ${index}`)
+                    responseMessage.focusingErrors.push({
+                        message: "Error executing lens",
+                        lensName: parsedLensesNames![i]
+                    })
+                    continue
+                }
             }
         } catch (error: any) {
+            console.log(error);
+            console.log("fhinished before expected")
             res.status(HttpStatusCode.InternalServerError).send({
                 message: "Error in lens execution",
                 reason: error.message
@@ -384,9 +452,12 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     }
     epi = writeLeaflet(epi, leafletSectionList)
 
+    responseMessage.response = epi;
+
+
     //Check if is HTML response
     if (req.accepts('html') == 'html') {
-
+        logResponse(responseMessage)
         try {
             const epiTemplate = readFileSync(`${process.cwd()}/templates/epi.liquid`, "utf-8")
 
@@ -405,6 +476,42 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
         }
     }
     else {//Response with e(ePi)
+        logResponse(responseMessage)
         res.status(HttpStatusCode.Ok).send(epi)
     }
+}
+
+const objectEquals = (x: any, y: any) => {
+    if (x === y) return true;
+    // if both x and y are null or undefined and exactly the same
+
+    if (!(x instanceof Object) || !(y instanceof Object)) return false;
+    // if they are not strictly equal, they both need to be Objects
+
+    if (x.constructor !== y.constructor) return false;
+    // they must have the exact same prototype chain, the closest we can do is
+    // test there constructor.
+
+    for (var p in x) {
+        if (!x.hasOwnProperty(p)) continue;
+        // other properties were tested using x.constructor === y.constructor
+
+        if (!y.hasOwnProperty(p)) return false;
+        // allows to compare x[ p ] and y[ p ] when set to undefined
+
+        if (x[p] === y[p]) continue;
+        // if they have the same strict value or identity then they are equal
+
+        if (typeof (x[p]) !== "object") return false;
+        // Numbers, Strings, Functions, Booleans must be strictly equal
+
+        if (!objectEquals(x[p], y[p])) return false;
+        // Objects and Arrays must be tested recursively
+    }
+
+    for (p in y)
+        if (y.hasOwnProperty(p) && !x.hasOwnProperty(p))
+            return false;
+    // allows x[ p ] to be set to undefined
+    return true;
 }
