@@ -444,6 +444,9 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     for (let i in lenses) {
         let lense = lenses[i]
         let lensFullName = `${parsedLensesNames![i].lensSelector}_${parsedLensesNames![i].lensName}`
+
+        // If there are lenses, we can already mark the ePI as enhanced
+        epi = setCategoryCode(epi, "E", "Enhanced")
         try {
             // Iterate on leaflet sections
             for (let index in leafletSectionList) {
