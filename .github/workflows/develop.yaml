@@ -50,7 +50,7 @@ jobs:
       env:
         KUBECONFIG_BASE64: ${{ secrets.KUBECONFIG_DEV }}
       run: |
-        echo $KUBECONFIG_BASE64 | base64 --decode > $KUBECONFIG
+        echo ${{ env.KUBECONFIG_BASE64 }} | base64 --decode > $KUBECONFIG
     
     - name: Update deployment
       uses: ./
