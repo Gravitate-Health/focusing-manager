@@ -41,12 +41,16 @@ jobs:
           docker push ${{ env.IMAGE }}:${{ env.TAG }}
   
   deploy-dev:
+    needs: [docker]
     runs-on: ubuntu-latest
     if: ${{ !github.event.act }}
     steps:
 
     - name: Authenticate to cluster
-      run: echo ${{ secrets.KUBECONFIG_DEV }} | base64 -d > $KUBECONFIG
+      env:
+        KUBECONFIG_BASE64: ${{ secrets.KUBECONFIG_DEV }}
+      run: |
+        echo $KUBECONFIG_BASE64 | base64 --decode > $KUBECONFIG
     
     - name: Update deployment
       uses: ./
