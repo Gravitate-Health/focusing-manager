@@ -39,3 +39,28 @@ jobs:
         run: |
           sudo docker build -t ${{ env.IMAGE }}:${{ env.TAG }} .
           docker push ${{ env.IMAGE }}:${{ env.TAG }}
+  
+  deploy-dev:
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.act }}
+    steps:
+
+    - name: Authenticate to cluster
+      run: echo ${{ secrets.KUBECONFIG_DEV }} | base64 -d > $KUBECONFIG
+    
+    - name: Update deployment
+      uses: ./
+      with:
+        namespace: default
+        deployment: fhir-connector
+        container: nginx
+        image: ${{ env.IMAGE }}:${{ env.TAG }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        #transient: ${{ github.event_name == 'pull_request' }}
+        #production: ${{ github.event_name == 'push' }}
+        transient: false
+        production: false
+
+        #url: https://example.com/${{ github.ref }}
+        environment: ${{ github.event_name == 'push' && 'production' || format('dev-{0}', github.ref) }}
+        wait: false
