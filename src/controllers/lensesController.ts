@@ -28,8 +28,13 @@ const getLeaflet = (epi: any) => {
 
 const getCategoryCode = (epi: any) => {
     // This is assuming that the "Composition" resource is the first one of the bundle. It might break in the future
-    let codeCategory = epi['entry'][0]['resource']['category'][0]['coding'][0]["code"]
-    return codeCategory
+    try {
+        let codeCategory = epi['entry'][0]['resource']['category'][0]['coding'][0]["code"]
+        return codeCategory
+    } catch (error) {
+    }
+
+    return null
 }
 
 const setCategoryCode = (epi: any, code: string, display: string) => {
@@ -410,7 +415,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     let epiWasNotPreprocessed = objectEquals(epi, originalEpi)
     let epiCategoryCoding = getCategoryCode(epi);
     let epiExtensions = getExtensions(epi);
-    if (epiWasNotPreprocessed || epi == null || epiCategoryCoding == "R" || epiExtensions == undefined || epiExtensions == null || epiExtensions.length == 0) {
+    if (epiWasNotPreprocessed || epi == null || epiCategoryCoding == "R" || epiCategoryCoding == null || epiExtensions == undefined || epiExtensions == null || epiExtensions.length == 0) {
         Logger.logInfo("lensesController.ts", "focusProcess", `EPI was not preprocessed or no categories found. Stopping focusing process and returning raw ePI.`)
         // CONVERT TO "R" IN CASE IT WAS MARKED AS "P"
         if (epiCategoryCoding == "P") {
