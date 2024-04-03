@@ -1,4 +1,5 @@
 import {AxiosError} from 'axios';
+import { Logger } from "../utils/Logger";
 
 export interface ResponseErrorBody {}
 
@@ -11,7 +12,7 @@ export default class ResponseError implements ResponseError {
       errorData: error.response!.data,
       //errorDetails: error.response!.data.error.details,
     };
-    console.log(`Creating error with status code ${statusCode} and body: ${JSON.stringify(body)}`);
+    Logger.logError("ResponseError.ts", " - ", `Creating error with status code ${statusCode} and body: ${JSON.stringify(body)}`);
     this.body = body
     this.statusCode = statusCode
   }

@@ -43,6 +43,7 @@ export class PreprocessingProvider extends AxiosController {
     }
 
     callServicesFromList = async (preprocessors: string[], epi: any)/* : Promise<AxiosResponse> */ => {
+        let errors = []
         for (let i in preprocessors) {
             let serviceName = preprocessors[i]
             try {
@@ -51,10 +52,11 @@ export class PreprocessingProvider extends AxiosController {
                 if (error instanceof AxiosError) {
                     if (error.code === "ENOTFOUND") {
                         Logger.logError('preprocessingProvider.ts', 'callServicesFromList', `Preprocessing service not found: ${serviceName}`)
+                        errors.push({ serviceName: serviceName, error: "Service not found" })
                     }
                 }
             }
         };
-        return epi
+        return [epi, errors]
     }
 }
