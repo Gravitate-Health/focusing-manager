@@ -401,26 +401,28 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
 
     if (preprocessors) {
         try {
-            [epi, preprocessingErrors] = await preprocessingProvider.callServicesFromList(preprocessors, epi)
+            if (getCategoryCode(epi) == "R") {
+                [epi, preprocessingErrors] = await preprocessingProvider.callServicesFromList(preprocessors, epi)
+            }
         } catch (error) {
             Logger.logError("lensesController.ts", "focusProcess", `Error in preprocessing provider, with the following preprocessors: ` + preprocessors)
             Logger.logError("lensesController.ts", "focusProcess", `Error in preprocessing provider: ` + JSON.stringify(error));
         }
     }
-    responseMessage["preprocessingErrors"] = preprocessingErrors || null
+    responseMessage["preprocessingErrors"] = preprocessingErrors || []
 
     // IF EPI IS NOT PREPROCESSED, RETURN RAW EPI AND STOP FOCUSING PROCESS. DO NOT EXECUTE LENSES
     // OR
     // IF EPI IS MARKED AS PREPROCESSED BUT NO CATEGORIES ARE PRESENT, RETURN
-    let epiWasNotPreprocessed = objectEquals(epi, originalEpi)
+    let epiWasNotPreprocessed = false
+    if (getCategoryCode(epi) == "R") {
+        epiWasNotPreprocessed = objectEquals(epi, originalEpi)
+    }
     let epiCategoryCoding = getCategoryCode(epi);
     let epiExtensions = getExtensions(epi);
     if (epiWasNotPreprocessed || epi == null || epiCategoryCoding == "R" || epiCategoryCoding == null || epiExtensions == undefined || epiExtensions == null || epiExtensions.length == 0) {
         Logger.logInfo("lensesController.ts", "focusProcess", `EPI was not preprocessed or no categories found. Stopping focusing process and returning raw ePI.`)
         // CONVERT TO "R" IN CASE IT WAS MARKED AS "P"
-        if (epiCategoryCoding == "P") {
-            epi = setCategoryCode(epi, "R", "Raw")
-        }
         preprocessors?.forEach(preprocessorName => {
             responseMessage["preprocessingErrors"].push({ serviceName: preprocessorName, error: "Preprocessed version of ePI could not be handled by preprocessor." })
         })
@@ -512,12 +514,14 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     //Check if is HTML response
     if (req.accepts('html') == 'html') {
         try {
+            console.log("Converting to html")
             const epiTemplate = readFileSync(`${process.cwd()}/templates/epi.liquid`, "utf-8")
 
             const engine = new Liquid()
             engine.parseAndRender(epiTemplate, epi)
                 .then(html => {
                     res.set('Content-Type', 'text/html')
+                    responseMessage.response = html
                     logAndSendResponseWithHeaders(res, responseMessage, HttpStatusCode.Ok)
                     return
                 });
@@ -530,7 +534,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
         }
     }
     else {//Response with e(ePi)
-        logAndSendResponseWithHeaders(res, responseMessage)
+        logAndSendResponseWithHeaders(res, responseMessage, HttpStatusCode.Ok)
         return
     }
 }
