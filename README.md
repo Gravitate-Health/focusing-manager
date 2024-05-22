@@ -18,7 +18,7 @@
 
 ## Requirements
 
-To let this service to query a kubernetes cluster, the cluster needs a `role`, `serviceaccount` and `rolebinding` to grant permission to query the cluster. This resources are created with the following files:
+To let this service to query a kubernetes cluster, the cluster needs a `role`, `serviceaccount` and `rolebinding` to grant permission to query the cluster. These resources are created with the following files:
 - [Service account YAML file](./kubernetes-yaml/001_focusing-manager-service-account.yaml): Creates the service account which will be use by the pods. This service account uses the `image-pull-secret`.
 - [Role YAML file](./kubernetes-yaml/002_focusing-manager-role.yaml): Creates role with permission to list services.
 - [Role Binding YAML file](./kubernetes-yaml/003_focusing-manager-role-binding.yaml): Binds the role to the service account
