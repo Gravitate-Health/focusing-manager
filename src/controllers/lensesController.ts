@@ -436,7 +436,8 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
             let lensObj = parsedLensesNames[i]
             try {
                 let lens = await lensesProvider.getLensFromSelector(lensObj["lensSelector"], lensObj["lensName"])
-                lenses.push(lens)
+                const lensBase64data = lens.content[0].data
+                lenses.push(atob(lensBase64data))
             } catch (error) {
                 console.log(error);
             }
@@ -482,7 +483,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
                 }
 
                 // Create enhance function from lens
-                let lensFunction = new Function("epi, ips, pv, html", lense.lens)
+                let lensFunction = new Function("epi, ips, pv, html", lense)
                 let resObject = lensFunction(epi, ips, {}, html)
 
                 try {
