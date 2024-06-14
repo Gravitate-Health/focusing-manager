@@ -40,7 +40,7 @@ export class LensesProvider extends AxiosController {
 
     getLensFromSelector = async (lensSelectorName: string, lensName: string) => {
         let lensesList: string[] = []
-        let lensCompleteName = `${lensSelectorName}_${lensName}`
+        let lensCompleteName = `${lensName}`
         let url = `http://${lensSelectorName}.default.svc.cluster.local:3000/lenses/${lensCompleteName}`;
         Logger.logInfo('lenses.provider.ts', 'getLenseSelectorAvailableLenses', `Getting lenses from selector: ${url}`)
         try {
@@ -58,9 +58,16 @@ export class LensesProvider extends AxiosController {
 
     splitLensIntoParts = (lensToSplit: string) => {
         let splitLens = lensToSplit.split("_")
-        return {
-            lensSelector: splitLens[0],
-            lensName: splitLens[1]
+        if (splitLens.length === 2) {
+            return {
+                lensSelector: splitLens[0],
+                lensName: splitLens[1]
+            }
+        } else {
+            return {
+                lensSelector: "lens-selector-mvp2",
+                lensName: splitLens[0]
+            }
         }
     }
 
