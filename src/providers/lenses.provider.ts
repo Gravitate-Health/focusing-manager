@@ -58,9 +58,16 @@ export class LensesProvider extends AxiosController {
 
     splitLensIntoParts = (lensToSplit: string) => {
         let splitLens = lensToSplit.split("_")
-        return {
-            lensSelector: splitLens[0],
-            lensName: splitLens[1]
+        if (splitLens.length === 2) {
+            return {
+                lensSelector: splitLens[0],
+                lensName: splitLens[1]
+            }
+        } else {
+            return {
+                lensSelector: "lens-selector-mvp2",
+                lensName: splitLens[0]
+            }
         }
     }
 
