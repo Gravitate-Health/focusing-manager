@@ -18,6 +18,10 @@ export class PreprocessingProvider extends AxiosController {
             console.log("No preprocessor selected. Getting all of them");
             try {
                 preprocessors = await this.queryPreprocessingServices() as string[]
+
+                if (preprocessors[0] == "preprocessing-service-mvp2" && preprocessors.length == 2) {
+                    preprocessors = ["preprocessing-service-manual, preprocessing-service-mvp2"]
+                }
             } catch (error) {
                 console.error(error)
                 throw error
