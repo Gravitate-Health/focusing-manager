@@ -10,9 +10,17 @@ export class FhirIpsProvider extends AxiosController {
 
     getIpsByPatientIdentifier = async (identifier: string): Promise<AxiosResponse> => {
         try {
-            let url = `${this.baseUrl}/Patient/$summary?identifier=${identifier}&_format=json`;
-            //let url = `${this.baseUrl}/Composition/${id}/$document?_format=json`; // This is the old workflow, where patient is foun via ID.
-            let response = await this.request.get(url)
+            //let url = `${this.baseUrl}/Patient/$summary?identifier=${identifier}&_format=json`;
+            let url = `${this.baseUrl}/Patient/$summary`;
+            let body = {
+                "resourceType" : "Parameters",
+                "id" : "Focusing IPS request",
+                "parameter" : [{
+                  "name" : "identifier",
+                  "valueIdentifier" : {"value": `${identifier}`}
+                }]
+            }
+            let response = await this.request.post(url, body);
             let data = response.data
             console.log(response.status)
             console.log(data.issue)
