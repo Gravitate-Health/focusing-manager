@@ -50,6 +50,12 @@ const getExtensions = (epi: any) => {
     return codeCategory
 }
 
+const setExtensions = (epi: any, extensions: any) => {
+    // This is assuming that the "Composition" resource is the first one of the bundle. It might break in the future
+    epi['entry'][0]['resource']['extension'] = extensions
+    return epi
+}
+
 const writeLeaflet = (epi: any, leafletSectionList: any[]) => {
     // This is assuming that the "Composition" resource is the first one of the bundle. It might break in the future
     epi['entry'][0]['resource']['section'][0]['section'] = leafletSectionList
@@ -84,6 +90,11 @@ const getAllLensesNames = async (): Promise<string[]> => {
         });
     }
     return lensesList
+}
+
+const getLensesIdenfier = (lens: any) => {
+    let lensIdentifier = lens["identifier"][0]["value"]
+    return lensIdentifier
 }
 
 export const getLensesNames = async (_req: Request, res: Response) => {
@@ -431,11 +442,13 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     }
 
     let lenses = []
+    let completeLenses = []
     if (parsedLensesNames) {
         for (let i in parsedLensesNames) {
             let lensObj = parsedLensesNames[i]
             try {
                 let lens = await lensesProvider.getLensFromSelector(lensObj["lensSelector"], lensObj["lensName"])
+                completeLenses.push(lens)
                 const lensBase64data = lens.content[0].data
                 lenses.push(atob(lensBase64data))
             } catch (error) {
@@ -452,6 +465,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     for (let i in lenses) {
         let lense = lenses[i]
         let lensFullName = `${parsedLensesNames![i].lensSelector}_${parsedLensesNames![i].lensName}`
+        let lensApplied = false;
 
         // If there are lenses, we can already mark the ePI as enhanced
         epi = setCategoryCode(epi, "E", "Enhanced")
@@ -486,6 +500,10 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
                 let lensFunction = new Function("epi, ips, pv, html", lense)
                 let resObject = lensFunction(epi, ips, {}, html)
 
+                if (html != resObject) {
+                    lensApplied = true;
+                }
+
                 try {
                     // Execute lense and save result on ePI leaflet section
                     let enhancedHtml = await resObject.enhance()
@@ -499,6 +517,33 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
                     })
                     continue
                 }
+            }
+
+            let lensIdentifier = getLensesIdenfier(completeLenses[i])
+
+            if (lensApplied) {
+                epiExtensions = getExtensions(epi)
+                epiExtensions.push({
+                    "extension": [
+                        {
+                            "url": "lens",
+                            "valueCodeableReference": {
+                                "reference": {
+                                    "reference": "Library/" + lensIdentifier
+                                }
+                            }
+                        },
+                        {
+                            "url": "elementClass",
+                            "valueString": lensIdentifier
+                        },
+                        {
+                            "url": "explanation",
+                            "valueString": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor."
+                        }
+                    ],
+                    "url": "http://hl7.eu/fhir/ig/gravitate-health/StructureDefinition/LensesApplied"
+                })
             }
         } catch (error: any) {
             console.log(error);
