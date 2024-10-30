@@ -1,4 +1,7 @@
-export const explanation = {
+export type LensIdentifier = "pregnancy-lens" | "conditions-lens" | "allergies-lens" | "interaction-lens" | "default";
+export type Language = "en" | "es" | "pt" | "da";
+
+export const explanation: { [key in LensIdentifier]: { [key in Language]: string[] | string } } = {
     "pregnancy-lens": {
         "en": "This section was highlighted because you are a female of 18+ years, and this section refers to potential issues with pregnancy or breastfeeding.",
         "es": "Esta sección fue resaltada porque usted es una mujer de 18+ años, y esta sección se refiere a posibles problemas con el embarazo o la lactancia.",
