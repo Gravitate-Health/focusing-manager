@@ -47,4 +47,10 @@ export const explanation = {
             " som er kontraindiceret med "
         ]
     },
+    "default": {
+        en: "This section was highlighted because it is relevant to your health.",
+        es: "Esta sección fue resaltada porque es relevante para su salud.",
+        pt: "Esta seção foi destacada porque é relevante para a sua saúde.",
+        da: "Denne sektion blev fremhævet, fordi den er relevant for din sundhed."
+    }
 }
