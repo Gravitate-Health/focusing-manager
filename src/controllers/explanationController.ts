@@ -19,7 +19,7 @@ export const createExplanation = async (ipsIdentifier: string, epiLanguage: Lang
         case "allergies-lens":
             return await buildAllergyIntolleranceExplanation(epiLanguage, ipsIdentifier)
         case "interaction-lens":
-            return buildInteractionExplanation(epiLanguage, ipsIdentifier)
+            return buildInteractionExplanation(explanation[lensIdentifier][epiLanguage])
         default:
             return buildDefaultExplanation(explanation[lensIdentifier][epiLanguage])
     }
@@ -58,7 +58,7 @@ const buildAllergyIntolleranceExplanation = async (ipsIdentifier: string, explan
 }
 
 const buildInteractionExplanation = (explanationText: any): any => {
-    return undefined
+    return explanationText
 }
 
 const buildDefaultExplanation = (explanationText: any): any => {
