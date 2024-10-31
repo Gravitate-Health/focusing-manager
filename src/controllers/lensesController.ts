@@ -160,7 +160,6 @@ export const focusEpiIdIpsId = async (req: Request, res: Response) => {
         let ipsResponse = await fhirIpsProvider.getIpsByPatientIdentifier(reqPatientIdentifier)
         Logger.logInfo("lensesController.ts", "focus", `Got IPS with patientIdentifier: ${reqPatientIdentifier} -- `)
         ips = ipsResponse.data
-        console.log(ips);
     } catch (error: any) {
         console.log(error);
         if (error.status == 400 && error.body["issue"][0]["severity"] == "error") {
@@ -373,7 +372,6 @@ const logAndSendResponseWithHeaders = (res: Response, responseMessage: any, stat
     console.log("________________")
 
     Logger.logInfo("lensesController.ts", "focus", `Result :`)
-    console.log(JSON.stringify(responseMessage))
     let epi: Object;
 
     // Send processed epi, or raw if the processed one is not found in the object.
@@ -505,6 +503,9 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
                 // Create enhance function from lens
                 let lensFunction = new Function("epi, ips, pv, html", lense)
                 let resObject = lensFunction(epi, ips, {}, html)
+
+                console.log("resObject", resObject)
+                console.log("html", html)
 
                 if (html != resObject) {
                     lensApplied = true;

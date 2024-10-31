@@ -1,4 +1,4 @@
-export type LensIdentifier = "pregnancy-lens" | "conditions-lens" | "allergies-lens" | "interaction-lens" | "default";
+export type LensIdentifier = "pregnancy-lens" | "conditions-lens" | "allergyintollerance-lens" | "interaction-lens" | "default";
 export type Language = "en" | "es" | "pt" | "da";
 
 export const explanation: { [key in LensIdentifier]: { [key in Language]: string[] | string } } = {
@@ -14,7 +14,7 @@ export const explanation: { [key in LensIdentifier]: { [key in Language]: string
         "pt": "Esta seção foi destacada porque você declarou no seu sumário clínico o diagnóstico de ",
         "da": "Denne sektion blev fremhævet, fordi du har angivet i dit kliniske resumé diagnosen "
     },
-    "allergies-lens": {
+    "allergyintollerance-lens": {
         "en": [
             "This section was highlighted because you have stated in your clinical summary an ",
             " to "

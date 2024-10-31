@@ -16,7 +16,7 @@ export const createExplanation = async (ipsIdentifier: string, epiLanguage: Lang
             return buildPregnancyExplanation(explanation[lensIdentifier][epiLanguage])
         case "conditions-lens":
             return await buildConditionExplanation(ipsIdentifier, explanation[lensIdentifier][epiLanguage])
-        case "allergies-lens":
+        case "allergyintollerance-lens":
             return await buildAllergyIntolleranceExplanation(epiLanguage, ipsIdentifier)
         case "interaction-lens":
             return buildInteractionExplanation(explanation[lensIdentifier][epiLanguage])
