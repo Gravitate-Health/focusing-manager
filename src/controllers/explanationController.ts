@@ -21,7 +21,7 @@ export const createExplanation = async (ipsIdentifier: string, epiLanguage: Lang
         case "interaction-lens":
             return buildInteractionExplanation(explanation[lensIdentifier][epiLanguage])
         default:
-            return buildDefaultExplanation(explanation[lensIdentifier][epiLanguage])
+            return buildDefaultExplanation(explanation["default"][epiLanguage])
     }
 }
 
