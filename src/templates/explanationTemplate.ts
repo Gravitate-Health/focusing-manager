@@ -32,23 +32,29 @@ export const explanation: { [key in LensIdentifier]: { [key in Language]: string
             " over for "
         ]
     },
+    // "interaction-lens": {
+    //     "en": [
+    //         "This section was highlighted because you have stated in your clinical summary that you are taking ",
+    //         " which is counter-indicated with "
+    //     ],
+    //     "es": [
+    //         "Esta sección fue destacada porque has indicado en tu resumen clínico que estás tomando ",
+    //         " que está contraindicado con "
+    //     ],
+    //     "pt": [
+    //         "Esta seção foi destacada porque você indicou no seu sumário clínico que está tomando ",
+    //         " que é contraindicado com "
+    //     ],
+    //     "da": [
+    //         "Denne sektion blev fremhævet, fordi du har angivet i dit kliniske resumé, at du tager ",
+    //         " som er kontraindiceret med "
+    //     ]
+    // },
     "interaction-lens": {
-        "en": [
-            "This section was highlighted because you have stated in your clinical summary that you are taking ",
-            " which is counter-indicated with "
-        ],
-        "es": [
-            "Esta sección fue destacada porque has indicado en tu resumen clínico que estás tomando ",
-            " que está contraindicado con "
-        ],
-        "pt": [
-            "Esta seção foi destacada porque você indicou no seu sumário clínico que está tomando ",
-            " que é contraindicado com "
-        ],
-        "da": [
-            "Denne sektion blev fremhævet, fordi du har angivet i dit kliniske resumé, at du tager ",
-            " som er kontraindiceret med "
-        ]
+        "en": "This section was highlighted because you have stated in your clinical summary that you are taking medications that may interact with each other.",
+        "es": "Esta sección fue resaltada porque ha indicado en su resumen clínico que está tomando medicamentos que pueden interactuar entre sí.",
+        "pt": "Esta seção foi destacada porque você indicou no seu resumo clínico que está tomando medicamentos que podem interagir entre si.",
+        "da": "Denne sektion blev fremhævet, fordi du har angivet i dit kliniske resumé, at du tager medicin, der kan interagere med hinanden."
     },
     "default": {
         "en": "This section was highlighted because it is relevant to your health.",

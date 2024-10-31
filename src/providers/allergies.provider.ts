@@ -22,7 +22,10 @@ export class AllergiesProvider {
         let allergiesDisplay = [];
         for (let allergy of allergiesSearchSet.entry) {
             Logger.logInfo('AllergiesProvider.ts', 'getAllergiesByPatientIdentifier', `Allergy: ${allergy.resource.code.coding[0].display}`);
-            allergiesDisplay.push(allergy.resource.code.coding[0].display);
+            allergiesDisplay.push({
+                "type": allergy.resource.type ? allergy.resource.type : "allergy",
+                "causalAgent": allergy.resource.code.coding[0].display
+            });
         }
 
         return allergiesDisplay;
