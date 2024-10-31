@@ -9,6 +9,7 @@ import { ProfileProvider } from "../providers/profile.provider";
 import { Liquid } from "liquidjs";
 import { readFileSync } from "fs";
 import { objectEquals } from "../utils/utils"
+import { createExplanation } from "./explanationController";
 
 const FHIR_IPS_URL = process.env.FHIR_IPS_URL as string;
 const FHIR_EPI_URL = process.env.FHIR_EPI_URL as string;
@@ -48,6 +49,11 @@ const getExtensions = (epi: any) => {
     // This is assuming that the "Composition" resource is the first one of the bundle. It might break in the future
     let codeCategory = epi['entry'][0]['resource']['extension']
     return codeCategory
+}
+
+const getPatientIdentifierFromPatientSummary = (ips: any) => {
+    let patientIdentifier = ips['entry'][1]['resource']['identifier'][0]['value']
+    return patientIdentifier
 }
 
 const setExtensions = (epi: any, extensions: any) => {
@@ -520,6 +526,8 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
             }
 
             let lensIdentifier = getLensesIdenfier(completeLenses[i])
+            let epiLanguage = epi['entry'][0]['resource']['language']
+            let patientIdentifier = getPatientIdentifierFromPatientSummary(ips)
 
             if (lensApplied) {
                 epiExtensions = getExtensions(epi)
@@ -539,7 +547,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
                         },
                         {
                             "url": "explanation",
-                            "valueString": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor."
+                            "valueString": createExplanation(patientIdentifier, epiLanguage, lensIdentifier)
                         }
                     ],
                     "url": "http://hl7.eu/fhir/ig/gravitate-health/StructureDefinition/LensesApplied"
