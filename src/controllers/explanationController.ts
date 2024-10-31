@@ -37,7 +37,7 @@ const buildConditionExplanation = async (ipsIdentifier: string, explanationText:
     }
 
     for (let condition of conditionList) {
-        explanationText += condition
+        explanationText += `${condition} `
     }
 
     return explanationText
@@ -52,7 +52,7 @@ const buildAllergyIntolleranceExplanation = async (ipsIdentifier: string, explan
 
     let finalExplanation = explanationText[0]
     for (let allergy of allergyIntoleranceList) {
-        finalExplanation += allergy.type + explanationText[1] + allergy.causalAgent
+        finalExplanation += allergy.type + explanationText[1] + `${allergy.causalAgent} `
     }
     return finalExplanation
 }

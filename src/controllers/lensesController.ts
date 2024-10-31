@@ -547,7 +547,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
                         },
                         {
                             "url": "explanation",
-                            "valueString": createExplanation(patientIdentifier, epiLanguage, lensIdentifier)
+                            "valueString": await createExplanation(patientIdentifier, epiLanguage, lensIdentifier)
                         }
                     ],
                     "url": "http://hl7.eu/fhir/ig/gravitate-health/StructureDefinition/LensesApplied"
