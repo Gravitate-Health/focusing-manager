@@ -504,16 +504,14 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
                 let lensFunction = new Function("epi, ips, pv, html", lense)
                 let resObject = lensFunction(epi, ips, {}, html)
 
-                console.log("resObject", resObject)
-                console.log("html", html)
-
-                if (html != resObject) {
-                    lensApplied = true;
-                }
-
                 try {
                     // Execute lense and save result on ePI leaflet section
                     let enhancedHtml = await resObject.enhance()
+
+                    if (enhancedHtml != html) {
+                        lensApplied = true
+                    }
+
                     leafletSectionList[index]['text']['div'] = enhancedHtml
                 } catch (error) {
                     Logger.logError("lensesController.ts", "focusProcess", `Error executing lens ${lensFullName} on leaflet section number: ${index}`)
