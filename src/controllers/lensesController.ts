@@ -473,7 +473,37 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
 
         // If there are lenses, we can already mark the ePI as enhanced
         epi = setCategoryCode(epi, "E", "Enhanced")
-        applyLensToSections(lense, leafletSectionList, lensFullName, lensApplied, responseMessage, epi, ips, completeLenses, i, res)
+        applyLensToSections(lense, leafletSectionList, lensFullName, lensApplied, responseMessage, epi, ips, completeLenses, res)
+        
+        let lensIdentifier = getLensesIdenfier(completeLenses[i])
+        let epiLanguage = epi['entry'][0]['resource']['language']
+        let patientIdentifier = getPatientIdentifierFromPatientSummary(ips)
+
+        if (lensApplied) {
+            let epiExtensions = getExtensions(epi)
+            epiExtensions.push({
+                "extension": [
+                    {
+                        "url": "lens",
+                        "valueCodeableReference": {
+                            "reference": {
+                                "reference": "Library/" + lensIdentifier
+                            }
+                        }
+                    },
+                    {
+                        "url": "elementClass",
+                        "valueString": lensIdentifier
+                    },
+                    {
+                        "url": "explanation",
+                        "valueString": await createExplanation(patientIdentifier, epiLanguage, lensIdentifier)
+                    }
+                ],
+                "url": "http://hl7.eu/fhir/ig/gravitate-health/StructureDefinition/LensesApplied"
+            })
+        }
+
     }
     epi = writeLeaflet(epi, leafletSectionList)
 
@@ -508,7 +538,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     }
 }
 
-const applyLensToSections = async (lense: string, leafletSectionList: any[], lensFullName: string, lensApplied: Boolean, responseMessage: any, epi: any, ips: any, completeLenses: any, lenseIndex: string, res: Response) => {
+const applyLensToSections = async (lense: string, leafletSectionList: any[], lensFullName: string, lensApplied: Boolean, responseMessage: any, epi: any, ips: any, completeLenses: any, res: Response) => {
     try {
         // Iterate on leaflet sections
         for (let index in leafletSectionList) {
@@ -518,7 +548,7 @@ const applyLensToSections = async (lense: string, leafletSectionList: any[], len
                 let sectionObject = leafletSectionList[index]
 
                 if (sectionObject.section != undefined) {
-                    applyLensToSections(lense, sectionObject.section, lensFullName, lensApplied, responseMessage, epi, ips, completeLenses, lenseIndex, res)
+                    applyLensToSections(lense, sectionObject.section, lensFullName, lensApplied, responseMessage, epi, ips, completeLenses, res)
                 }
 
                 html = sectionObject['text']['div']
@@ -560,35 +590,6 @@ const applyLensToSections = async (lense: string, leafletSectionList: any[], len
                 })
                 continue
             }
-        }
-
-        let lensIdentifier = getLensesIdenfier(completeLenses[lenseIndex])
-        let epiLanguage = epi['entry'][0]['resource']['language']
-        let patientIdentifier = getPatientIdentifierFromPatientSummary(ips)
-
-        if (lensApplied) {
-            let epiExtensions = getExtensions(epi)
-            epiExtensions.push({
-                "extension": [
-                    {
-                        "url": "lens",
-                        "valueCodeableReference": {
-                            "reference": {
-                                "reference": "Library/" + lensIdentifier
-                            }
-                        }
-                    },
-                    {
-                        "url": "elementClass",
-                        "valueString": lensIdentifier
-                    },
-                    {
-                        "url": "explanation",
-                        "valueString": await createExplanation(patientIdentifier, epiLanguage, lensIdentifier)
-                    }
-                ],
-                "url": "http://hl7.eu/fhir/ig/gravitate-health/StructureDefinition/LensesApplied"
-            })
         }
     } catch (error: any) {
         console.log(error);
