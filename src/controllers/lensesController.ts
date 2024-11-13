@@ -469,95 +469,11 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     for (let i in lenses) {
         let lense = lenses[i]
         let lensFullName = `${parsedLensesNames![i].lensSelector}_${parsedLensesNames![i].lensName}`
-        let lensApplied = false;
+        let lensApplied = new Boolean(false)
 
         // If there are lenses, we can already mark the ePI as enhanced
         epi = setCategoryCode(epi, "E", "Enhanced")
-        try {
-            // Iterate on leaflet sections
-            for (let index in leafletSectionList) {
-                Logger.logInfo("lensesController.ts", "focusProcess", `Executing lens ${lensFullName} on leaflet section number: ${index}`);
-                // Get HTML text
-                let html
-                try {
-
-                    let sectionObject = leafletSectionList[index]
-                    html = sectionObject['text']['div']
-
-                    if (html == undefined) {
-                        responseMessage.focusingErrors.push({
-                            message: "No HTML text found on leaflet section " + i,
-                            lensName: lensFullName
-                        })
-                        continue;
-                    }
-                } catch (error) {
-                    console.log(error)
-                    responseMessage.focusingErrors.push({
-                        message: "Error getting leaflet section " + i,
-                        lensName: lensFullName
-                    })
-
-                }
-
-                // Create enhance function from lens
-                let lensFunction = new Function("epi, ips, pv, html", lense)
-                let resObject = lensFunction(epi, ips, {}, html)
-
-                try {
-                    // Execute lense and save result on ePI leaflet section
-                    let enhancedHtml = await resObject.enhance()
-
-                    if (enhancedHtml != html) {
-                        lensApplied = true
-                    }
-
-                    leafletSectionList[index]['text']['div'] = enhancedHtml
-                } catch (error) {
-                    Logger.logError("lensesController.ts", "focusProcess", `Error executing lens ${lensFullName} on leaflet section number: ${index}`)
-                    console.error(error);
-                    responseMessage.focusingErrors.push({
-                        message: "Error executing lens",
-                        lensName: lensFullName
-                    })
-                    continue
-                }
-            }
-
-            let lensIdentifier = getLensesIdenfier(completeLenses[i])
-            let epiLanguage = epi['entry'][0]['resource']['language']
-            let patientIdentifier = getPatientIdentifierFromPatientSummary(ips)
-
-            if (lensApplied) {
-                epiExtensions = getExtensions(epi)
-                epiExtensions.push({
-                    "extension": [
-                        {
-                            "url": "lens",
-                            "valueCodeableReference": {
-                                "reference": {
-                                    "reference": "Library/" + lensIdentifier
-                                }
-                            }
-                        },
-                        {
-                            "url": "elementClass",
-                            "valueString": lensIdentifier
-                        },
-                        {
-                            "url": "explanation",
-                            "valueString": await createExplanation(patientIdentifier, epiLanguage, lensIdentifier)
-                        }
-                    ],
-                    "url": "http://hl7.eu/fhir/ig/gravitate-health/StructureDefinition/LensesApplied"
-                })
-            }
-        } catch (error: any) {
-            console.log(error);
-            console.log("finished before expected!")
-            logAndSendResponseWithHeaders(res, responseMessage, HttpStatusCode.InternalServerError)
-            return
-        }
+        applyLensToSections(lense, leafletSectionList, lensFullName, lensApplied, responseMessage, epi, ips, completeLenses, i, res)
     }
     epi = writeLeaflet(epi, leafletSectionList)
 
@@ -588,6 +504,96 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     }
     else {//Response with e(ePi)
         logAndSendResponseWithHeaders(res, responseMessage, HttpStatusCode.Ok)
+        return
+    }
+}
+
+const applyLensToSections = async (lense: string, leafletSectionList: any[], lensFullName: string, lensApplied: Boolean, responseMessage: any, epi: any, ips: any, completeLenses: any, lenseIndex: string, res: Response) => {
+    try {
+        // Iterate on leaflet sections
+        for (let index in leafletSectionList) {
+            Logger.logInfo("lensesController.ts", "focusProcess", `Executing lens ${lensFullName} on leaflet section number: ${index}`);
+            let html
+            try {
+                let sectionObject = leafletSectionList[index]
+
+                if (sectionObject.section != undefined) {
+                    applyLensToSections(lense, sectionObject.section, lensFullName, lensApplied, responseMessage, epi, ips, completeLenses, lenseIndex, res)
+                }
+
+                html = sectionObject['text']['div']
+
+                if (html == undefined) {
+                    responseMessage.focusingErrors.push({
+                        message: "No HTML text found on leaflet section " + index,
+                        lensName: lensFullName
+                    })
+                    continue;
+                }
+            } catch (error) {
+                console.log(error)
+                responseMessage.focusingErrors.push({
+                    message: "Error getting leaflet section " + index,
+                    lensName: lensFullName
+                })
+            }
+
+            // Create enhance function from lens
+            let lensFunction = new Function("epi, ips, pv, html", lense)
+            let resObject = lensFunction(epi, ips, {}, html)
+
+            try {
+                // Execute lense and save result on ePI leaflet section
+                let enhancedHtml = await resObject.enhance()
+
+                if (enhancedHtml != html) {
+                    lensApplied = true
+                }
+
+                leafletSectionList[index]['text']['div'] = enhancedHtml
+            } catch (error) {
+                Logger.logError("lensesController.ts", "focusProcess", `Error executing lens ${lensFullName} on leaflet section number: ${index}`)
+                console.error(error);
+                responseMessage.focusingErrors.push({
+                    message: "Error executing lens",
+                    lensName: lensFullName
+                })
+                continue
+            }
+        }
+
+        let lensIdentifier = getLensesIdenfier(completeLenses[lenseIndex])
+        let epiLanguage = epi['entry'][0]['resource']['language']
+        let patientIdentifier = getPatientIdentifierFromPatientSummary(ips)
+
+        if (lensApplied) {
+            let epiExtensions = getExtensions(epi)
+            epiExtensions.push({
+                "extension": [
+                    {
+                        "url": "lens",
+                        "valueCodeableReference": {
+                            "reference": {
+                                "reference": "Library/" + lensIdentifier
+                            }
+                        }
+                    },
+                    {
+                        "url": "elementClass",
+                        "valueString": lensIdentifier
+                    },
+                    {
+                        "url": "explanation",
+                        "valueString": await createExplanation(patientIdentifier, epiLanguage, lensIdentifier)
+                    }
+                ],
+                "url": "http://hl7.eu/fhir/ig/gravitate-health/StructureDefinition/LensesApplied"
+            })
+        }
+    } catch (error: any) {
+        console.log(error);
+        console.log("finished before expected!")
+        logAndSendResponseWithHeaders(res, responseMessage, HttpStatusCode.InternalServerError)
         return
     }
 }
