@@ -26,6 +26,15 @@ export class ConditionsProvider {
             return undefined;
         }
 
+        if (conditionsSearchSet.entry.length === 0) {
+            return undefined;
+        }
+
+        // Check if the conditionsSearchSet is iterable
+        if (!conditionsSearchSet.entry[Symbol.iterator]) {
+            return undefined;
+        }
+
         for (let condition of conditionsSearchSet.entry) {
             Logger.logInfo('ConditionsProvider.ts', 'getConditionsByPatientIdentifier', `Condition: ${condition.resource.code.coding[0].display}`);
             conditionsDisplay.push(condition.resource.code.coding[0].display);
