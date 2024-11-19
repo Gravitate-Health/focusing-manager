@@ -576,7 +576,9 @@ const applyLensToSections = async (lense: string, leafletSectionList: any[], len
                 // Execute lense and save result on ePI leaflet section
                 let enhancedHtml = await resObject.enhance()
 
-                if (enhancedHtml != html) {
+                const diff = html.localeCompare(enhancedHtml)
+
+                if (diff != 0) {
                     lensApplied = true
                 }
 
