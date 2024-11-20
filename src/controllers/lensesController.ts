@@ -401,7 +401,8 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
 
     if (preprocessors) {
         try {
-            if (getCategoryCode(epi) == "R") {
+            let categoryCode = getCategoryCode(epi)
+            if (categoryCode == "R" || categoryCode == "" || categoryCode == null) {
                 [epi, preprocessingErrors] = await preprocessingProvider.callServicesFromList(preprocessors, epi)
             }
         } catch (error) {
