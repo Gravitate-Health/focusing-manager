@@ -9,27 +9,35 @@ export const explanation: { [key in LensIdentifier]: { [key in Language]: string
         "da": "Denne sektion blev fremhævet, fordi du er en kvinde over 18 år, og denne sektion henviser til potentielle problemer med graviditet eller amning."
     },
     "conditions-lens": {
-        "en": "This section was highlighted because you have stated in your clinical summary the diagnostic of ",
-        "es": "Esta sección fue resaltada porque usted ha declarado en su resumen clínico el diagnóstico de ",
-        "pt": "Esta seção foi destacada porque você declarou no seu sumário clínico o diagnóstico de ",
-        "da": "Denne sektion blev fremhævet, fordi du har angivet i dit kliniske resumé diagnosen "
+        "en": ["This section was highlighted because you have stated in your clinical summary the diagnostic of ", "some conditions."],
+        "es": ["Esta sección fue resaltada porque usted ha declarado en su resumen clínico el diagnóstico de ", "algunas condiciones."],
+        "pt": ["Esta seção foi destacada porque você declarou no seu sumário clínico o diagnóstico de ", "algumas condições."],
+        "da": ["Denne sektion blev fremhævet, fordi du har angivet i dit kliniske resumé diagnosen ", "nogle tilstande."]
     },
     "allergyintollerance-lens": {
         "en": [
             "This section was highlighted because you have stated in your clinical summary an ",
-            " to "
+            " to ",
+            "allergy or intolerance",
+            "some agent."
         ],
         "es": [
             "Esta sección fue resaltada porque usted ha declarado en su resumen clínico una ",
-            " a "
+            " a ",
+            "alergia o intolerancia",
+            "algun agente."
         ],
         "pt": [
             "Esta seção foi destacada porque você declarou no seu sumário clínico uma ",
-            " a "
+            " a ",
+            "alergia ou intolerância",
+            "algum agente."
         ],
         "da": [
             "Denne sektion blev fremhævet, fordi du har angivet i dit kliniske resumé en ",
-            " over for "
+            " over for ",
+            "allergi eller intolerance",
+            "noget middel."
         ]
     },
     // "interaction-lens": {

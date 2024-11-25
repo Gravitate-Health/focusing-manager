@@ -33,11 +33,11 @@ const buildConditionExplanation = async (ipsIdentifier: string, explanationText:
     const conditionList = await conditionProvider.getConditionsByPatientIdentifier(ipsIdentifier)
     
     if (conditionList === undefined) {
-        return explanationText + "some conditions."
+        return explanationText[0] + explanationText[1]
     }
 
     for (let condition of conditionList) {
-        explanationText += `${condition} `
+        explanationText[0] += `${condition} `
     }
 
     return explanationText
@@ -47,7 +47,7 @@ const buildAllergyIntolleranceExplanation = async (ipsIdentifier: string, explan
     const allergyIntoleranceList = await allergyIntoleranceProvider.getAllergiesByPatientIdentifier(ipsIdentifier)
 
     if (allergyIntoleranceList === undefined) {
-        return explanationText[0] + "allergy" + explanationText[1] + "some agent."
+        return explanationText[0] + explanationText[2] + explanationText[1] + explanationText[3]
     }
 
     let finalExplanation = explanationText[0]
