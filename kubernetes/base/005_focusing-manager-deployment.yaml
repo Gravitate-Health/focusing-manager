@@ -29,24 +29,24 @@ spec:
     spec:
       serviceAccountName: focusing-manager-serviceaccount
       containers:
-        - name: focusing-manager
-          image: gravitate-registry.cr.de-fra.ionos.com/focusing-manager:latest #only for hackaton
-          imagePullPolicy: Always
-          env:
-            - name: ENVIRONMENT
-              value: "prod"
-            - name: PREPROCESSING_LABEL_SELECTOR
-              value: eu.gravitate-health.fosps.preprocessing=true
-            - name: FOCUSING_LABEL_SELECTOR
-              value: eu.gravitate-health.fosps.focusing=true
-            - name: FHIR_IPS_URL
-              value: https://fosps.gravitatehealth.eu/ips/api/fhir
-            - name: FHIR_EPI_URL
-              value: https://fosps.gravitatehealth.eu/epi/api/fhir
-            - name: PROFILE_URL
-              value: https://fosps.gravitatehealth.eu/profiles
-          ports:
-            - containerPort: 3000
-              protocol: TCP
+      - name: focusing-manager
+        image: gravitate-registry.cr.de-fra.ionos.com/focusing-manager:1.18.0 #only for hackaton
+        imagePullPolicy: Always
+        env:
+        - name: ENVIRONMENT
+          value: "prod"
+        - name: PREPROCESSING_LABEL_SELECTOR
+          value: eu.gravitate-health.fosps.preprocessing=true
+        - name: FOCUSING_LABEL_SELECTOR
+          value: eu.gravitate-health.fosps.focusing=true
+        - name: FHIR_IPS_URL
+          value: https://fosps.gravitatehealth.eu/ips/api/fhir
+        - name: FHIR_EPI_URL
+          value: https://fosps.gravitatehealth.eu/epi/api/fhir
+        - name: PROFILE_URL
+          value: https://fosps.gravitatehealth.eu/profiles
+        ports:
+        - containerPort: 3000
+          protocol: TCP
       restartPolicy: Always
 status: {}
