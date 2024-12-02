@@ -20,6 +20,7 @@ let lensesProvider = new LensesProvider("")
 let fhirEpiProvider = new FhirEpiProvider(FHIR_EPI_URL)
 let fhirIpsProvider = new FhirIpsProvider(FHIR_IPS_URL)
 let profileProvider = new ProfileProvider(PROFILE_URL)
+let lensApplied = false
 
 const getLeaflet = (epi: any) => {
     // This is assuming that the "Composition" resource is the first one of the bundle. It might break in the future
@@ -472,7 +473,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     for (let i in lenses) {
         let lense = lenses[i]
         let lensFullName = `${parsedLensesNames![i].lensSelector}_${parsedLensesNames![i].lensName}`
-        let lensApplied = new Boolean(false)
+        lensApplied = false
 
         // If there are lenses, we can already mark the ePI as enhanced
         epi = setCategoryCode(epi, "E", "Enhanced")
@@ -481,9 +482,9 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
         let epiLanguage = epi['entry'][0]['resource']['language']
         let patientIdentifier = getPatientIdentifierFromPatientSummary(ips)
         
-        leafletSectionList = await applyLensToSections(lense, leafletSectionList, lensFullName, lensApplied, responseMessage, epi, ips, completeLenses, res)
+        leafletSectionList = await applyLensToSections(lense, leafletSectionList, lensFullName, responseMessage, epi, ips, completeLenses, res)
         
-        if (lensApplied == true) {
+        if (lensApplied) {
             let epiExtensions = getExtensions(epi)
             epiExtensions.push({
                 "extension": [
@@ -542,7 +543,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     }
 }
 
-const applyLensToSections = async (lense: string, leafletSectionList: any[], lensFullName: string, lensApplied: Boolean, responseMessage: any, epi: any, ips: any, completeLenses: any, res: Response) => {
+const applyLensToSections = async (lense: string, leafletSectionList: any[], lensFullName: string, responseMessage: any, epi: any, ips: any, completeLenses: any, res: Response) => {
     try {
         // Iterate on leaflet sections
         for (let index in leafletSectionList) {
@@ -552,7 +553,7 @@ const applyLensToSections = async (lense: string, leafletSectionList: any[], len
                 let sectionObject = leafletSectionList[index]
 
                 if (sectionObject.section != undefined) {
-                    applyLensToSections(lense, sectionObject.section, lensFullName, lensApplied, responseMessage, epi, ips, completeLenses, res)
+                    applyLensToSections(lense, sectionObject.section, lensFullName, responseMessage, epi, ips, completeLenses, res)
                 }
 
                 html = sectionObject['text']['div']
