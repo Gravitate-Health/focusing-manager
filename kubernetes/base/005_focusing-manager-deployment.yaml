@@ -30,7 +30,7 @@ spec:
       serviceAccountName: focusing-manager-serviceaccount
       containers:
       - name: focusing-manager
-        image: gravitate-registry.cr.de-fra.ionos.com/focusing-manager:v1.22.0
+        image: gravitate-registry.cr.de-fra.ionos.com/focusing-manager:v1.24.0
         imagePullPolicy: Always
         env:
         - name: ENVIRONMENT
