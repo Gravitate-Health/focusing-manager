@@ -582,6 +582,10 @@ const applyLensToSections = async (lense: string, leafletSectionList: any[], len
 
                 const diff = html.localeCompare(enhancedHtml)
 
+                console.log("Original: ", html)
+                console.log("Enhanced: ", enhancedHtml)
+                console.log("Diff: ", diff != 0 ? "Different" : "Equal")
+
                 if (diff != 0) {
                     lensApplied = true
                 }
