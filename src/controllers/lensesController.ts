@@ -594,12 +594,12 @@ const applyLensToSections = async (lense: string, leafletSectionList: any[], len
                 continue
             }
         }
-
-        return leafletSectionList
     } catch (error: any) {
         console.log(error);
         console.log("finished before expected!")
         logAndSendResponseWithHeaders(res, responseMessage, HttpStatusCode.InternalServerError)
         return
     }
+
+    return leafletSectionList
 }
