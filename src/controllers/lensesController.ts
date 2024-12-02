@@ -108,7 +108,6 @@ export const getLensesNames = async (_req: Request, res: Response) => {
     let lensesList: string[] = [];
     try {
         lensesList = await getAllLensesNames()
-
     } catch (error) {
         res.status(HttpStatusCode.InternalServerError).send({
             error: "There was an error"
@@ -448,6 +447,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
 
     let lenses = []
     let completeLenses = []
+    console.log(parsedLensesNames)
     if (parsedLensesNames) {
         for (let i in parsedLensesNames) {
             let lensObj = parsedLensesNames[i]
@@ -460,6 +460,8 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
                 console.log(error);
             }
         }
+    } else {
+
     }
     Logger.logInfo("lensesController.ts", "focusProcess", `Found the following lenses: ${JSON.stringify(lenses)}`);
 
@@ -594,12 +596,12 @@ const applyLensToSections = async (lense: string, leafletSectionList: any[], len
                 continue
             }
         }
+
+        return leafletSectionList
     } catch (error: any) {
         console.log(error);
         console.log("finished before expected!")
         logAndSendResponseWithHeaders(res, responseMessage, HttpStatusCode.InternalServerError)
         return
     }
-
-    return leafletSectionList
 }
