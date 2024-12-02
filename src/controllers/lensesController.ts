@@ -483,7 +483,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
         
         leafletSectionList = await applyLensToSections(lense, leafletSectionList, lensFullName, lensApplied, responseMessage, epi, ips, completeLenses, res)
         
-        if (lensApplied.valueOf() != false && parsedLensesNames![i].lensName != "rmm-lens") {
+        if (lensApplied.valueOf() != false) {
             let epiExtensions = getExtensions(epi)
             epiExtensions.push({
                 "extension": [
