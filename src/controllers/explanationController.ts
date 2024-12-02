@@ -29,16 +29,21 @@ const buildPregnancyExplanation = (explanationText: any): any => {
     return explanationText
 }
 
-const buildConditionExplanation = async (ipsIdentifier: string, explanationText: any) => {
+const buildConditionExplanation = async (ipsIdentifier: string, rawExplanation: any) => {
     const conditionList = await conditionProvider.getConditionsByPatientIdentifier(ipsIdentifier)
+
+    let explanationText
     
     if (conditionList === undefined) {
-        return explanationText[0] + explanationText[1]
+        explanationText = rawExplanation[0] + rawExplanation[1]
+        return explanationText
     }
 
     for (let condition of conditionList) {
-        explanationText[0] += `${condition} `
+        rawExplanation[0] += `${condition} `
     }
+
+    explanationText = rawExplanation[0]
 
     return explanationText
 }
