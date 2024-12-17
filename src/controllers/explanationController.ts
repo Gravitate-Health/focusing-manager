@@ -20,6 +20,8 @@ export const createExplanation = async (ipsIdentifier: string, epiLanguage: Lang
             return await buildAllergyIntolleranceExplanation(ipsIdentifier, explanation[lensIdentifier][epiLanguage])
         case "interaction-lens":
             return buildInteractionExplanation(explanation[lensIdentifier][epiLanguage])
+        case "diabetes-lens":
+            return "";
         default:
             return buildDefaultExplanation(explanation["default"][epiLanguage])
     }
@@ -40,6 +42,10 @@ const buildConditionExplanation = async (ipsIdentifier: string, rawExplanation: 
     }
 
     for (let condition of conditionList) {
+        // RegEx to remove the text between parentheses, parentheses included
+        condition = condition.replace(/\s*\(.*?\)\s*/g, '')
+        condition = condition.trim()
+
         rawExplanation[0] += `${condition} `
     }
 

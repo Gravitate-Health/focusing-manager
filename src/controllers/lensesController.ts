@@ -483,30 +483,37 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
         let patientIdentifier = getPatientIdentifierFromPatientSummary(ips)
         
         leafletSectionList = await applyLensToSections(lense, leafletSectionList, lensFullName, responseMessage, epi, ips, completeLenses, res)
-        
+
         if (lensApplied) {
-            let epiExtensions = getExtensions(epi)
-            epiExtensions.push({
-                "extension": [
-                    {
-                        "url": "lens",
-                        "valueCodeableReference": {
-                            "reference": {
-                                "reference": "Library/" + lensIdentifier
+
+            let explanationText = await createExplanation(patientIdentifier, epiLanguage, lensIdentifier)
+
+            if (explanationText != undefined && explanationText != "") {
+                let epiExtensions = getExtensions(epi)
+                epiExtensions.push({
+                    "extension": [
+                        {
+                            "url": "lens",
+                            "valueCodeableReference": {
+                                "reference": {
+                                    "reference": "Library/" + lensIdentifier
+                                }
                             }
+                        },
+                        {
+                            "url": "elementClass",
+                            "valueString": lensIdentifier
+                        },
+                        {
+                            "url": "explanation",
+                            "valueString": explanationText
                         }
-                    },
-                    {
-                        "url": "elementClass",
-                        "valueString": lensIdentifier
-                    },
-                    {
-                        "url": "explanation",
-                        "valueString": await createExplanation(patientIdentifier, epiLanguage, lensIdentifier)
-                    }
-                ],
-                "url": "http://hl7.eu/fhir/ig/gravitate-health/StructureDefinition/LensesApplied"
-            })
+                    ],
+                    "url": "http://hl7.eu/fhir/ig/gravitate-health/StructureDefinition/LensesApplied"
+                })
+            }
+
+            epi = setExtensions(epi, epiExtensions)
         }
 
     }

@@ -1,4 +1,4 @@
-export type LensIdentifier = "pregnancy-lens" | "conditions-lens" | "allergyintollerance-lens" | "interaction-lens" | "default";
+export type LensIdentifier = "pregnancy-lens" | "conditions-lens" | "allergyintollerance-lens" | "interaction-lens" | "diabetes-lens" | "default";
 export type Language = "en" | "es" | "pt" | "da";
 
 export const explanation: { [key in LensIdentifier]: { [key in Language]: string[] | string } } = {
@@ -69,5 +69,11 @@ export const explanation: { [key in LensIdentifier]: { [key in Language]: string
         "es": "Esta sección fue resaltada porque es relevante para su salud.",
         "pt": "Esta seção foi destacada porque é relevante para a sua saúde.",
         "da": "Denne sektion blev fremhævet, fordi den er relevant for din sundhed."
+    },
+    "diabetes-lens": {
+        "en": "",
+        "es": "",
+        "pt": "",
+        "da": ""
     }
 }
