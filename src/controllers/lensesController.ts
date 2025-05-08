@@ -477,11 +477,11 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
 
         // If there are lenses, we can already mark the ePI as enhanced
         epi = setCategoryCode(epi, "E", "Enhanced")
-        
+
         let lensIdentifier = getLensesIdenfier(completeLenses[i])
         let epiLanguage = epi['entry'][0]['resource']['language']
         let patientIdentifier = getPatientIdentifierFromPatientSummary(ips)
-        
+
         leafletSectionList = await applyLensToSections(lense, leafletSectionList, lensFullName, responseMessage, epi, ips, completeLenses, res)
 
         if (lensApplied) {
@@ -586,8 +586,9 @@ const applyLensToSections = async (lense: string, leafletSectionList: any[], len
 
             try {
                 // Execute lense and save result on ePI leaflet section
-                let enhancedHtml = await resObject.enhance()
-
+                // let enhancedHtml = await resObject.enhance()
+                const enhanceResult = await resObject.enhance();
+                let enhancedHtml = enhanceResult.content;
                 const diff = html.localeCompare(enhancedHtml)
 
                 console.log("Original: ", html)
