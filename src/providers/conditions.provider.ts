@@ -36,8 +36,21 @@ export class ConditionsProvider {
         }
 
         for (let condition of conditionsSearchSet.entry) {
+            if (condition.resource.code.coding[0].display === undefined) {
+                continue;
+            }
+            if (condition.resource.code.coding[0].display === '') {
+                continue;
+            }
+            
             Logger.logInfo('ConditionsProvider.ts', 'getConditionsByPatientIdentifier', `Condition: ${condition.resource.code.coding[0].display}`);
-            conditionsDisplay.push(condition.resource.code.coding[0].display);
+            // Push the condition display to the conditionsDisplay array but remove the text in parentheses if it exists
+            let conditionDisplay = condition.resource.code.coding[0].display;
+            const match = conditionDisplay.match(/\(([^)]+)\)/);
+            if (match) {
+                conditionDisplay = conditionDisplay.replace(match[0], '').trim();
+            }
+            conditionsDisplay.push(conditionDisplay);
         }
 
         return conditionsDisplay;

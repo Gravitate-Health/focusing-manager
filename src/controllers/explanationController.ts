@@ -41,12 +41,17 @@ const buildConditionExplanation = async (ipsIdentifier: string, rawExplanation: 
         return explanationText
     }
 
-    for (let condition of conditionList) {
-        // RegEx to remove the text between parentheses, parentheses included
+    for (let i = 0; i < conditionList.length; i++) {
+        let condition = conditionList[i];
+
         condition = condition.replace(/\s*\(.*?\)\s*/g, '')
         condition = condition.trim()
 
-        rawExplanation[0] += `${condition} `
+        rawExplanation[0] += condition;
+        
+        if (i < conditionList.length - 1) {
+            rawExplanation[0] += ", ";
+        }
     }
 
     explanationText = rawExplanation[0]
