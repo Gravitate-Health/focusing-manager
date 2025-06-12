@@ -46,7 +46,7 @@ const buildConditionExplanation = async (ipsIdentifier: string, rawExplanation: 
 
         condition = condition.replace(/\s*\(.*?\)\s*/g, '')
         condition = condition.trim()
-
+        
         rawExplanation[0] += condition;
         
         if (i < conditionList.length - 1) {

@@ -29,25 +29,25 @@ spec:
     spec:
       serviceAccountName: focusing-manager-serviceaccount
       containers:
-        - name: focusing-manager
-          image: gravitate-registry.cr.de-fra.ionos.com/focusing-manager:latest
-          imagePullPolicy: Always
-          env:
-            - name: ENVIRONMENT
-              value: "prod"
-            - name: PREPROCESSING_LABEL_SELECTOR
-              value: eu.gravitate-health.fosps.preprocessing=true
-            - name: FOCUSING_LABEL_SELECTOR
-              value: eu.gravitate-health.fosps.focusing=true
-            - name: FHIR_IPS_URL
-              value: https://gravitate-health.lst.tfo.upm.es/ips/api/fhir
-            - name: FHIR_EPI_URL
-              value: https://gravitate-health.lst.tfo.upm.es/epi/api/fhir
-            - name: PROFILE_URL
-              value: https://gravitate-health.lst.tfo.upm.es/profiles
-          ports:
-            - containerPort: 3000
-              protocol: TCP
-          resources: {}
+      - name: focusing-manager
+        image: gravitate-registry.cr.de-fra.ionos.com/focusing-manager:himms
+        imagePullPolicy: Always
+        env:
+        - name: ENVIRONMENT
+          value: "prod"
+        - name: PREPROCESSING_LABEL_SELECTOR
+          value: eu.gravitate-health.fosps.preprocessing=true
+        - name: FOCUSING_LABEL_SELECTOR
+          value: eu.gravitate-health.fosps.focusing=true
+        - name: FHIR_IPS_URL
+          value: https://gravitate-health.lst.tfo.upm.es/ips/api/fhir
+        - name: FHIR_EPI_URL
+          value: https://gravitate-health.lst.tfo.upm.es/epi/api/fhir
+        - name: PROFILE_URL
+          value: https://gravitate-health.lst.tfo.upm.es/profiles
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+        resources: {}
       restartPolicy: Always
 status: {}
