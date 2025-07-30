@@ -1,5 +1,4 @@
 import { Logger } from "../utils/Logger"
-import { explanation, Language, LensIdentifier } from "../templates/explanationTemplate"
 import { ConditionsProvider } from "../providers/conditions.provider"
 import { AllergiesProvider } from "../providers/allergies.provider";
 
@@ -8,70 +7,36 @@ const FHIR_IPS_URL = process.env.FHIR_IPS_URL as string;
 const conditionProvider = new ConditionsProvider(FHIR_IPS_URL)
 const allergyIntoleranceProvider = new AllergiesProvider(FHIR_IPS_URL)
 
-export const createExplanation = async (ipsIdentifier: string, epiLanguage: Language, lensIdentifier: LensIdentifier) => {
-    Logger.logInfo("explanationController.ts", "createExplanation", "Creating explanation")
-
-    switch(lensIdentifier) {
-        case "pregnancy-lens":
-            return buildPregnancyExplanation(explanation[lensIdentifier][epiLanguage])
-        case "conditions-lens":
-            return await buildConditionExplanation(ipsIdentifier, explanation[lensIdentifier][epiLanguage])
-        case "allergyintollerance-lens":
-            return await buildAllergyIntolleranceExplanation(ipsIdentifier, explanation[lensIdentifier][epiLanguage])
-        case "interaction-lens":
-            return buildInteractionExplanation(explanation[lensIdentifier][epiLanguage])
-        case "diabetes-lens":
-            return "";
-        default:
-            return buildDefaultExplanation(explanation["default"][epiLanguage])
+// Utility to extract explanation/report from FHIR Composition extensions
+function getExtensionValue(epi: any, lensIdentifier: string, key: 'explanation' | 'report') {
+    const extensions = epi?.entry?.[0]?.resource?.extension || [];
+    for (const ext of extensions) {
+        if (ext.url === "http://hl7.eu/fhir/ig/gravitate-health/StructureDefinition/LensesApplied") {
+            const subExts = ext.extension || [];
+            let foundLens = false;
+            let value = undefined;
+            for (const sub of subExts) {
+                if (sub.url === "lens" && sub.valueCodeableReference?.reference?.reference === `Library/${lensIdentifier}`) {
+                    foundLens = true;
+                }
+                if (sub.url === key) {
+                    value = sub.valueString;
+                }
+            }
+            if (foundLens && value) return value;
+        }
     }
+    return undefined;
 }
 
-const buildPregnancyExplanation = (explanationText: any): any => {
-    return explanationText
+const DEFAULT_MESSAGE = "This was highlighted because it's important for you.";
+
+export const createExplanation = async (epi: any, lensIdentifier: string) => {
+    Logger.logInfo("explanationController.ts", "createExplanation", "Fetching explanation from FHIR Composition extension")
+    return getExtensionValue(epi, lensIdentifier, 'explanation') || DEFAULT_MESSAGE;
 }
 
-const buildConditionExplanation = async (ipsIdentifier: string, rawExplanation: any) => {
-    const conditionList = await conditionProvider.getConditionsByPatientIdentifier(ipsIdentifier)
-
-    let explanationText
-    
-    if (conditionList === undefined) {
-        explanationText = rawExplanation[0] + rawExplanation[1]
-        return explanationText
-    }
-
-    for (let condition of conditionList) {
-        // RegEx to remove the text between parentheses, parentheses included
-        condition = condition.replace(/\s*\(.*?\)\s*/g, '')
-        condition = condition.trim()
-
-        rawExplanation[0] += `${condition} `
-    }
-
-    explanationText = rawExplanation[0]
-
-    return explanationText
-}
-
-const buildAllergyIntolleranceExplanation = async (ipsIdentifier: string, explanationText: any) => {
-    const allergyIntoleranceList = await allergyIntoleranceProvider.getAllergiesByPatientIdentifier(ipsIdentifier)
-
-    if (allergyIntoleranceList === undefined) {
-        return explanationText[0] + explanationText[2] + explanationText[1] + explanationText[3]
-    }
-
-    let finalExplanation = explanationText[0]
-    for (let allergy of allergyIntoleranceList) {
-        finalExplanation += allergy.type + explanationText[1] + `${allergy.causalAgent} `
-    }
-    return finalExplanation
-}
-
-const buildInteractionExplanation = (explanationText: any): any => {
-    return explanationText
-}
-
-const buildDefaultExplanation = (explanationText: any): any => {
-    return explanationText
+export const getReport = async (epi: any, lensIdentifier: string) => {
+    Logger.logInfo("explanationController.ts", "getReport", "Fetching report from FHIR Composition extension")
+    return getExtensionValue(epi, lensIdentifier, 'report') || DEFAULT_MESSAGE;
 }
