@@ -35,23 +35,24 @@ if (environment === "dev") {
 const coreV1Api = kc.makeApiClient(k8s.CoreV1Api);
 
 export class k8sClient implements IServiceClient {
-async getServiceBaseUrlsByLabel(labelSelector: string): Promise<string[]> {
-  const services = await coreV1Api.listNamespacedService(
-    "default",
-    undefined,
-    false,
-    undefined,
-    undefined,
-    labelSelector
-  );
-  let serviceList: string[] = [];
-  for (const service of services.body.items) {
-    let serviceName = service.metadata!.name as string;
-    let serviceNamespace = service.metadata?.namespace ?? "default"; // fallback if not set
-    let servicePort = service.spec!.ports?.[0]?.port as string
-    if (serviceName && servicePort) {
-      serviceList.push(`http://${serviceName}.${serviceNamespace}.svc.cluster.local:${servicePort}`);
+  async getServiceBaseUrlsByLabel(labelSelector: string): Promise<string[]> {
+    const services = await coreV1Api.listNamespacedService(
+      "default",
+      undefined,
+      false,
+      undefined,
+      undefined,
+      labelSelector
+    );
+    let serviceList: string[] = [];
+    for (const service of services.body.items) {
+      let serviceName = service.metadata!.name as string;
+      let serviceNamespace = service.metadata?.namespace ?? "default"; // fallback if not set
+      let servicePort = (service.spec?.ports?.[0]?.port ?? '').toString();
+      if (serviceName && servicePort) {
+        serviceList.push(`http://${serviceName}.${serviceNamespace}.svc.cluster.local:${servicePort}`);
+      }
+    }
+    return serviceList;
   }
-  return serviceList;
-}
 }
