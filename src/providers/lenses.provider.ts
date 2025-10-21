@@ -1,6 +1,6 @@
 import { parse } from 'dotenv';
 import AxiosController from '../utils/axios';
-import { getK8sServicesByLabel } from "../utils/k8sClient";
+import { ServiceClientFactory } from '../utils/ServiceClientFactory';
 import { Logger } from "../utils/Logger";
 
 const FOCUSING_LABEL_SELECTOR = process.env.FOCUSING_LABEL_SELECTOR || "";
@@ -53,7 +53,7 @@ export class LensesProvider extends AxiosController {
     }
 
     queryFocusingServices = async () => {
-        return getK8sServicesByLabel(FOCUSING_LABEL_SELECTOR)
+        return (await ServiceClientFactory.getClient()).getServiceBaseUrlsByLabel(FOCUSING_LABEL_SELECTOR)
     }
 
     splitLensIntoParts = (lensToSplit: string) => {

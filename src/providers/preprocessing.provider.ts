@@ -1,7 +1,7 @@
 import { AxiosError } from 'axios';
 import AxiosController from '../utils/axios';
 import { Logger } from '../utils/Logger';
-import { getK8sServicesByLabel } from '../utils/k8sClient';
+import { ServiceClientFactory } from '../utils/ServiceClientFactory';
 
 const PREPROCESSING_LABEL_SELECTOR = process.env.PREPROCESSING_LABEL_SELECTOR || "";
 
@@ -30,8 +30,8 @@ export class PreprocessingProvider extends AxiosController {
         return preprocessors
     }
 
-    queryPreprocessingServices = () => {
-        return getK8sServicesByLabel(PREPROCESSING_LABEL_SELECTOR)
+    queryPreprocessingServices = async () => {
+        return (await ServiceClientFactory.getClient()).getServiceBaseUrlsByLabel(PREPROCESSING_LABEL_SELECTOR)
     }
 
     callPreprocessingService = async (serviceName: string, epi: any) => {

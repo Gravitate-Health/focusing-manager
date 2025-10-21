@@ -1,4 +1,6 @@
 import * as k8s from "@kubernetes/client-node";
+import { IServiceClient } from './IServiceClient';
+
 
 let environment = process.env.ENVIRONMENT;
 console.log(`Connecting to k8s cluster in ${environment} mode`);
@@ -32,7 +34,8 @@ if (environment === "dev") {
 
 const coreV1Api = kc.makeApiClient(k8s.CoreV1Api);
 
-export async function getK8sServicesByLabel(labelSelector: string) {
+export class k8sClient implements IServiceClient {
+async getServiceBaseUrlsByLabel(labelSelector: string): Promise<string[]> {
   const services = await coreV1Api.listNamespacedService(
     "default",
     undefined,
@@ -47,4 +50,5 @@ export async function getK8sServicesByLabel(labelSelector: string) {
     serviceList.push(serviceName);
   }
   return serviceList;
+}
 }

@@ -1,5 +1,4 @@
 
-import { getK8sServicesByLabel } from "../utils/k8sClient";
 import { Logger } from "../utils/Logger";
 import axios, { AxiosError, HttpStatusCode } from "axios";
 import { Response, Request } from "express";
