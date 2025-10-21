@@ -27,7 +27,7 @@ export class LensesProvider extends AxiosController {
 
     getLensSelectorAvailableLenses = async (lensSelectorName: string) => {
         let lensesList: string[] = []
-        let url = `http://${lensSelectorName}.default.svc.cluster.local:3000/lenses`;
+        let url = `${lensSelectorName}/lenses`;
         Logger.logInfo('lenses.provider.ts', 'getLenseSelectorAvailableLenses', `Getting lenses from selector: ${url}`)
         try {
             let response = await this.request.get(url)
@@ -41,7 +41,7 @@ export class LensesProvider extends AxiosController {
     getLensFromSelector = async (lensSelectorName: string, lensName: string) => {
         let lensesList: string[] = []
         let lensCompleteName = `${lensName}`
-        let url = `http://${lensSelectorName}.default.svc.cluster.local:3000/lenses/${lensCompleteName}`;
+        let url = `${lensSelectorName}/lenses/${lensCompleteName}`;
         Logger.logInfo('lenses.provider.ts', 'getLenseSelectorAvailableLenses', `Getting lenses from selector: ${url}`)
         try {
             let response = await this.request.get(url)

@@ -35,7 +35,7 @@ export class PreprocessingProvider extends AxiosController {
     }
 
     callPreprocessingService = async (serviceName: string, epi: any) => {
-        let url = `http://${serviceName}.default.svc.cluster.local:3000/preprocess`;
+        let url = `${serviceName}/preprocess`;
         Logger.logInfo('preprocessingProvider.ts', 'callPreprocessingService', `Querying preprocessing service: ${url}`)
         try {
             let response = await this.request.post(url, epi)

@@ -47,7 +47,10 @@ async getServiceBaseUrlsByLabel(labelSelector: string): Promise<string[]> {
   let serviceList: string[] = [];
   for (const service of services.body.items) {
     let serviceName = service.metadata!.name as string;
-    serviceList.push(serviceName);
+    let serviceNamespace = service.metadata?.namespace ?? "default"; // fallback if not set
+    let servicePort = service.spec!.ports?.[0]?.port as string
+    if (serviceName && servicePort) {
+      serviceList.push(`http://${serviceName}.${serviceNamespace}.svc.cluster.local:${servicePort}`);
   }
   return serviceList;
 }
