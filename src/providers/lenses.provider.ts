@@ -20,7 +20,7 @@ export class LensesProvider extends AxiosController {
             throw error
         }
         Logger.logInfo("lensesController.ts", "getLenses",
-            `Found the following lenses: ${lensSelectorList}`
+            `Found the following lens selectors: ${lensSelectorList}`
         );
         return lensSelectorList
     }
