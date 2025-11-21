@@ -30,28 +30,60 @@ export class DockerClient implements IServiceClient {
 
   async getServiceBaseUrlsByLabel(label: string): Promise<string[]> {
     try {
-      console.debug('[DockerClient] Checking socket exists:', fs.existsSync('/var/run/docker.sock'));
+      console.debug('[DockerClient] socket exists:', fs.existsSync('/var/run/docker.sock'));
       const filters = { label: [label] };
-      console.debug('[DockerClient] Requesting containers with filters:', JSON.stringify(filters));
 
-      const response = await docker.get<DockerContainer[]>('/containers/json', {
+      // Try server-side filter first
+      let response = await docker.get<DockerContainer[]>('/containers/json', {
         params: {
           filters: JSON.stringify(filters),
         },
       });
 
-      console.debug('[DockerClient] Docker API response status:', response.status);
-      if (Array.isArray(response.data)) {
-        console.debug('[DockerClient] Number of containers returned:', response.data.length);
-        // Log brief info about the first few containers for debugging
-        response.data.slice(0, 5).forEach((c, i) =>
-          console.debug(`[DockerClient] container[${i}] id=${c.Id} names=${JSON.stringify(c.Names)} image=${c.Image} ports=${JSON.stringify(c.Ports)} networks=${JSON.stringify(Object.keys(c.NetworkSettings?.Networks || {}))}`)
-        );
-      } else {
-        console.debug('[DockerClient] Docker API did not return an array. Response data:', response.data);
+      if (!Array.isArray(response.data)) {
+        response.data = [];
+      }
+      const serverCount = Array.isArray(response.data) ? response.data.length : 0;
+      console.debug('[DockerClient] server-side containers:', serverCount);
+
+      let containers = response.data;
+
+      // If server-side filter returned nothing, fall back to fetching all and filter client-side.
+      if (!containers || containers.length === 0) {
+        console.debug('[DockerClient] falling back to client-side filter (fetching all containers)');
+        const allResp = await docker.get<DockerContainer[]>('/containers/json', { params: { all: true } });
+        containers = Array.isArray(allResp.data) ? allResp.data : [];
+
+        // parse label into key/value or key-only (case-insensitive comparison)
+        const idx = label.indexOf('=');
+        let key: string, value: string | undefined;
+        if (idx >= 0) {
+          key = label.slice(0, idx);
+          value = label.slice(idx + 1);
+        } else {
+          key = label;
+          value = undefined;
+        }
+
+        const keyLower = key.toLowerCase();
+        const valueLower = value !== undefined ? value.toLowerCase() : undefined;
+
+        containers = containers.filter((c) => {
+          const labels = c.Labels || {};
+          // check keys case-insensitively
+          const matchingKey = Object.keys(labels).find((k) => k.toLowerCase() === keyLower);
+          if (!matchingKey) return false;
+          if (valueLower !== undefined) {
+            const labVal = (labels[matchingKey] ?? '').toLowerCase();
+            return labVal === valueLower;
+          }
+          return true;
+        });
+
+        console.debug('[DockerClient] containers after client-side filtering:', containers.length);
       }
 
-      return response.data.map((container) => {
+      return containers.map((container) => {
         const name = container.Names?.[0]?.replace(/^\//, '') ?? '';
         const networks = container.NetworkSettings?.Networks;
         const ip =
@@ -59,24 +91,13 @@ export class DockerClient implements IServiceClient {
             ? Object.values(networks)[0].IPAddress
             : null;
 
-        // Pick first private port (internal to container)
         const port = container.Ports?.[0]?.PrivatePort;
+        if (!port) return null;
 
-        if (!port) {
-          console.debug(`[DockerClient] Skipping container ${container.Id} (no port found)`);
-          return null;
-        }
-
-        // Prefer Docker DNS name (e.g., 'db') over IP
         const host = name || ip;
-        if (!host) {
-          console.debug(`[DockerClient] Skipping container ${container.Id} (no host found). name="${name}" ip="${ip}"`);
-          return null;
-        }
+        if (!host) return null;
 
-        const url = `http://${host}:${port}`;
-        console.debug(`[DockerClient] Resolved container ${container.Id} -> ${url}`);
-        return url;
+        return `http://${host}:${port}`;
       }).filter((url): url is string => url !== null);
     } catch (err: any) {
       console.error('[DockerClient] Error querying Docker API:', {
