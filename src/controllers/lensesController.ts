@@ -77,7 +77,13 @@ const getAllPreprocessorNames = async (): Promise<string[]> => {
     let preprocessors = await preprocessingProvider.queryPreprocessingServices()
     for (let i in preprocessors) {
         let preprocessor = preprocessors[i]
-        preprocessorsList.push(preprocessor)
+        if (preprocessorsList.includes(preprocessor)) {
+            Logger.logWarn("lensesController.ts", "getAllPreprocessorNames",
+            `Preprocessor ${preprocessor} already exists, skipping. You might have duplicate preprocessors.`
+            );
+        } else {
+            preprocessorsList.push(preprocessor)
+        }
     }
     return preprocessorsList
 }
