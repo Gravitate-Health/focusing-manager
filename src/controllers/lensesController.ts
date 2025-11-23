@@ -561,7 +561,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
 
     // Iterate lenses
     for (let i in lenses) {
-        let lense = lenses[i]
+        let lens = lenses[i]
         let lensFullName = `${parsedLensesNames![i].lensSelector}_${parsedLensesNames![i].lensName}`
         lensApplied = false
 
@@ -572,7 +572,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
         let epiLanguage = epi['entry'][0]['resource']['language']
         let patientIdentifier = getPatientIdentifierFromPatientSummary(ips)
         
-        let lensApplication = await applyLensToSections(lense, leafletSectionList, lensFullName, responseMessage, epi, ips, completeLenses, res)
+        let lensApplication = await applyLensToSections(lens, leafletSectionList, lensFullName, responseMessage, epi, ips, completeLenses, res)
 
         if (lensApplied) {
             leafletSectionList = lensApplication.leafletSectionList
@@ -640,7 +640,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     }
 }
 
-const applyLensToSections = async (lense: string, leafletSectionList: any[], lensFullName: string, responseMessage: any, epi: any, ips: any, completeLenses: any, res: Response) => {
+const applyLensToSections = async (lens: string, leafletSectionList: any[], lensFullName: string, responseMessage: any, epi: any, ips: any, completeLenses: any, res: Response) => {
     try {
         // Iterate on leaflet sections
         // I want to only execute the lens all sections at a time, so I will not use a forEach
@@ -655,7 +655,7 @@ const applyLensToSections = async (lense: string, leafletSectionList: any[], len
                 explanation: ""
             }
         }
-        if (lense == undefined || lense == "") {
+        if (lens == undefined || lens == "") {
             responseMessage.focusingErrors.push({
                 message: "Lens is undefined or empty",
                 lensName: lensFullName
@@ -665,7 +665,7 @@ const applyLensToSections = async (lense: string, leafletSectionList: any[], len
                 explanation: ""
             }
         }
-        if (typeof lense !== 'string') {
+        if (typeof lens !== 'string') {
             responseMessage.focusingErrors.push({
                 message: "Lens is not a string",
                 lensName: lensFullName
@@ -680,10 +680,10 @@ const applyLensToSections = async (lense: string, leafletSectionList: any[], len
         let explanation = ""
 
         // Create enhance function from lens
-        let lensFunction = new Function("epi, ips, pv, html", lense)
+        let lensFunction = new Function("epi, ips, pv, html", lens)
         let resObject = lensFunction(epi, ips, {}, leafletHTMLString)
         try {
-            // Execute lense and save result on ePI leaflet section
+            // Execute lens and save result on ePI leaflet section
             let enhancedHtml = await resObject.enhance()
             // If the lens has an explanation function, execute it
             if (resObject.explanation == undefined || resObject.explanation == null || typeof resObject.explanation !== 'function') {
