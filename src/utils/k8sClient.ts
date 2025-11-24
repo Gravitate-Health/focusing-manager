@@ -1,4 +1,5 @@
 import * as k8s from "@kubernetes/client-node";
+import * as fs from 'fs';
 import { IServiceClient } from './IServiceClient';
 
 
@@ -34,25 +35,62 @@ if (environment === "dev") {
 
 const coreV1Api = kc.makeApiClient(k8s.CoreV1Api);
 
+function resolveNamespace(): string {
+  // 1) common env vars set by runners / manifests
+  const fromEnv = process.env.NAMESPACE || process.env.POD_NAMESPACE || process.env.K8S_NAMESPACE;
+  if (fromEnv && fromEnv.trim()) return fromEnv.trim();
+
+  // 2) in-cluster token namespace file
+  try {
+    const nsFile = '/var/run/secrets/kubernetes.io/serviceaccount/namespace';
+    if (fs.existsSync(nsFile)) {
+      const data = fs.readFileSync(nsFile, 'utf8').trim();
+      if (data) return data;
+    }
+  } catch {
+    // ignore
+  }
+
+  // 3) kubeconfig current-context namespace (if present)
+  try {
+    const current = kc.getCurrentContext();
+    const ctx = (kc as any).contexts?.find((c: any) => c.name === current);
+    const ns = ctx?.context?.namespace;
+    if (ns && ns.trim()) return ns.trim();
+  } catch {
+    // ignore
+  }
+
+  // fallback
+  return 'default';
+}
+
 export class k8sClient implements IServiceClient {
   async getServiceBaseUrlsByLabel(labelSelector: string): Promise<string[]> {
-    const services = await coreV1Api.listNamespacedService(
-      "default",
-      undefined,
-      false,
-      undefined,
-      undefined,
-      labelSelector
-    );
-    let serviceList: string[] = [];
-    for (const service of services.body.items) {
-      let serviceName = service.metadata!.name as string;
-      let serviceNamespace = service.metadata?.namespace ?? "default"; // fallback if not set
-      let servicePort = (service.spec?.ports?.[0]?.port ?? '').toString();
-      if (serviceName && servicePort) {
-        serviceList.push(`http://${serviceName}.${serviceNamespace}.svc.cluster.local:${servicePort}`);
+    try {
+      const namespace = resolveNamespace();
+
+      // use the generated request-object overload
+      const req: k8s.CoreV1ApiListNamespacedServiceRequest = {
+        namespace,
+        labelSelector,
+      };
+
+      const services = await coreV1Api.listNamespacedService(req);
+
+      const serviceList: string[] = [];
+      for (const service of services.items) {
+        const serviceName = service.metadata!.name as string;
+        const serviceNamespace = service.metadata?.namespace ?? namespace;
+        const servicePort = (service.spec?.ports?.[0]?.port ?? '').toString();
+        if (serviceName && servicePort) {
+          serviceList.push(`http://${serviceName}.${serviceNamespace}.svc.cluster.local:${servicePort}`);
+        }
       }
+      return serviceList;
+    } catch (err: any) {
+      console.error('[k8sClient] Error listing services:', err?.message ?? err);
+      return [];
     }
-    return serviceList;
   }
 }
