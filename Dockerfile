@@ -1,4 +1,4 @@
-FROM node:16-slim as buildstage
+FROM node:16-slim AS buildstage
 
 WORKDIR /usr/src/app
 
