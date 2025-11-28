@@ -32,11 +32,11 @@ export class LensesProvider extends AxiosController {
         let baseUrl = this.lensSelectorMap[lensSelectorName]
         if (!baseUrl) {
             const msg = `Lens selector not found: ${lensSelectorName}`
-            Logger.logError('lenses.provider.ts', 'getLenseSelectorAvailableLenses', msg)
+            Logger.logError('lenses.provider.ts', 'getLensSelectorAvailableLenses', msg)
             throw new Error(msg)
         }
         const url = `${baseUrl}/lenses`
-        Logger.logInfo('lenses.provider.ts', 'getLenseSelectorAvailableLenses', `Getting lenses from selector: ${url}`)
+        Logger.logInfo('lenses.provider.ts', 'getLensSelectorAvailableLenses', `Getting lenses from selector: ${url}`)
         try {
             let response = await this.request.get(url)
 
@@ -74,12 +74,12 @@ export class LensesProvider extends AxiosController {
                 }
             } catch (err) {
                 // Log but don't fail the main response
-                Logger.logError('lenses.provider.ts', 'getLenseSelectorAvailableLenses', `Error updating lensNameMap for selector ${lensSelectorName}: ${err}`)
+                Logger.logError('lenses.provider.ts', 'getLensSelectorAvailableLenses', `Error updating lensNameMap for selector ${lensSelectorName}: ${err}`)
             }
 
             return response.data
         } catch (error) {
-            Logger.logError('lenses.provider.ts', 'getLenseSelectorAvailableLenses', `Error getting from selector: ${url}`)
+            Logger.logError('lenses.provider.ts', 'getLensSelectorAvailableLenses', `Error getting from selector: ${url}`)
             throw error
         }
     }
@@ -90,16 +90,16 @@ export class LensesProvider extends AxiosController {
         let baseUrl = this.lensSelectorMap[lensSelectorName]
         if (!baseUrl) {
             const msg = `Lens selector not found: ${lensSelectorName}`
-            Logger.logError('lenses.provider.ts', 'getLenseSelectorAvailableLenses', msg)
+            Logger.logError('lenses.provider.ts', 'getLensSelectorAvailableLenses', msg)
             throw new Error(msg)
         }
         let url = `${baseUrl}/lenses/${lensCompleteName}`;
-        Logger.logInfo('lenses.provider.ts', 'getLenseSelectorAvailableLenses', `Getting lens from selector: ${url}`)
+        Logger.logInfo('lenses.provider.ts', 'getLensSelectorAvailableLenses', `Getting lens from selector: ${url}`)
         try {
             let response = await this.request.get(url)
             return response.data
         } catch (error) {
-            Logger.logError('lenses.provider.ts', 'getLenseSelectorAvailableLenses', `Error getting from selector: ${url}`)
+            Logger.logError('lenses.provider.ts', 'getLensSelectorAvailableLenses', `Error getting from selector: ${url}`)
             throw error
         }
     }

@@ -554,7 +554,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     } else {
 
     }
-    Logger.logInfo("lensesController.ts", "focusProcess", `Found the following lenses: ${JSON.stringify(lenses)}`);
+    Logger.logInfo("lensesController.ts", "focusProcess", `Found the following lenses: ${completeLenses?.map(l => l.lensName).join(', ')}`);
 
     // Get leaflet sectoins from ePI
     let leafletSectionList = getLeaflet(epi)
