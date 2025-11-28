@@ -3,7 +3,7 @@ import AxiosController from '../utils/axios';
 import { ServiceClientFactory } from '../utils/ServiceClientFactory';
 import { Logger } from "../utils/Logger";
 
-const FOCUSING_LABEL_SELECTOR = process.env.FOCUSING_LABEL_SELECTOR || "";
+const FOCUSING_LABEL_SELECTOR = process.env.FOCUSING_LABEL_SELECTOR || "eu.gravitate-health.fosps.focusing=True";
 const LEE_URL = process.env.LEE_URL || "";
 
 export class LensesProvider extends AxiosController {

@@ -3,7 +3,8 @@ import AxiosController from '../utils/axios';
 import { Logger } from '../utils/Logger';
 import { ServiceClientFactory } from '../utils/ServiceClientFactory';
 
-const PREPROCESSING_LABEL_SELECTOR = process.env.PREPROCESSING_LABEL_SELECTOR || "";
+const PREPROCESSING_LABEL_SELECTOR = process.env.PREPROCESSING_LABEL_SELECTOR || "eu.gravitate-health.fosps.preprocessing=True";
+const PREPROCESSING_EXTERNAL_ENDPOINTS = process.env.PREPROCESSING_EXTERNAL_ENDPOINTS || ""; // Comma-separated list of URLs
 
 export class PreprocessingProvider extends AxiosController {
     private serviceMap: Map<string, string> = new Map(); // Maps service name to URL
@@ -39,19 +40,44 @@ export class PreprocessingProvider extends AxiosController {
         }
     }
 
+    private parseExternalEndpoints = (): string[] => {
+        if (!PREPROCESSING_EXTERNAL_ENDPOINTS || PREPROCESSING_EXTERNAL_ENDPOINTS.trim() === "") {
+            return [];
+        }
+
+        const endpoints = PREPROCESSING_EXTERNAL_ENDPOINTS.split(',')
+            .map(url => url.trim())
+            .filter(url => url.length > 0);
+
+        Logger.logDebug("preprocessing.provider.ts", "parseExternalEndpoints", 
+            `Found ${endpoints.length} external preprocessor endpoint(s) in ENV`);
+
+        return endpoints;
+    }
+
     queryPreprocessingServices = async (): Promise<string[]> => {
-        const serviceUrls = await (await ServiceClientFactory.getClient()).getServiceBaseUrlsByLabel(PREPROCESSING_LABEL_SELECTOR);
+        // Get discovered services
+        const discoveredUrls = await (await ServiceClientFactory.getClient()).getServiceBaseUrlsByLabel(PREPROCESSING_LABEL_SELECTOR);
+        
+        // Get external endpoints from ENV
+        const externalUrls = this.parseExternalEndpoints();
+        
+        // Combine both sources
+        const allServiceUrls = [...discoveredUrls, ...externalUrls];
+        
+        Logger.logDebug("preprocessing.provider.ts", "queryPreprocessingServices", 
+            `Total services: ${allServiceUrls.length} (${discoveredUrls.length} discovered, ${externalUrls.length} external)`);
         
         // Clear existing map
         this.serviceMap.clear();
         
         const serviceNames: string[] = [];
 
-        for (const url of serviceUrls) {
+        for (const url of allServiceUrls) {
             const baseName = this.extractServiceName(url);
             
             // Check if this name already exists
-            let count =  1;
+            let count = 1;
             while (this.serviceMap.has(count > 1 ? `${baseName}-${count}` : baseName)) {
                 count++;
             }

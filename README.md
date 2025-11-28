@@ -18,46 +18,43 @@
 
 ## Requirements
 
-To let this service to query a kubernetes cluster, the cluster needs a `role`, `serviceaccount` and `rolebinding` to grant permission to query the cluster. These resources are created with the following files:
-- [Service account YAML file](./kubernetes-yaml/001_focusing-manager-service-account.yaml): Creates the service account which will be use by the pods. This service account uses the `image-pull-secret`.
-- [Role YAML file](./kubernetes-yaml/002_focusing-manager-role.yaml): Creates role with permission to list services.
-- [Role Binding YAML file](./kubernetes-yaml/003_focusing-manager-role-binding.yaml): Binds the role to the service account
+To let this service query a Kubernetes cluster, the cluster needs a `role`, `serviceaccount` and `rolebinding` to grant permission to query the cluster. These resources are created with the following files:
+- [Service account YAML file](./kubernetes/base/001_focusing-manager-service-account.yaml): Creates the service account which will be used by the pods. This service account uses the `image-pull-secret`.
+- [Role YAML file](./kubernetes/base/002_focusing-manager-role.yaml): Creates role with permission to list services.
+- [Role Binding YAML file](./kubernetes/base/003_focusing-manager-role-binding.yaml): Binds the role to the service account
 
 To apply them: 
+
 ```bash
-kubectl apply -f kubernetes-yaml/001_focusing-manager-service-account.yaml
-kubectl apply -f kubernetes-yaml/002_focusing-manager-role.yaml
-kubectl apply -f kubernetes-yaml/003_focusing-manager-role-binding.yaml
+kubectl apply -f kubernetes/base/001_focusing-manager-service-account.yaml
+kubectl apply -f kubernetes/base/002_focusing-manager-role.yaml
+kubectl apply -f kubernetes/base/003_focusing-manager-role-binding.yaml
 ```
 
 ## Deployment
 
 The service needs the following environment variables:
-- `FOCUSING_LABEL_SELECTOR`: The focusing label selector. Kubernetes cluster will filter the services with this label selector. (E.g: FOCUSING_LABEL_SELECTOR="eu.gravitate-health.fosps.focusing=true")
-- `PREPROCESSING_LABEL_SELECTOR`: The preprocessing label selector. Kubernetes cluster will filter the services with this label selector. (E.g: PREPROCESSING_LABEL_SELECTOR="eu.gravitate-health.fosps.preprocessing=true")
 
-To deploy the service, create the `service`, `deployment` and `virtual service`:
-```bash
-kubectl apply -f kubernetes-yaml/004_focusing-manager-service.yaml
-kubectl apply -f kubernetes-yaml/005_focusing-manager-deployment.yaml
-kubectl apply -f kubernetes-yaml/006_focusing-manager_vs.yml
-```
+**1. FHIR ENDPOINTS**
 
-And try querying the focusing manager:
-```bash
-curl --location 'https://fosps.gravitatehealth.eu/focusing'
-```
+These URLs *may* point to the same FHIR server.
 
-## Development
+- `FHIR_EPI_URL`: URL to the FHIR ePI server endpoint, required for ePI id [focusing flows](#focusing-flows).
+- `FHIR_IPS_URL`: URL to the FHIR IPS server endpoint, required for IPS id [focusing flows](#focusing-flows).
+- `PROFILE_URL`: *Optional* URL to the FHIR server where profile (Persona Vector) is stored.
 
-The service can be executed listening for changes under the `src` directory with:
-```bash
-npm run dev
-```
+**2. Service Discovery**
 
-This service uses the [Kubernetes javascript client](https://github.com/kubernetes-client/javascript) to query the kubernetes cluster
+- `ENVIRONMENT`: Deployment environment (`production` for kubernetes or `standalone` for Docker)
+- `FOCUSING_LABEL_SELECTOR`: The focusing label selector. Kubernetes cluster (or Docker) will filter the services with this label selector. (defaults to `eu.gravitate-health.fosps.focusing=True`)
+- `PREPROCESSING_LABEL_SELECTOR`: The preprocessing label selector. Kubernetes cluster (or Docker) will filter the services with this label selector. (defaults to `eu.gravitate-health.fosps.preprocessing=True`)
+- `PREPROCESSING_EXTERNAL_ENDPOINTS`: *Optional* comma-separated list of *external* preprocessing service base URLs
+    - Example: `http://preprocessor1.example.com:8080,http://preprocessor2.example.com:9090`
+    - Note: Do not include the `/preprocess` path
 
-In production, the service uses the service account to query the cluster. Outside the cluster this is not possible. To develop this service outside the cluster, set the the following enviornment variables (or create a `.env` file) so the kubernetes client can connect to the cluster:
+**3. Kubernetes Dev**
+*Optional* In production, the service uses the service account to query the cluster. Outside the cluster this is not possible. To develop this service outside the cluster, set the the following enviornment variables (or create a `.env` file) so the kubernetes client can connect to the cluster:
+
 - `ENVIRONMENT`: "dev"
 - `CLUSTER_NAME`: Cluster name
 - `CLUSTER_SERVER`: Cluster URL
@@ -66,15 +63,48 @@ In production, the service uses the service account to query the cluster. Outsid
 - `USER_TOKEN`: User token
 - `CONTEXT_NAME`: Context name
 
+To deploy the service, create the `service`, `deployment` and `virtual service`:
+
+```bash
+kubectl apply -f kubernetes-yaml/004_focusing-manager-service.yaml
+kubectl apply -f kubernetes-yaml/005_focusing-manager-deployment.yaml
+kubectl apply -f kubernetes-yaml/006_focusing-manager_vs.yml
+```
+
+And try querying the focusing manager:
+
+```bash
+curl --location 'https://fosps.gravitatehealth.eu/focusing'
+```
+
+## Development
+
+The service can be executed listening for changes under the `src` directory with:
+
+```bash
+npm run dev
+```
+
+This service uses the [Kubernetes javascript client](https://github.com/kubernetes-client/javascript) to query the kubernetes cluster
+
 ## Focusing Flows
 
-According to the specified schema, this service has 4 ways (flows) of focusing the ePIs, depending on which parameters do you use:
+This service has 4 ways of focusing ePIs, depending on which parameters you use:
 
-1. ePI id and IPS id (this is the only flow that is currently implemented and working)
-2. ePI id and IPS JSON object.
-3. ePI JSON object and IPS id.
-4. ePI JSON object and IPS JSON object.
+- PI ID + Patient Identifier: Fetch both from servers
+- ePI ID + IPS JSON: Provide IPS in request body
+- ePI JSON + Patient Identifier: Provide ePI, fetch IPS
+- ePI JSON + IPS JSON: Provide both in request body
 
+Optional query parameters:
+
+- `lenses`: Comma-separated list of lens names (omit to use all), available lenses can be found by `GET /focusing/lenses`
+- `preprocessors`: Comma-separated list of preprocessor names (omit to use all), available preprocessor can be found by `GET /focusing/preprocessing`
+
+Example:
+```
+curl 'https://fosps.gravitatehealth.eu/focusing/focus/epi123?patientIdentifier=patient456&lenses=lens1,lens2'
+```
 Getting help
 ------------
 In case you find a problem or you need extra help, please use the issues tab to report the issue.
@@ -87,6 +117,7 @@ License
 ------------
 
 This project is distributed under the terms of the [Apache License, Version 2.0 (AL2)](https://www.apache.org/licenses/LICENSE-2.0). The license applies to this file and other files in the [GitHub repository](https://github.com/Gravitate-Health/keycloak) hosting this file.
+
 ```
 Copyright 2022 Universidad Politécnica de Madrid
 
@@ -106,3 +137,5 @@ limitations under the License.
 Authors and history
 ---------------------------
 - Guillermo Mejías ([@gmej](https://github.com/gmej))
+- Alejandro Alonso ([@aalonsolopez](https://github.com/aalonsolopez))
+- Alejandro Medrano ([@amedranogil](https://github.com/amedranogil))
