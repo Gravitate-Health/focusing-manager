@@ -16,11 +16,6 @@ export const getPreprocessingServices = async (_req: Request, res: Response) => 
   let preprocessingServiceList: string[];
   try {
     preprocessingServiceList = await preprocessingProvider.queryPreprocessingServices() as string[]
-
-    if (preprocessingServiceList[0] == "preprocessing-service-mvp2" && preprocessingServiceList.length == 2) {
-      preprocessingServiceList = ["preprocessing-service-manual", "preprocessing-service-mvp2"]
-    }
-
   } catch (error) {
     console.error(error)
     res.status(HttpStatusCode.InternalServerError).send({

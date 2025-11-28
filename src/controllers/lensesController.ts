@@ -182,20 +182,9 @@ const writeLeaflet = (epi: any, leafletSectionList: any[]) => {
 }
 
 const getAllPreprocessorNames = async (): Promise<string[]> => {
-    let preprocessorsList: string[] = [];
     // Get preprocessors
     let preprocessors = await preprocessingProvider.queryPreprocessingServices()
-    for (let i in preprocessors) {
-        let preprocessor = preprocessors[i]
-        if (preprocessorsList.includes(preprocessor)) {
-            Logger.logWarn("lensesController.ts", "getAllPreprocessorNames",
-            `Preprocessor ${preprocessor} already exists, skipping. You might have duplicate preprocessors.`
-            );
-        } else {
-            preprocessorsList.push(preprocessor)
-        }
-    }
-    return preprocessorsList
+    return preprocessors
 }
 
 const getAllLensesNames = async (): Promise<string[]> => {
