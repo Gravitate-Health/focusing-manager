@@ -24,51 +24,161 @@ let fhirIpsProvider = new FhirIpsProvider(FHIR_IPS_URL)
 let profileProvider = new ProfileProvider(PROFILE_URL)
 let lensApplied = false
 
+// Helper function to find a resource by type - handles both bundles and direct resources
+const findResourceByType = (resource: any, resourceType: string): any => {
+    if (!resource) {
+        return null;
+    }
+    
+    // If it's the resource we're looking for, return it
+    if (resource.resourceType === resourceType) {
+        return resource;
+    }
+    
+    // If it's a Bundle, search in entries
+    if (resource.resourceType === "Bundle" && resource.entry && Array.isArray(resource.entry)) {
+        const entry = resource.entry.find((e: any) => 
+            e.resource && e.resource.resourceType === resourceType
+        );
+        return entry ? entry.resource : null;
+    }
+    
+    // Resource not found
+    return null;
+}
+
 const getLeaflet = (epi: any) => {
-    // This is assuming that the "Composition" resource is the first one of the bundle. It might break in the future
-    let leafletSectionList = epi['entry'][0]['resource']['section'][0]['section']
-    return leafletSectionList
+    const composition = findResourceByType(epi, "Composition");
+    if (!composition) {
+        Logger.logError("lensesController.ts", "getLeaflet", "Composition resource not found in ePI");
+        return null;
+    }
+    
+    if (!composition.section || !Array.isArray(composition.section)) {
+        Logger.logError("lensesController.ts", "getLeaflet", "Composition has no sections");
+        return null;
+    }
+    
+    // Find the main leaflet section (usually first section with subsections)
+    const leafletSection = composition.section.find((s: any) => s.section && Array.isArray(s.section));
+    if (!leafletSection) {
+        Logger.logError("lensesController.ts", "getLeaflet", "No leaflet section with subsections found");
+        return composition.section[0]?.section || null;
+    }
+    
+    return leafletSection.section;
 }
 
 const getCategoryCode = (epi: any) => {
-    // This is assuming that the "Composition" resource is the first one of the bundle. It might break in the future
-    try {
-        let codeCategory = epi['entry'][0]['resource']['category'][0]['coding'][0]["code"]
-        return codeCategory
-    } catch (error) {
+    const composition = findResourceByType(epi, "Composition");
+    if (!composition) {
+        Logger.logWarn("lensesController.ts", "getCategoryCode", "Composition resource not found");
+        return null;
     }
-
-    return null
+    
+    try {
+        return composition.category?.[0]?.coding?.[0]?.code || null;
+    } catch (error) {
+        Logger.logWarn("lensesController.ts", "getCategoryCode", "Could not extract category code");
+        return null;
+    }
 }
 
 const setCategoryCode = (epi: any, code: string, display: string) => {
-    // This is assuming that the "Composition" resource is the first one of the bundle. It might break in the future
-    epi['entry'][0]['resource']['category'][0]['coding'][0]["code"] = code
-    epi['entry'][0]['resource']['category'][0]['coding'][0]["display"] = display
+    const composition = findResourceByType(epi, "Composition");
+    if (!composition) {
+        Logger.logError("lensesController.ts", "setCategoryCode", "Composition resource not found");
+        return epi;
+    }
+    
+    // Ensure category structure exists
+    if (!composition.category) {
+        composition.category = [];
+    }
+    if (composition.category.length === 0) {
+        composition.category.push({ coding: [] });
+    }
+    if (!composition.category[0].coding) {
+        composition.category[0].coding = [];
+    }
+    if (composition.category[0].coding.length === 0) {
+        composition.category[0].coding.push({});
+    }
+    
+    composition.category[0].coding[0].code = code;
+    composition.category[0].coding[0].display = display;
+    
     return epi;
 }
 
+const getlanguage = (epi: any) => {
+    const composition = findResourceByType(epi, "Composition");
+    if (!composition) {
+        Logger.logWarn("lensesController.ts", "getlanguage", "Composition resource not found");
+        return null;
+    }
+    
+    return composition.language || null;
+}
+
 const getExtensions = (epi: any) => {
-    // This is assuming that the "Composition" resource is the first one of the bundle. It might break in the future
-    let codeCategory = epi['entry'][0]['resource']['extension']
-    return codeCategory
+    const composition = findResourceByType(epi, "Composition");
+    if (!composition) {
+        Logger.logWarn("lensesController.ts", "getExtensions", "Composition resource not found");
+        return [];
+    }
+    
+    return composition.extension || [];
 }
 
 const getPatientIdentifierFromPatientSummary = (ips: any) => {
-    let patientIdentifier = ips['entry'][1]['resource']['identifier'][0]['value']
-    return patientIdentifier
+    const patient = findResourceByType(ips, "Patient");
+    if (!patient) {
+        Logger.logWarn("lensesController.ts", "getPatientIdentifierFromPatientSummary", "Patient resource not found in IPS");
+        return null;
+    }
+    
+    if (!patient.identifier || !Array.isArray(patient.identifier) || patient.identifier.length === 0) {
+        Logger.logWarn("lensesController.ts", "getPatientIdentifierFromPatientSummary", "Patient has no identifiers");
+        return null;
+    }
+    
+    return patient.identifier[0].value || null;
 }
 
 const setExtensions = (epi: any, extensions: any) => {
-    // This is assuming that the "Composition" resource is the first one of the bundle. It might break in the future
-    epi['entry'][0]['resource']['extension'] = extensions
-    return epi
+    const composition = findResourceByType(epi, "Composition");
+    if (!composition) {
+        Logger.logError("lensesController.ts", "setExtensions", "Composition resource not found");
+        return epi;
+    }
+    
+    composition.extension = extensions;
+    return epi;
 }
 
 const writeLeaflet = (epi: any, leafletSectionList: any[]) => {
-    // This is assuming that the "Composition" resource is the first one of the bundle. It might break in the future
-    epi['entry'][0]['resource']['section'][0]['section'] = leafletSectionList
-    return epi
+    const composition = findResourceByType(epi, "Composition");
+    if (!composition) {
+        Logger.logError("lensesController.ts", "writeLeaflet", "Composition resource not found");
+        return epi;
+    }
+    
+    if (!composition.section || !Array.isArray(composition.section)) {
+        Logger.logError("lensesController.ts", "writeLeaflet", "Composition has no sections");
+        return epi;
+    }
+    
+    // Find the main leaflet section and update it
+    const leafletSectionIndex = composition.section.findIndex((s: any) => s.section && Array.isArray(s.section));
+    if (leafletSectionIndex >= 0) {
+        composition.section[leafletSectionIndex].section = leafletSectionList;
+    } else if (composition.section.length > 0) {
+        // Fallback: update first section
+        composition.section[0].section = leafletSectionList;
+    }
+    
+    return epi;
 }
 
 const getAllPreprocessorNames = async (): Promise<string[]> => {
@@ -121,7 +231,7 @@ const getAllLensesNames = async (): Promise<string[]> => {
     return lensesList
 }
 
-const getLensesIdenfier = (lens: any) => {
+const getLensIdenfier = (lens: any) => {
     let lensIdentifier = lens["identifier"][0]["value"]
     return lensIdentifier
 }
@@ -554,7 +664,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     } else {
 
     }
-    Logger.logInfo("lensesController.ts", "focusProcess", `Found the following lenses: ${completeLenses?.map(l => l.lensName).join(', ')}`);
+    Logger.logInfo("lensesController.ts", "focusProcess", `Found the following lenses: ${completeLenses?.map(l => getLensIdenfier(l)).join(', ')}`);
 
     // Get leaflet sectoins from ePI
     let leafletSectionList = getLeaflet(epi)
@@ -568,8 +678,8 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
         // If there are lenses, we can already mark the ePI as enhanced
         epi = setCategoryCode(epi, "E", "Enhanced")
         
-        let lensIdentifier = getLensesIdenfier(completeLenses[i])
-        let epiLanguage = epi['entry'][0]['resource']['language']
+        let lensIdentifier = getLensIdenfier(completeLenses[i])
+        let epiLanguage = getlanguage(epi)
         let patientIdentifier = getPatientIdentifierFromPatientSummary(ips)
         
         let lensApplication = await applyLensToSections(lens, leafletSectionList, lensFullName, responseMessage, epi, ips, completeLenses, res)
