@@ -9,9 +9,7 @@ import { ProfileProvider } from "../providers/profile.provider";
 import { Liquid } from "liquidjs";
 import { readFileSync, stat } from "fs";
 import { objectEquals } from "../utils/utils"
-import { createExplanation } from "./explanationController";
-import JSDOM from "jsdom";
-import { explanation } from "../templates/explanationTemplate";
+import { applyLenses } from "./LensExecutionEnvironment";
 
 const FHIR_IPS_URL = process.env.FHIR_IPS_URL as string;
 const FHIR_EPI_URL = process.env.FHIR_EPI_URL as string;
@@ -47,28 +45,6 @@ const findResourceByType = (resource: any, resourceType: string): any => {
     return null;
 }
 
-const getLeaflet = (epi: any) => {
-    const composition = findResourceByType(epi, "Composition");
-    if (!composition) {
-        Logger.logError("lensesController.ts", "getLeaflet", "Composition resource not found in ePI");
-        return null;
-    }
-    
-    if (!composition.section || !Array.isArray(composition.section)) {
-        Logger.logError("lensesController.ts", "getLeaflet", "Composition has no sections");
-        return null;
-    }
-    
-    // Find the main leaflet section (usually first section with subsections)
-    const leafletSection = composition.section.find((s: any) => s.section && Array.isArray(s.section));
-    if (!leafletSection) {
-        Logger.logError("lensesController.ts", "getLeaflet", "No leaflet section with subsections found");
-        return composition.section[0]?.section || null;
-    }
-    
-    return leafletSection.section;
-}
-
 const getCategoryCode = (epi: any) => {
     const composition = findResourceByType(epi, "Composition");
     if (!composition) {
@@ -82,103 +58,6 @@ const getCategoryCode = (epi: any) => {
         Logger.logWarn("lensesController.ts", "getCategoryCode", "Could not extract category code");
         return null;
     }
-}
-
-const setCategoryCode = (epi: any, code: string, display: string) => {
-    const composition = findResourceByType(epi, "Composition");
-    if (!composition) {
-        Logger.logError("lensesController.ts", "setCategoryCode", "Composition resource not found");
-        return epi;
-    }
-    
-    // Ensure category structure exists
-    if (!composition.category) {
-        composition.category = [];
-    }
-    if (composition.category.length === 0) {
-        composition.category.push({ coding: [] });
-    }
-    if (!composition.category[0].coding) {
-        composition.category[0].coding = [];
-    }
-    if (composition.category[0].coding.length === 0) {
-        composition.category[0].coding.push({});
-    }
-    
-    composition.category[0].coding[0].code = code;
-    composition.category[0].coding[0].display = display;
-    
-    return epi;
-}
-
-const getlanguage = (epi: any) => {
-    const composition = findResourceByType(epi, "Composition");
-    if (!composition) {
-        Logger.logWarn("lensesController.ts", "getlanguage", "Composition resource not found");
-        return null;
-    }
-    
-    return composition.language || null;
-}
-
-const getExtensions = (epi: any) => {
-    const composition = findResourceByType(epi, "Composition");
-    if (!composition) {
-        Logger.logWarn("lensesController.ts", "getExtensions", "Composition resource not found");
-        return [];
-    }
-    
-    return composition.extension || [];
-}
-
-const getPatientIdentifierFromPatientSummary = (ips: any) => {
-    const patient = findResourceByType(ips, "Patient");
-    if (!patient) {
-        Logger.logWarn("lensesController.ts", "getPatientIdentifierFromPatientSummary", "Patient resource not found in IPS");
-        return null;
-    }
-    
-    if (!patient.identifier || !Array.isArray(patient.identifier) || patient.identifier.length === 0) {
-        Logger.logWarn("lensesController.ts", "getPatientIdentifierFromPatientSummary", "Patient has no identifiers");
-        return null;
-    }
-    
-    return patient.identifier[0].value || null;
-}
-
-const setExtensions = (epi: any, extensions: any) => {
-    const composition = findResourceByType(epi, "Composition");
-    if (!composition) {
-        Logger.logError("lensesController.ts", "setExtensions", "Composition resource not found");
-        return epi;
-    }
-    
-    composition.extension = extensions;
-    return epi;
-}
-
-const writeLeaflet = (epi: any, leafletSectionList: any[]) => {
-    const composition = findResourceByType(epi, "Composition");
-    if (!composition) {
-        Logger.logError("lensesController.ts", "writeLeaflet", "Composition resource not found");
-        return epi;
-    }
-    
-    if (!composition.section || !Array.isArray(composition.section)) {
-        Logger.logError("lensesController.ts", "writeLeaflet", "Composition has no sections");
-        return epi;
-    }
-    
-    // Find the main leaflet section and update it
-    const leafletSectionIndex = composition.section.findIndex((s: any) => s.section && Array.isArray(s.section));
-    if (leafletSectionIndex >= 0) {
-        composition.section[leafletSectionIndex].section = leafletSectionList;
-    } else if (composition.section.length > 0) {
-        // Fallback: update first section
-        composition.section[0].section = leafletSectionList;
-    }
-    
-    return epi;
 }
 
 const getAllPreprocessorNames = async (): Promise<string[]> => {
@@ -218,11 +97,6 @@ const getAllLensesNames = async (): Promise<string[]> => {
         }
     }
     return lensesList
-}
-
-const getLensIdenfier = (lens: any) => {
-    let lensIdentifier = lens["identifier"][0]["value"]
-    return lensIdentifier
 }
 
 export const getLensesNames = async (_req: Request, res: Response) => {
@@ -487,7 +361,7 @@ const personaVectorParser = async (partientId: string) => {
     }
 }
 
-const logAndSendResponseWithHeaders = (res: Response, responseMessage: any, statusCode: HttpStatusCode = HttpStatusCode.Ok) => {
+const logAndSendResponseWithHeaders = (res: Response, responseMessage: any, statusCode: number = HttpStatusCode.Ok) => {
     console.log("________________")
     console.log("Sending response")
     console.log("________________")
@@ -508,74 +382,6 @@ const logAndSendResponseWithHeaders = (res: Response, responseMessage: any, stat
 
     // Send response independent of the result
     res.status(statusCode).send(epi)
-}
-
-let getLeafletHTMLString = (leafletSectionList: any[]) => {
-    let htmlString = "";
-    for (let i in leafletSectionList) {
-        let section = leafletSectionList[i];
-        if (section['text'] && section['text']['div']) {
-            htmlString += section['text']['div'];
-        }
-        if (section['section']) {
-            htmlString += getLeafletHTMLString(section['section']);
-        }
-        if (section['entry']) {
-            for (let j in section['entry']) {
-                let entry = section['entry'][j];
-                if (entry['resource'] && entry['resource']['text'] && entry['resource']['text']['div']) {
-                    htmlString += entry['resource']['text']['div'];
-                }
-                if (entry['resource'] && entry['resource']['section']) {
-                    htmlString += getLeafletHTMLString(entry['resource']['section']);
-                }
-            }
-        }
-    }
-
-    return htmlString;
-}
-
-let getLeafletSectionListFromHTMLString = (html: string, leafletSectionList: any[]) => {
-    // Parse HTML and extract leaflet sections, which are divs with a xmlns="http://www.w3.org/1999/xhtml" attribute, and add them to the leafletSectionList
-    const dom = new JSDOM.JSDOM(html);
-    const document = dom.window.document;
-    const divs = document.querySelectorAll('div[xmlns="http://www.w3.org/1999/xhtml"]');
-    let newLeafletSectionList: any[] = [];
-
-    for (let i = 0; i < divs.length; i++) {
-        let div = divs[i];
-        let sectionTitle = leafletSectionList[i]?.title;
-        let sectionCode = leafletSectionList[i]?.code;
-        if (div == undefined) {
-            continue;
-        }
-        if (sectionTitle == undefined) {
-            sectionTitle = div.querySelector('h1, h2, h3, h4, h5, h6')?.textContent || "Section " + (i + 1);
-        }
-
-        if (sectionCode == undefined) {
-            sectionCode = {
-                coding: [{
-                    system: "http://hl7.org/fhir/CodeSystem/section-code",
-                    code: "section-" + (i + 1),
-                    display: sectionTitle
-                }]
-            };
-        }
-
-        let sectionObject: any = {
-            title: sectionTitle,
-            code: sectionCode,
-            text: {
-                status: "additional",
-                div: div.outerHTML
-            }
-        };
-        newLeafletSectionList.push(sectionObject);
-    }
-
-    return newLeafletSectionList;
 }
 
 const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv: any, preprocessors: string[] | undefined, parsedLensesNames: any[] | undefined) => {
@@ -636,7 +442,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     }
 
     let lenses = []
-    let completeLenses = []
+    let completeLenses: any[] = []
     console.log(parsedLensesNames)
     if (parsedLensesNames) {
         for (let i in parsedLensesNames) {
@@ -644,8 +450,6 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
             try {
                 let lens = await lensesProvider.getLensFromSelector(lensObj["lensSelector"], lensObj["lensName"])
                 completeLenses.push(lens)
-                const lensBase64data = lens.content[0].data
-                lenses.push(atob(lensBase64data))
             } catch (error) {
                 console.log(error);
             }
@@ -653,60 +457,13 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     } else {
 
     }
-    Logger.logInfo("lensesController.ts", "focusProcess", `Found the following lenses: ${completeLenses?.map(l => getLensIdenfier(l)).join(', ')}`);
-
-    // Get leaflet sectoins from ePI
-    let leafletSectionList = getLeaflet(epi)
-
-    // Iterate lenses
-    for (let i in lenses) {
-        let lens = lenses[i]
-        let lensFullName = `${parsedLensesNames![i].lensSelector}_${parsedLensesNames![i].lensName}`
-        lensApplied = false
-
-        // If there are lenses, we can already mark the ePI as enhanced
-        epi = setCategoryCode(epi, "E", "Enhanced")
-        
-        let lensIdentifier = getLensIdenfier(completeLenses[i])
-        let epiLanguage = getlanguage(epi)
-        let patientIdentifier = getPatientIdentifierFromPatientSummary(ips)
-        
-        let lensApplication = await applyLensToSections(lens, leafletSectionList, lensFullName, responseMessage, epi, ips, completeLenses, res)
-
-        if (lensApplied) {
-            leafletSectionList = lensApplication.leafletSectionList
-            let explanationText = lensApplication.explanation || await createExplanation(patientIdentifier, epiLanguage, lensIdentifier)
-
-            if (explanationText != undefined && explanationText != "") {
-                let epiExtensions = getExtensions(epi)
-                epiExtensions.push({
-                    "extension": [
-                        {
-                            "url": "lens",
-                            "valueCodeableReference": {
-                                "reference": {
-                                    "reference": "Library/" + lensIdentifier
-                                }
-                            }
-                        },
-                        {
-                            "url": "elementClass",
-                            "valueString": lensIdentifier
-                        },
-                        {
-                            "url": "explanation",
-                            "valueString": explanationText
-                        }
-                    ],
-                    "url": "http://hl7.eu/fhir/ig/gravitate-health/StructureDefinition/LensesApplied"
-                })
-            }
-
-            epi = setExtensions(epi, epiExtensions)
-        }
-
-    }
-    epi = writeLeaflet(epi, leafletSectionList)
+     //// LENS EXECUTION ENVIRONMENT
+    let focusingErrors: any[] = []
+    const lensResult = await applyLenses(epi, ips, completeLenses)
+    epi = lensResult.epi
+    focusingErrors = lensResult.focusingErrors
+    responseMessage.focusingErrors = focusingErrors
+    logAndSendResponseWithHeaders(res, responseMessage, HttpStatusCode.InternalServerError) //TODO update focusing function!
 
     responseMessage.response = epi;
 
@@ -739,91 +496,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     }
 }
 
-const applyLensToSections = async (lens: string, leafletSectionList: any[], lensFullName: string, responseMessage: any, epi: any, ips: any, completeLenses: any, res: Response) => {
-    try {
-        // Iterate on leaflet sections
-        // I want to only execute the lens all sections at a time, so I will not use a forEach
-        Logger.logInfo("lensesController.ts", "focusProcess", `Applying lens ${lensFullName} to leaflet sections`)
-        if (leafletSectionList == undefined || leafletSectionList.length == 0) {
-            responseMessage.focusingErrors.push({
-                message: "No leaflet sections found",
-                lensName: lensFullName
-            })
-            return {
-                leafletSectionList: leafletSectionList,
-                explanation: ""
-            }
-        }
-        if (lens == undefined || lens == "") {
-            responseMessage.focusingErrors.push({
-                message: "Lens is undefined or empty",
-                lensName: lensFullName
-            })
-            return {
-                leafletSectionList: leafletSectionList,
-                explanation: ""
-            }
-        }
-        if (typeof lens !== 'string') {
-            responseMessage.focusingErrors.push({
-                message: "Lens is not a string",
-                lensName: lensFullName
-            })
-            return {
-                leafletSectionList: leafletSectionList,
-                explanation: ""
-            }
-        }
-
-        let leafletHTMLString = getLeafletHTMLString(leafletSectionList)
-        let explanation = ""
-
-        // Create enhance function from lens
-        let lensFunction = new Function("epi, ips, pv, html", lens)
-        let resObject = lensFunction(epi, ips, {}, leafletHTMLString)
-        try {
-            // Execute lens and save result on ePI leaflet section
-            let enhancedHtml = await resObject.enhance()
-            // If the lens has an explanation function, execute it
-            if (resObject.explanation == undefined || resObject.explanation == null || typeof resObject.explanation !== 'function') {
-                Logger.logInfo("lensesController.ts", "focusProcess", `Lens ${lensFullName} does not have an explanation function, using empty string`)
-                resObject.explanation = async () => {
-                    return ""
-                }
-            }
-            
-            explanation = await resObject.explanation()
-            const diff = leafletHTMLString.localeCompare(enhancedHtml)
-            if (diff != 0) {
-                lensApplied = true
-                Logger.logInfo("lensesController.ts", "focusProcess", `Lens ${lensFullName} applied to leaflet sections`)
-            }
-
-            leafletSectionList = getLeafletSectionListFromHTMLString(enhancedHtml, leafletSectionList)
-        } catch (error) {
-            Logger.logError("lensesController.ts", "focusProcess", `Error executing lens ${lensFullName} on leaflet sections`)
-            console.error(error);
-            responseMessage.focusingErrors.push({
-                message: "Error executing lens",
-                lensName: lensFullName
-            })
-            return {
-                leafletSectionList: leafletSectionList,
-                explanation: ""
-            }
-        }
-
-        return {
-            leafletSectionList: leafletSectionList,
-            explanation: explanation || ""
-        }
-    } catch (error: any) {
-        console.log(error);
-        console.log("finished before expected!")
-        logAndSendResponseWithHeaders(res, responseMessage, HttpStatusCode.InternalServerError)
-        return {
-            leafletSectionList: leafletSectionList,
-            explanation: ""
-        }
-    }
+const getExtensions = (epi: any) => {
+    const composition = findResourceByType(epi, "Composition");
+    return composition.extension || [];
 }
