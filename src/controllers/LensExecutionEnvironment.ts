@@ -339,10 +339,17 @@ const setExtensions = (epi: any, extensions: any) => {
 }
 
 const writeLeaflet = (epi: any, leafletSectionList: any[]) => {
-    const composition = getLeaflet(epi)
+    const composition = findResourceByType(epi, "Composition");
     if (!composition) {
+        Logger.logError("lensesController.ts", "writeLeaflet", "Composition resource not found in ePI");
         return epi;
     }
+    
+    if (!composition.section || !Array.isArray(composition.section)) {
+        Logger.logError("lensesController.ts", "writeLeaflet", "Composition has no sections");
+        return epi;
+    }
+    
     // Find the main leaflet section and update it
     const leafletSectionIndex = composition.section.findIndex((s: any) => s.section && Array.isArray(s.section));
     if (leafletSectionIndex >= 0) {
