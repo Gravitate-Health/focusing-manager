@@ -463,7 +463,6 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     epi = lensResult.epi
     focusingErrors = lensResult.focusingErrors
     responseMessage.focusingErrors = focusingErrors
-    logAndSendResponseWithHeaders(res, responseMessage, HttpStatusCode.InternalServerError) //TODO update focusing function!
 
     responseMessage.response = epi;
 
