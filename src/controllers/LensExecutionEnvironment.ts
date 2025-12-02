@@ -67,7 +67,8 @@ const applyLensToSections = async (lens: any, leafletSectionList: any[], epi: an
     let lensCode = "" 
     try {
         const lensBase64data = lens.content[0].data
-        lensCode = atob(lensBase64data)
+        // Decode base64 with proper UTF-8 support
+        lensCode = Buffer.from(lensBase64data, 'base64').toString('utf-8')
     } catch (error) {
         console.error('Lens code extraction error: ', error);
         return {
