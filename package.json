@@ -27,6 +27,7 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
+    "@gravitatehealth/lens-execution-environment": "^0.0.1",
     "@kubernetes/client-node": "^1.4.0",
     "axios": "^1.3.5",
     "dotenv": "^16.0.3",
