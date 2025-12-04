@@ -9,7 +9,7 @@ import { ProfileProvider } from "../providers/profile.provider";
 import { Liquid } from "liquidjs";
 import { readFileSync, stat } from "fs";
 import { objectEquals } from "../utils/utils"
-import { applyLenses } from "@gravitatehealth/lens-execution-environment";
+import { applyLenses } from "@gravitate-health/lens-execution-environment";
 
 const FHIR_IPS_URL = process.env.FHIR_IPS_URL as string;
 const FHIR_EPI_URL = process.env.FHIR_EPI_URL as string;
