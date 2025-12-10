@@ -9,6 +9,8 @@ const LEE_URL = process.env.LEE_URL || "";
 export class LensesProvider extends AxiosController {
     private lensSelectorMap: Record<string, string> = {}
     private lensNameMap: Record<string, { selectorName: string, actualLensName: string }> = {}
+    private isRefreshing: boolean = false; // Prevent concurrent refreshes
+    private refreshPromise: Promise<Record<string, string>> | null = null; // Share refresh promise
 
     constructor(baseUrl: string) {
         super(baseUrl);
@@ -31,9 +33,23 @@ export class LensesProvider extends AxiosController {
     getLensSelectorAvailableLenses = async (lensSelectorName: string) => {
         let baseUrl = this.lensSelectorMap[lensSelectorName]
         if (!baseUrl) {
-            const msg = `Lens selector not found: ${lensSelectorName}`
-            Logger.logError('lenses.provider.ts', 'getLensSelectorAvailableLenses', msg)
-            throw new Error(msg)
+            Logger.logWarn('lenses.provider.ts', 'getLensSelectorAvailableLenses', 
+                `Lens selector not found: ${lensSelectorName}. Refreshing service registry...`)
+            
+            try {
+                await this.queryFocusingServices();
+                baseUrl = this.lensSelectorMap[lensSelectorName];
+                
+                if (!baseUrl) {
+                    const msg = `Lens selector still not found after refresh: ${lensSelectorName}`
+                    Logger.logError('lenses.provider.ts', 'getLensSelectorAvailableLenses', msg)
+                    throw new Error(msg)
+                }
+            } catch (error) {
+                Logger.logError('lenses.provider.ts', 'getLensSelectorAvailableLenses', 
+                    `Failed to refresh service registry: ${error}`)
+                throw new Error(`Lens selector not found: ${lensSelectorName}`)
+            }
         }
         const url = `${baseUrl}/lenses`
         Logger.logInfo('lenses.provider.ts', 'getLensSelectorAvailableLenses', `Getting lenses from selector: ${url}`)
@@ -89,9 +105,23 @@ export class LensesProvider extends AxiosController {
         let lensCompleteName = `${lensName}`
         let baseUrl = this.lensSelectorMap[lensSelectorName]
         if (!baseUrl) {
-            const msg = `Lens selector not found: ${lensSelectorName}`
-            Logger.logError('lenses.provider.ts', 'getLensSelectorAvailableLenses', msg)
-            throw new Error(msg)
+            Logger.logWarn('lenses.provider.ts', 'getLensFromSelector', 
+                `Lens selector not found: ${lensSelectorName}. Refreshing service registry...`)
+            
+            try {
+                await this.queryFocusingServices();
+                baseUrl = this.lensSelectorMap[lensSelectorName];
+                
+                if (!baseUrl) {
+                    const msg = `Lens selector still not found after refresh: ${lensSelectorName}`
+                    Logger.logError('lenses.provider.ts', 'getLensFromSelector', msg)
+                    throw new Error(msg)
+                }
+            } catch (error) {
+                Logger.logError('lenses.provider.ts', 'getLensFromSelector', 
+                    `Failed to refresh service registry: ${error}`)
+                throw new Error(`Lens selector not found: ${lensSelectorName}`)
+            }
         }
         let url = `${baseUrl}/lenses/${lensCompleteName}`;
         Logger.logInfo('lenses.provider.ts', 'getLensSelectorAvailableLenses', `Getting lens from selector: ${url}`)
@@ -105,23 +135,45 @@ export class LensesProvider extends AxiosController {
     }
 
     queryFocusingServices = async () => {
+        // If already refreshing, wait for that operation to complete
+        if (this.isRefreshing && this.refreshPromise) {
+            Logger.logDebug("lenses.provider.ts", "queryFocusingServices", 
+                "Refresh already in progress, waiting...");
+            return this.refreshPromise;
+        }
+        
+        // Mark as refreshing and create promise
+        this.isRefreshing = true;
+        this.refreshPromise = this._performRefresh();
+        
+        try {
+            const result = await this.refreshPromise;
+            return result;
+        } finally {
+            this.isRefreshing = false;
+            this.refreshPromise = null;
+        }
+    }
+
+    private _performRefresh = async (): Promise<Record<string, string>> => {
         const services = await (await ServiceClientFactory.getClient()).getServiceBaseUrlsByLabel(FOCUSING_LABEL_SELECTOR)
-        const map: Record<string, string> = {}
+        const newMap: Record<string, string> = {}
         if (services && services instanceof Array) {
             services.forEach((s: string) => {
                 try {
                     const parsed = new URL(s)
                     const domain = parsed.hostname
-                    map[domain] = s
+                    newMap[domain] = s
                 } catch (err) {
                     // fallback: strip protocol and path
                     const domain = (s || '').replace(/(^\w+:|^)\/\//, '').split('/')[0]
-                    map[domain] = s
+                    newMap[domain] = s
                 }
             })
         }
-        this.lensSelectorMap = map
-        return map
+        // Atomic replacement of the selector map
+        this.lensSelectorMap = newMap
+        return newMap
     }
 
     // filter lensNameMap with given lenses
