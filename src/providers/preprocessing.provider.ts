@@ -155,6 +155,7 @@ export class PreprocessingProvider extends AxiosController {
         
         try {
             let response = await this.request.post(url, epi)
+            this.setCategoryCode(epi, "P");
             return response.data
         } catch (error) {
             Logger.logError('preprocessing.provider.ts', 'callPreprocessingService', 
@@ -207,4 +208,56 @@ export class PreprocessingProvider extends AxiosController {
     isServiceRegistered = (serviceName: string): boolean => {
         return this.serviceMap.has(serviceName);
     }
+
+    setCategoryCode (epi: any, code: string):any  {
+    const composition = this.findResourceByType(epi, "Composition");
+    if (!composition) {
+        Logger.logWarn("lensesController.ts", "setCategoryCode", "Composition resource not found");
+        return;
+    }
+    
+    try {
+        if (!composition.category) {
+            composition.category = [];
+        }
+        if (!composition.category[0]) {
+            composition.category[0] = { coding: [] };
+        }
+        if (!composition.category[0].coding) {
+            composition.category[0].coding = [];
+        }
+        if (!composition.category[0].coding[0]) {
+            composition.category[0].coding[0] = {};
+        }
+        composition.category[0].coding[0].code = code;
+    } catch (error) {
+        Logger.logWarn("lensesController.ts", "setCategoryCode", "Could not set category code");
+    }
+}
+
+
+
+// Helper function to find a resource by type - handles both bundles and direct resources
+findResourceByType (resource: any, resourceType: string): any {
+    if (!resource) {
+        return null;
+    }
+    
+    // If it's the resource we're looking for, return it
+    if (resource.resourceType === resourceType) {
+        return resource;
+    }
+    
+    // If it's a Bundle, search in entries
+    if (resource.resourceType === "Bundle" && resource.entry && Array.isArray(resource.entry)) {
+        const entry = resource.entry.find((e: any) => 
+            e.resource && e.resource.resourceType === resourceType
+        );
+        return entry ? entry.resource : null;
+    }
+    
+    // Resource not found
+    return null;
+}
+
 }

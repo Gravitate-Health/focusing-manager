@@ -409,12 +409,12 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     }
     let preprocessingErrors
 
+    // PREPROCESSING 
     if (preprocessors) {
+        //TODO: handle caching of preprocessing results
+        //TODO: timeout for preprocessing
         try {
-            let categoryCode = getCategoryCode(epi)
-            if (categoryCode == "R" || categoryCode == "" || categoryCode == null) {
-                [epi, preprocessingErrors] = await preprocessingProvider.callServicesFromList(preprocessors, epi)
-            }
+            [epi, preprocessingErrors] = await preprocessingProvider.callServicesFromList(preprocessors, epi)
         } catch (error) {
             Logger.logError("lensesController.ts", "focusProcess", `Error in preprocessing provider, with the following preprocessors: ` + preprocessors)
             Logger.logError("lensesController.ts", "focusProcess", `Error in preprocessing provider: ` + JSON.stringify(error));
@@ -422,26 +422,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     }
     responseMessage["preprocessingErrors"] = preprocessingErrors || []
 
-    // IF EPI IS NOT PREPROCESSED, RETURN RAW EPI AND STOP FOCUSING PROCESS. DO NOT EXECUTE LENSES
-    // OR
-    // IF EPI IS MARKED AS PREPROCESSED BUT NO CATEGORIES ARE PRESENT, RETURN
-    let epiWasNotPreprocessed = false
-    if (getCategoryCode(epi) == "R") {
-        epiWasNotPreprocessed = objectEquals(epi, originalEpi)
-    }
-    let epiCategoryCoding = getCategoryCode(epi);
-    let epiExtensions = getExtensions(epi);
-    if (epiWasNotPreprocessed || epi == null || epiCategoryCoding == "R" || epiCategoryCoding == null || epiExtensions == undefined || epiExtensions == null || epiExtensions.length == 0) {
-        Logger.logInfo("lensesController.ts", "focusProcess", `EPI was not preprocessed or no categories found. Stopping focusing process and returning raw ePI.`)
-        // CONVERT TO "R" IN CASE IT WAS MARKED AS "P"
-        preprocessors?.forEach(preprocessorName => {
-            responseMessage["preprocessingErrors"].push({ serviceName: preprocessorName, error: "Preprocessed version of ePI could not be handled by preprocessor." })
-        })
-        logAndSendResponseWithHeaders(res, responseMessage)
-        return
-    }
-
-    let lenses = []
+    // LENS RESOLUTION
     let completeLenses: any[] = []
     console.log(parsedLensesNames)
     if (parsedLensesNames) {
@@ -457,7 +438,8 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     } else {
 
     }
-     //// LENS EXECUTION ENVIRONMENT
+    
+    // LENS EXECUTION ENVIRONMENT
     let focusingErrors: any[] = []
     const lensResult = await applyLenses(epi, ips, completeLenses)
     epi = lensResult.epi
