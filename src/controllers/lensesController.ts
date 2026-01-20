@@ -456,11 +456,22 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     
     // LENS EXECUTION ENVIRONMENT
     let focusingErrors: any[] = []
-    const { applyLenses: applyLensesFunc } = await loadApplyLenses();
-    const lensResult = await applyLensesFunc(epi, ips, completeLenses)
-    epi = lensResult.epi
-    focusingErrors = lensResult.focusingErrors
-    responseMessage.focusingErrors = focusingErrors
+    try {
+        const { applyLenses: applyLensesFunc } = await loadApplyLenses();
+        if (!applyLensesFunc) {
+            throw new Error("applyLenses could not be loaded");
+        }
+
+        const lensResult = await applyLensesFunc(epi, ips, completeLenses)
+        epi = lensResult.epi
+        focusingErrors = lensResult.focusingErrors
+        responseMessage.focusingErrors = focusingErrors
+    } catch (err: any) {
+        const errMsg = err?.message ?? err;
+        focusingErrors.push({ message: errMsg, lensName: "(applyLenses)" });
+        responseMessage.focusingErrors = focusingErrors
+        Logger.logError("lensesController.ts", "focusProcess", `Error applying lenses: ${errMsg}`)
+    }
 
     responseMessage.response = epi;
 
