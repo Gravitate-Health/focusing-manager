@@ -1,7 +1,7 @@
 import { AxiosError } from 'axios';
-import AxiosController from '../utils/axios';
-import { Logger } from '../utils/Logger';
-import { ServiceClientFactory } from '../utils/ServiceClientFactory';
+import AxiosController from '../utils/axios.js';
+import { Logger } from '../utils/Logger.js';
+import { ServiceClientFactory } from '../utils/ServiceClientFactory.js';
 
 const PREPROCESSING_LABEL_SELECTOR = process.env.PREPROCESSING_LABEL_SELECTOR || "eu.gravitate-health.fosps.preprocessing=True";
 const PREPROCESSING_EXTERNAL_ENDPOINTS = process.env.PREPROCESSING_EXTERNAL_ENDPOINTS || ""; // Comma-separated list of URLs

@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import { Logger } from '../utils/Logger';
+import { Logger } from '../utils/Logger.js';
 import { stringify } from 'qs';
-import ResponseError from '../error/ResponseError';
+import ResponseError from '../error/ResponseError.js';
 
 class AxiosController {
   protected readonly axiosInstance: AxiosInstance;

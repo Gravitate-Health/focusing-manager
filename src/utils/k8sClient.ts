@@ -1,5 +1,5 @@
 import * as fs from 'fs';
-import { IServiceClient } from './IServiceClient';
+import { IServiceClient } from './IServiceClient.js';
 
 // Dynamic import of Kubernetes client to handle ESM module
 let k8s: any;

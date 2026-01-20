@@ -1,5 +1,5 @@
 import {AxiosError} from 'axios';
-import { Logger } from "../utils/Logger";
+import { Logger } from "../utils/Logger.js";
 
 export interface ResponseErrorBody {}
 

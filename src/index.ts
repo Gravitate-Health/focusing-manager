@@ -2,7 +2,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import express from "express";
-import { FocusingManagerRouter } from "./routes/routes";
+import { FocusingManagerRouter } from "./routes/routes.js";
 
 const PORT = parseInt(process.env.SERVER_PORT as string) || 3000;
 

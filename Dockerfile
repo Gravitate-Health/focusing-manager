@@ -14,9 +14,8 @@ USER root
 
 WORKDIR /usr/src/app
 COPY --chown=node package*.json ./
-COPY . .
-RUN npm install
-COPY --from=buildstage /usr/src/app/build .
+COPY --chown=node --from=buildstage /usr/src/app/build . 
+RUN npm install --production
 
 EXPOSE ${PORT}
 

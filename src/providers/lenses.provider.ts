@@ -1,7 +1,7 @@
 import { parse } from 'dotenv';
-import AxiosController from '../utils/axios';
-import { ServiceClientFactory } from '../utils/ServiceClientFactory';
-import { Logger } from "../utils/Logger";
+import AxiosController from '../utils/axios.js';
+import { ServiceClientFactory } from '../utils/ServiceClientFactory.js';
+import { Logger } from "../utils/Logger.js";
 
 const FOCUSING_LABEL_SELECTOR = process.env.FOCUSING_LABEL_SELECTOR || "eu.gravitate-health.fosps.focusing=True";
 const LEE_URL = process.env.LEE_URL || "";

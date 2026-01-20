@@ -1,9 +1,9 @@
 
-import { Logger } from "../utils/Logger";
+import { Logger } from "../utils/Logger.js";
 import axios, { AxiosError, HttpStatusCode } from "axios";
 import { Response, Request } from "express";
-import { FhirEpiProvider } from "../providers/fhirEpi.provider";
-import { PreprocessingProvider } from "../providers/preprocessing.provider";
+import { FhirEpiProvider } from "../providers/fhirEpi.provider.js";
+import { PreprocessingProvider } from "../providers/preprocessing.provider.js";
 import { readFileSync } from "fs";
 import { Liquid } from "liquidjs";
 
