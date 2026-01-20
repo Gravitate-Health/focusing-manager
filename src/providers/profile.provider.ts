@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios';
-import AxiosController from '../utils/axios.js';
-import { Logger } from "../utils/Logger.js";
+import AxiosController from '../utils/axios';
+import { Logger } from "../utils/Logger";
 
 export class ProfileProvider extends AxiosController {
     constructor(baseUrl: string) {

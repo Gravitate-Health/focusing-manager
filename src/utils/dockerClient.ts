@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import * as fs from 'fs';
-import { IServiceClient } from './IServiceClient.js';
+import { IServiceClient } from './IServiceClient';
 
 interface DockerContainer {
   Id: string;

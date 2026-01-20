@@ -1,30 +1,15 @@
 import { Response, Request } from "express";
 import { HttpStatusCode } from "axios";
-import { Logger } from "../utils/Logger.js";
-import { PreprocessingProvider } from "../providers/preprocessing.provider.js";
-import { FhirEpiProvider } from "../providers/fhirEpi.provider.js";
-import { FhirIpsProvider } from "../providers/fhirIps.provider.js";
-import { LensesProvider } from "../providers/lenses.provider.js";
-import { ProfileProvider } from "../providers/profile.provider.js";
+import { Logger } from "../utils/Logger";
+import { PreprocessingProvider } from "../providers/preprocessing.provider";
+import { FhirEpiProvider } from "../providers/fhirEpi.provider";
+import { FhirIpsProvider } from "../providers/fhirIps.provider";
+import { LensesProvider } from "../providers/lenses.provider";
+import { ProfileProvider } from "../providers/profile.provider";
 import { Liquid } from "liquidjs";
 import { readFileSync, stat } from "fs";
-import { objectEquals } from "../utils/utils.js"
-
-// Workaround for ESM/CJS interop issue in lens-execution-environment
-let applyLenses: any;
-async function loadApplyLenses() {
-  if (!applyLenses) {
-    try {
-      // Try ESM import first
-      const mod = await import("@gravitate-health/lens-execution-environment");
-      applyLenses = mod.applyLenses;
-    } catch (e) {
-      // Fallback - will be handled at runtime
-      console.error("Failed to load applyLenses:", e);
-    }
-  }
-  return applyLenses;
-}
+import { objectEquals } from "../utils/utils"
+import { applyLenses } from "@gravitate-health/lens-execution-environment";
 
 const FHIR_IPS_URL = process.env.FHIR_IPS_URL as string;
 const FHIR_EPI_URL = process.env.FHIR_EPI_URL as string;
@@ -457,12 +442,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     // LENS EXECUTION ENVIRONMENT
     let focusingErrors: any[] = []
     try {
-        const { applyLenses: applyLensesFunc } = await loadApplyLenses();
-        if (!applyLensesFunc) {
-            throw new Error("applyLenses could not be loaded");
-        }
-
-        const lensResult = await applyLensesFunc(epi, ips, completeLenses)
+        const lensResult = await applyLenses(epi, ips, completeLenses)
         epi = lensResult.epi
         focusingErrors = lensResult.focusingErrors
         responseMessage.focusingErrors = focusingErrors

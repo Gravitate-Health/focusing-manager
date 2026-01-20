@@ -1,4 +1,4 @@
-import { IServiceClient } from "./IServiceClient.js";
+import { IServiceClient } from "./IServiceClient";
 
 export class ServiceClientFactory {
   private static k8sClient: IServiceClient | null = null;
@@ -10,13 +10,13 @@ export class ServiceClientFactory {
     if (useDockerClient) {
       // Lazy import only when needed
       if (!this.dockerClient) {
-        const { DockerClient } = await import("./dockerClient.js");
+        const { DockerClient } = await import("./dockerClient");
         this.dockerClient = new DockerClient();
       }
       return this.dockerClient;
     } else {
       if (!this.k8sClient) {
-        const { k8sClient } = await import("./k8sClient.js");
+        const { k8sClient } = await import("./k8sClient");
         this.k8sClient = new k8sClient();
       }
       return this.k8sClient;
