@@ -1,39 +1,48 @@
-import * as k8s from "@kubernetes/client-node";
 import * as fs from 'fs';
 import { IServiceClient } from './IServiceClient';
 
+// Dynamic import of Kubernetes client to handle ESM module
+let k8s: any;
+let kc: any;
+let coreV1Api: any;
 
-let environment = process.env.ENVIRONMENT;
-console.log(`Connecting to k8s cluster in ${environment} mode`);
+async function initK8sClient() {
+  if (k8s) return; // Already initialized
 
-const kc = new k8s.KubeConfig();
+  k8s = await import("@kubernetes/client-node");
+  
+  const environment = process.env.ENVIRONMENT;
+  console.log(`Connecting to k8s cluster in ${environment} mode`);
 
-if (environment === "dev") {
-  let cluster = {
-    name: process.env.CLUSTER_NAME,
-    server: process.env.CLUSTER_SERVER,
-    caData: process.env.CLUSTER_CADATA,
-  };
-  let user = {
-    name: process.env.USER_NAME,
-    token: process.env.USER_TOKEN,
-  };
-  let context = {
-    name: process.env.CONTEXT_NAME,
-    user: user.name,
-    cluster: cluster.name,
-  };
-  kc.loadFromOptions({
-    clusters: [cluster],
-    users: [user],
-    contexts: [context],
-    currentContext: context.name,
-  });
-} else {
-  kc.loadFromCluster();
+  kc = new k8s.KubeConfig();
+
+  if (environment === "dev") {
+    let cluster = {
+      name: process.env.CLUSTER_NAME,
+      server: process.env.CLUSTER_SERVER,
+      caData: process.env.CLUSTER_CADATA,
+    };
+    let user = {
+      name: process.env.USER_NAME,
+      token: process.env.USER_TOKEN,
+    };
+    let context = {
+      name: process.env.CONTEXT_NAME,
+      user: user.name,
+      cluster: cluster.name,
+    };
+    kc.loadFromOptions({
+      clusters: [cluster],
+      users: [user],
+      contexts: [context],
+      currentContext: context.name,
+    });
+  } else {
+    kc.loadFromCluster();
+  }
+
+  coreV1Api = kc.makeApiClient(k8s.CoreV1Api);
 }
-
-const coreV1Api = kc.makeApiClient(k8s.CoreV1Api);
 
 function resolveNamespace(): string {
   // 1) common env vars set by runners / manifests
@@ -68,10 +77,13 @@ function resolveNamespace(): string {
 export class k8sClient implements IServiceClient {
   async getServiceBaseUrlsByLabel(labelSelector: string): Promise<string[]> {
     try {
+      // Ensure k8s client is initialized
+      await initK8sClient();
+
       const namespace = resolveNamespace();
 
       // use the generated request-object overload
-      const req: k8s.CoreV1ApiListNamespacedServiceRequest = {
+      const req: any = {
         namespace,
         labelSelector,
       };
