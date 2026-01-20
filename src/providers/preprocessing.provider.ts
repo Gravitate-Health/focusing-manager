@@ -8,6 +8,8 @@ const PREPROCESSING_EXTERNAL_ENDPOINTS = process.env.PREPROCESSING_EXTERNAL_ENDP
 
 export class PreprocessingProvider extends AxiosController {
     private serviceMap: Map<string, string> = new Map(); // Maps service name to URL
+    private isRefreshing: boolean = false; // Prevent concurrent refreshes
+    private refreshPromise: Promise<string[]> | null = null; // Share refresh promise
 
     constructor(baseUrl: string) {
         super(baseUrl);
@@ -56,6 +58,27 @@ export class PreprocessingProvider extends AxiosController {
     }
 
     queryPreprocessingServices = async (): Promise<string[]> => {
+        // If already refreshing, wait for that operation to complete
+        if (this.isRefreshing && this.refreshPromise) {
+            Logger.logDebug("preprocessing.provider.ts", "queryPreprocessingServices", 
+                "Refresh already in progress, waiting...");
+            return this.refreshPromise;
+        }
+        
+        // Mark as refreshing and create promise
+        this.isRefreshing = true;
+        this.refreshPromise = this._performRefresh();
+        
+        try {
+            const result = await this.refreshPromise;
+            return result;
+        } finally {
+            this.isRefreshing = false;
+            this.refreshPromise = null;
+        }
+    }
+
+    private _performRefresh = async (): Promise<string[]> => {
         // Get discovered services
         const discoveredUrls = await (await ServiceClientFactory.getClient()).getServiceBaseUrlsByLabel(PREPROCESSING_LABEL_SELECTOR);
         
@@ -65,12 +88,11 @@ export class PreprocessingProvider extends AxiosController {
         // Combine both sources
         const allServiceUrls = [...discoveredUrls, ...externalUrls];
         
-        Logger.logDebug("preprocessing.provider.ts", "queryPreprocessingServices", 
+        Logger.logDebug("preprocessing.provider.ts", "_performRefresh", 
             `Total services: ${allServiceUrls.length} (${discoveredUrls.length} discovered, ${externalUrls.length} external)`);
         
-        // Clear existing map
-        this.serviceMap.clear();
-        
+        // Build new map atomically before replacing
+        const newServiceMap = new Map<string, string>();
         const serviceNames: string[] = [];
 
         for (const url of allServiceUrls) {
@@ -78,20 +100,23 @@ export class PreprocessingProvider extends AxiosController {
             
             // Check if this name already exists
             let count = 1;
-            while (this.serviceMap.has(count > 1 ? `${baseName}-${count}` : baseName)) {
+            while (newServiceMap.has(count > 1 ? `${baseName}-${count}` : baseName)) {
                 count++;
             }
             
             // Generate unique name (add number suffix if duplicate)
             const uniqueName = count > 1 ? `${baseName}-${count}` : baseName;
             
-            // Store mapping
-            this.serviceMap.set(uniqueName, url);
+            // Store mapping in new map
+            newServiceMap.set(uniqueName, url);
             serviceNames.push(uniqueName);
             
-            Logger.logDebug("preprocessing.provider.ts", "queryPreprocessingServices", 
+            Logger.logDebug("preprocessing.provider.ts", "_performRefresh", 
                 `Registered preprocessing service: ${uniqueName} -> ${url}`);
         }
+
+        // Atomic replacement of the service map
+        this.serviceMap = newServiceMap;
 
         return serviceNames;
     }
@@ -101,12 +126,27 @@ export class PreprocessingProvider extends AxiosController {
     }
 
     callPreprocessingService = async (serviceName: string, epi: any) => {
-        const serviceUrl = this.getServiceUrl(serviceName);
+        let serviceUrl = this.getServiceUrl(serviceName);
         
+        // If service not found in map, try to refresh the registry
         if (!serviceUrl) {
-            Logger.logError('preprocessing.provider.ts', 'callPreprocessingService', 
-                `Service name not found in registry: ${serviceName}`);
-            throw new Error(`Unknown preprocessing service: ${serviceName}`);
+            Logger.logWarn('preprocessing.provider.ts', 'callPreprocessingService', 
+                `Service name not found in registry: ${serviceName}. Refreshing service registry...`);
+            
+            try {
+                await this.queryPreprocessingServices();
+                serviceUrl = this.getServiceUrl(serviceName);
+                
+                if (!serviceUrl) {
+                    Logger.logError('preprocessing.provider.ts', 'callPreprocessingService', 
+                        `Service name still not found after refresh: ${serviceName}`);
+                    throw new Error(`Unknown preprocessing service: ${serviceName}`);
+                }
+            } catch (error) {
+                Logger.logError('preprocessing.provider.ts', 'callPreprocessingService', 
+                    `Failed to refresh service registry: ${error}`);
+                throw new Error(`Unknown preprocessing service: ${serviceName}`);
+            }
         }
         
         const url = `${serviceUrl}/preprocess`;
@@ -115,6 +155,7 @@ export class PreprocessingProvider extends AxiosController {
         
         try {
             let response = await this.request.post(url, epi)
+            this.setCategoryCode(epi, "P");
             return response.data
         } catch (error) {
             Logger.logError('preprocessing.provider.ts', 'callPreprocessingService', 
@@ -167,4 +208,56 @@ export class PreprocessingProvider extends AxiosController {
     isServiceRegistered = (serviceName: string): boolean => {
         return this.serviceMap.has(serviceName);
     }
+
+    setCategoryCode (epi: any, code: string):any  {
+    const composition = this.findResourceByType(epi, "Composition");
+    if (!composition) {
+        Logger.logWarn("lensesController.ts", "setCategoryCode", "Composition resource not found");
+        return;
+    }
+    
+    try {
+        if (!composition.category) {
+            composition.category = [];
+        }
+        if (!composition.category[0]) {
+            composition.category[0] = { coding: [] };
+        }
+        if (!composition.category[0].coding) {
+            composition.category[0].coding = [];
+        }
+        if (!composition.category[0].coding[0]) {
+            composition.category[0].coding[0] = {};
+        }
+        composition.category[0].coding[0].code = code;
+    } catch (error) {
+        Logger.logWarn("lensesController.ts", "setCategoryCode", "Could not set category code");
+    }
+}
+
+
+
+// Helper function to find a resource by type - handles both bundles and direct resources
+findResourceByType (resource: any, resourceType: string): any {
+    if (!resource) {
+        return null;
+    }
+    
+    // If it's the resource we're looking for, return it
+    if (resource.resourceType === resourceType) {
+        return resource;
+    }
+    
+    // If it's a Bundle, search in entries
+    if (resource.resourceType === "Bundle" && resource.entry && Array.isArray(resource.entry)) {
+        const entry = resource.entry.find((e: any) => 
+            e.resource && e.resource.resourceType === resourceType
+        );
+        return entry ? entry.resource : null;
+    }
+    
+    // Resource not found
+    return null;
+}
+
 }
