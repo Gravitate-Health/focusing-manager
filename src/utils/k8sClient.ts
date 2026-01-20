@@ -9,7 +9,9 @@ let coreV1Api: any;
 async function initK8sClient() {
   if (k8s) return; // Already initialized
 
-  k8s = await import("@kubernetes/client-node");
+  // Use Function constructor to prevent TypeScript from converting import() to require()
+  const dynamicImport = new Function('specifier', 'return import(specifier)');
+  k8s = await dynamicImport("@kubernetes/client-node");
   
   const environment = process.env.ENVIRONMENT;
   console.log(`Connecting to k8s cluster in ${environment} mode`);
