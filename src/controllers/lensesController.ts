@@ -66,283 +66,44 @@ const getAllPreprocessorNames = async (): Promise<string[]> => {
     return preprocessors
 }
 
-const getAllLensesNames = async (): Promise<string[]> => {
-    let lensesList: string[] = [];
-    // Get lensSelectors
-    let lensSelectorList = await lensesProvider.getLensSelectors()
-    for (let i in lensSelectorList) {
-        let lensSelectorName = lensSelectorList[i]
-        try {
-            // Get available lenses from lensSelector
-            let response = await lensesProvider.getLensSelectorAvailableLenses(lensSelectorName)
-            response["lenses"].forEach((lens: string) => {
-            // check if lens exists before pushing
-            if (lensesList.includes(`${lens}`)) {
-                let fullLensName = `${lensSelectorName}/${lens}`
-                Logger.logInfo("lensesController.ts", "getLensesNames",
-                    `Lens ${fullLensName} already exists, skipping. You might have duplicate lenses across selectors.`
-                );
-            } else {
-                lensesList.push(lens)
-            }
-        });
-            
-        } catch (error) {
-            
-        }
-    }
-    return lensesList
-}
-
 export const getLensesNames = async (_req: Request, res: Response) => {
-    Logger.logInfo("lensesController.ts", "focus", "\n\n\n_____________ GET LENSES ____________")
-    let lensesList: string[] = [];
+    Logger.logInfo("lensesController.ts", "getLensesNames", "\n\n\n_____________ GET LENSES ____________")
     try {
-        lensesList = await getAllLensesNames()
+        const lensesList = await lensesProvider.getAllAvailableLenses()
+        res.status(HttpStatusCode.Ok).send({
+            lenses: lensesList
+        })
     } catch (error) {
+        Logger.logError("lensesController.ts", "getLensesNames", `Error: ${error}`)
         res.status(HttpStatusCode.InternalServerError).send({
-            error: "There was an error"
+            error: "There was an error retrieving lenses"
         })
-        return
     }
-    res.status(HttpStatusCode.Ok).send({
-        lenses: lensesList
-    })
 }
 
-export const focusEpiIdIpsId = async (req: Request, res: Response) => {
-    Logger.logInfo("lensesController.ts", "focus", "\n\n\n_____________ POST FOCUS ____________")
-    let preprocessors: string[] | undefined, lensesNames: string[] | string, epi: any, ips: any, pv: any
-
-    let reqEpiId = req.params.epiId as string
-    let reqPatientIdentifier = req.query.patientIdentifier as string
-    let reqPreprocessors = req.query.preprocessors as string[]
-    let reqLensesNames = req.query.lenses as string[]
-
-    if (!reqEpiId || reqEpiId === "undefined") {
-        res.status(HttpStatusCode.BadRequest).send({
-            message: "Provide valid epiId value."
-        })
-        return
-    } else if (!reqPatientIdentifier || reqPatientIdentifier === "undefined") {
-        res.status(HttpStatusCode.BadRequest).send({
-            message: "Provide valid patientIdentifier value."
-        })
-        return
-    }
-
-    Logger.logDebug("lensesController.ts", "focus", `epiId: ${reqEpiId} -- patientIdentifier: ${reqPatientIdentifier} -- preprocessors: ${reqPreprocessors} -- lenses: ${reqLensesNames} -- `)
-
-    // get epiId
-    try {
-        let epiResponse = await fhirEpiProvider.getEpiById(reqEpiId)
-        Logger.logInfo("lensesController.ts", "focus", `Got ePI with id: ${reqEpiId} -- `)
-        epi = epiResponse.data
-    } catch (error: any) {
-        if (error.statusCode === 404) {
-            res.status(HttpStatusCode.NotFound).send(error)
-            return
-        }
-    }
-
-    // get IPS
-    try {
-        let ipsResponse = await fhirIpsProvider.getIpsByPatientIdentifier(reqPatientIdentifier)
-        Logger.logInfo("lensesController.ts", "focus", `Got IPS with patientIdentifier: ${reqPatientIdentifier} -- `)
-        ips = ipsResponse.data
-    } catch (error: any) {
-        console.log(error);
-        if (error.status == 400 && error.body["issue"][0]["severity"] == "error") {
-            Logger.logInfo('FhirIpsProvider.ts', "getIpsByPatientIdentifier", `More than one patient found for the provided identifier: ${reqPatientIdentifier}`);
-            //throw new Error(`Multiple patient resources found matching provided identifier: ${reqPatientIdentifier}`);
-        } else {
-            res.status(error.statusCode).send(error.body.errorData)
-            return
-        }
-    }
-
-    if (req.query.lenses) {
-        lensesNames = req.query.lenses as string;
-    } else {
-        lensesNames = await getAllLensesNames();
-    }
-
-    if (req.query.preprocessors) {
-        reqPreprocessors = req.query.preprocessors as string[];
-    } else {
-        reqPreprocessors = await getAllPreprocessorNames();
-    }
-
-
-    // TODO: change g-lens profile for PersonaVector
-    pv = await personaVectorParser(reqPatientIdentifier);
-    preprocessors = await parsePreprocessors(reqPreprocessors, res);
-    let parsedLensesNames: any[] | undefined = await parseLenses(lensesNames, res);
-
-    focusProccess(req, res, epi, ips, pv, preprocessors, parsedLensesNames);
-}
-
-export const baseRequest = (req: Request, res: Response) => {
+export const focus = async (req: Request, res: Response) => {
     console.log("_________________________________________")
-    Logger.logInfo("lensesController.ts", "baseRequest", "\n\n\n_____________ POST /focusing/focus ____________");
+    Logger.logInfo("lensesController.ts", "focus", "\n\n\n_____________ POST /focusing/focus ____________");
     console.log("_________________________________________")
 
-    let bodyIPS = req.query.patientIdentifier ? undefined : req.body.ips;
-    let bodyEPI = req.params.epiId ? undefined : req.body.epi;
+    // Get ePI (from params or body)
+    const epi = await getEpi(req, res);
+    if (!epi) return;
 
-    if (bodyEPI != undefined && bodyIPS != undefined) {
-        focusFullEpiFullIps(req, res);
-    } else if (req.query.patientIdentifier && bodyEPI != undefined) {
-        focusFullEpiIpsId(req, res);
-    } else if (req.params.epiId && bodyIPS != undefined) {
-        focusEpiIdFullIps(req, res);
-    } else if (req.params.epiId && req.query.patientIdentifier) {
-        focusEpiIdIpsId(req, res)
-    } else {
-        res.status(HttpStatusCode.BadRequest).send({
-            message: "Bad request",
-            reason: "Missing parameters"
-        })
-    }
-}
+    // Get IPS (from query or body)
+    const ips = await getIps(req, res);
+    if (!ips) return;
 
-const focusFullEpiFullIps = async (req: Request, res: Response) => {
-    let ips = req.body.ips;
-    let epi = req.body.epi;
-    let lenses;
-    let reqPreprocessors;
+    // Get and parse lenses and preprocessors
+    const result = await getLensesAndPreprocessors(req, res);
+    if (!result) return;
+    
+    const { preprocessors, parsedLenses } = result;
 
-    if (req.query.lenses) {
-        lenses = req.query.lenses as string;
-    } else {
-        lenses = await getAllLensesNames();
-    }
+    // Get persona vector
+    const pv = await personaVectorParser(req.query.patientIdentifier as string);
 
-    if (req.query.preprocessors) {
-        reqPreprocessors = req.query.preprocessors as string[];
-    } else {
-        reqPreprocessors = await getAllPreprocessorNames();
-    }
-
-    let parsedLensesNames: any[] | undefined = await parseLenses(lenses, res);
-    let preprocessors: string[] | undefined = await parsePreprocessors(reqPreprocessors, res);
-    let pv = await personaVectorParser(req.query.patientIdentifier as string);
-    focusProccess(req, res, epi, ips, pv, preprocessors, parsedLensesNames);
-}
-
-const focusFullEpiIpsId = async (req: Request, res: Response) => {
-    const reqPatientIdentifier = req.query.patientIdentifier as string;
-    let epi = req.body.epi;
-    let ips: any;
-    let lenses;
-    let reqPreprocessors;
-
-    if (!reqPatientIdentifier || reqPatientIdentifier === "undefined") {
-        res.status(HttpStatusCode.BadRequest).send({
-            message: "Provide valid patientIdentifier value."
-        })
-        return
-    }
-
-    try {
-        let ipsResponse = await fhirIpsProvider.getIpsByPatientIdentifier(reqPatientIdentifier)
-        ips = ipsResponse.data
-    } catch (error: any) {
-        if (error.statusCode === 404) {
-            res.status(HttpStatusCode.NotFound).send(error)
-            return
-        }
-    }
-
-
-    if (req.query.lenses) {
-        lenses = req.query.lenses as string;
-    } else {
-        lenses = await getAllLensesNames();
-    }
-
-    if (req.query.preprocessors) {
-        reqPreprocessors = req.query.preprocessors as string[];
-    } else {
-        reqPreprocessors = await getAllPreprocessorNames();
-    }
-
-    let parsedLensesNames: any[] | undefined = await parseLenses(lenses, res);
-    let preprocessors: string[] | undefined = await parsePreprocessors(reqPreprocessors, res);
-    let pv = await personaVectorParser(req.query.patientIdentifier as string);
-
-    focusProccess(req, res, epi, ips, pv, preprocessors, parsedLensesNames);
-}
-
-const focusEpiIdFullIps = async (req: Request, res: Response) => {
-    const epiId = req.params.epiId;
-    let epi: any;
-    let ips = req.body.ips;
-    let lenses;
-    let reqPreprocessors;
-
-    if (!epiId || epiId === "undefined") {
-        res.status(HttpStatusCode.BadRequest).send({
-            message: "Provide valid epiId value."
-        })
-        return
-    }
-
-    try {
-        let epiResponse = await fhirEpiProvider.getEpiById(epiId as string)
-        epi = epiResponse.data
-    } catch (error: any) {
-        if (error.statusCode === 404) {
-            res.status(HttpStatusCode.NotFound).send(error)
-            return
-        }
-    }
-
-
-    if (req.query.lenses) {
-        lenses = req.query.lenses as string;
-    } else {
-        lenses = await getAllLensesNames();
-    }
-
-    if (req.query.preprocessors) {
-        reqPreprocessors = req.query.preprocessors as string[];
-    } else {
-        reqPreprocessors = await getAllPreprocessorNames();
-    }
-
-    let parsedLensesNames: any[] | undefined = await parseLenses(lenses, res);
-    let preprocessors: string[] | undefined = await parsePreprocessors(req.query.preprocessors as string[], res);
-    let pv = await personaVectorParser(req.query.patientIdentifier as string);
-    focusProccess(req, res, epi, ips, pv, preprocessors, parsedLensesNames);
-}
-
-const parseLenses = async (reqLensesNames: string[] | string, res: Response) => {
-    // Parse lenses
-    let parsedLensesNames: any[] = []
-    try {
-        parsedLensesNames = await lensesProvider.parseLenses(reqLensesNames);
-        return parsedLensesNames;
-    } catch (error) {
-        res.status(HttpStatusCode.InternalServerError).send({
-            error: error
-        })
-        return
-    }
-}
-
-const parsePreprocessors = async (reqPreprocessors: string[], res: Response) => {
-    // Parse preprocessors
-    let preprocessors: string[] | undefined;
-    try {
-        preprocessors = await preprocessingProvider.parsePreprocessors(reqPreprocessors)
-        return preprocessors;
-    } catch (error) {
-        res.status(HttpStatusCode.InternalServerError).send({
-            error: "There was an error parsing preprocessors"
-        })
-        return
-    }
+    focusProccess(req, res, epi, ips, pv, preprocessors, parsedLenses);
 }
 
 const personaVectorParser = async (partientId: string) => {
@@ -353,6 +114,105 @@ const personaVectorParser = async (partientId: string) => {
         return pv;
     } catch (error: any) {
         console.log(`Could not find G-Lens Profile por Patient id: ${partientId}`);
+    }
+}
+
+const getEpi = async (req: Request, res: Response): Promise<any | null> => {
+    // If epiId is provided in params, fetch from FHIR server
+    if (req.params.epiId && req.params.epiId !== "undefined") {
+        const epiId = req.params.epiId;
+        try {
+            let epiResponse = await fhirEpiProvider.getEpiById(epiId)
+            Logger.logInfo("lensesController.ts", "getEpi", `Got ePI with id: ${epiId} -- `)
+            return epiResponse.data
+        } catch (error: any) {
+            if (error.statusCode === 404) {
+                res.status(HttpStatusCode.NotFound).send(error)
+            } else {
+                res.status(HttpStatusCode.InternalServerError).send(error)
+            }
+            return null
+        }
+    }
+    // Otherwise, use ePI from request body
+    else if (req.body.epi) {
+        return req.body.epi;
+    }
+    // No ePI provided
+    else {
+        res.status(HttpStatusCode.BadRequest).send({
+            message: "Provide valid epiId parameter or epi in request body."
+        })
+        return null
+    }
+}
+
+const getIps = async (req: Request, res: Response): Promise<any | null> => {
+    // If patientIdentifier is provided in query, fetch from FHIR server
+    if (req.query.patientIdentifier && req.query.patientIdentifier !== "undefined") {
+        const patientIdentifier = req.query.patientIdentifier as string;
+        try {
+            let ipsResponse = await fhirIpsProvider.getIpsByPatientIdentifier(patientIdentifier)
+            Logger.logInfo("lensesController.ts", "getIps", `Got IPS with patientIdentifier: ${patientIdentifier} -- `)
+            return ipsResponse.data
+        } catch (error: any) {
+            if (error.status == 400 && error.body["issue"][0]["severity"] == "error") {
+                Logger.logInfo('lensesController.ts', "getIps", `More than one patient found for the provided identifier: ${patientIdentifier}`);
+            }
+            res.status(error.statusCode).send(error.body.errorData)
+            return null
+        }
+    }
+    // Otherwise, use IPS from request body
+    else if (req.body.ips) {
+        return req.body.ips;
+    }
+    // No IPS provided
+    else {
+        res.status(HttpStatusCode.BadRequest).send({
+            message: "Provide valid patientIdentifier query parameter or ips in request body."
+        })
+        return null
+    }
+}
+
+const getLensesAndPreprocessors = async (req: Request, res: Response) => {
+    try {
+        // Get lens names from query or all available
+        let lensNames: string[] | string;
+        if (req.query.lenses) {
+            lensNames = req.query.lenses as string;
+        } else {
+            lensNames = await lensesProvider.getAllAvailableLenses();
+        }
+
+        // Normalize to array (Express converts single-item arrays to strings)
+        if (typeof lensNames === "string") {
+            lensNames = [lensNames];
+        }
+
+        // Parse lenses using provider to get selector info
+        const parsedLenses = await lensesProvider.parseLenses(lensNames);
+
+        // Get preprocessor names from query or all available
+        let preprocessors: string[];
+        if (req.query.preprocessors) {
+            preprocessors = req.query.preprocessors as string[];
+            // Normalize to array (Express converts single-item arrays to strings)
+            if (typeof preprocessors === "string") {
+                preprocessors = [preprocessors];
+            }
+        } else {
+            preprocessors = await getAllPreprocessorNames();
+        }
+
+        return { preprocessors, parsedLenses };
+    } catch (error) {
+        Logger.logError("lensesController.ts", "getLensesAndPreprocessors", `Error: ${error}`);
+        res.status(HttpStatusCode.InternalServerError).send({
+            error: "Error retrieving lenses and preprocessors"
+        });
+        return null;
     }
 }
 
@@ -419,27 +279,19 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
 
     // LENS RESOLUTION
     let completeLenses: any[] = []
-    console.log(parsedLensesNames)
-    if (parsedLensesNames) {
-        for (let i in parsedLensesNames) {
-            let lensObj = parsedLensesNames[i]
-            try {
-                let lens = await lensesProvider.getLensFromSelector(lensObj["lensSelector"], lensObj["lensName"])
-                completeLenses.push(lens)
-            } catch (error) {
-                console.log(error);
-            }
-        }
-    } else {
-
+    let lensResolutionErrors: any[] = []
+    if (parsedLensesNames && parsedLensesNames.length > 0) {
+        const result = await lensesProvider.getCompleteLenses(parsedLensesNames)
+        completeLenses = result.completeLenses
+        lensResolutionErrors = result.errors
     }
     
     // LENS EXECUTION ENVIRONMENT
-    let focusingErrors: any[] = []
+    let focusingErrors: any[] = [...lensResolutionErrors]
     try {
         const lensResult = await applyLenses(epi, ips, completeLenses)
         epi = lensResult.epi
-        focusingErrors = lensResult.focusingErrors
+        focusingErrors = [...lensResolutionErrors, ...lensResult.focusingErrors]
         responseMessage.focusingErrors = focusingErrors
     } catch (err: any) {
         const errMsg = err?.message ?? err;

@@ -185,6 +185,11 @@ export class LensesProvider extends AxiosController {
         } else if (typeof lensesToParse === "undefined") {
             throw new Error("No lenses were selected.")
         }
+        
+        // Ensure lensNameMap is populated
+        await this.getAllAvailableLenses()
+
+        // Find lensname in map to provide selector and actual lens name
         lensesToParse.forEach((lensToParse: string) => {
             let lensInfo = this.lensNameMap[lensToParse]
             if (lensInfo) {
@@ -193,9 +198,48 @@ export class LensesProvider extends AxiosController {
                     lensName: lensInfo.actualLensName
                 })
             } else {
-                console.warn(`Lens not found: ${lensToParse}`)
+                Logger.logWarn('lenses.provider.ts', 'parseLenses', `Lens not found: ${lensToParse}`)
             }       
         })
         return parsedLenses
+    }
+
+    getCompleteLenses = async (parsedLenses: Array<{ lensSelector: string, lensName: string }>) => {
+        const completeLenses: any[] = []
+        const errors: Array<{ lensName: string, error: string }> = []
+
+        for (const lensObj of parsedLenses) {
+            try {
+                const lens = await this.getLensFromSelector(lensObj.lensSelector, lensObj.lensName)
+                completeLenses.push(lens)
+                Logger.logInfo('lenses.provider.ts', 'getCompleteLenses', 
+                    `Retrieved lens: ${lensObj.lensName} from selector: ${lensObj.lensSelector}`)
+            } catch (error: any) {
+                const errorMsg = error?.message || String(error)
+                Logger.logError('lenses.provider.ts', 'getCompleteLenses', 
+                    `Failed to retrieve lens: ${lensObj.lensName} from selector: ${lensObj.lensSelector}. Error: ${errorMsg}`)
+                errors.push({ lensName: `${lensObj.lensSelector}/${lensObj.lensName}`, error: errorMsg })
+            }
+        }
+
+        return { completeLenses, errors }
+    }
+
+    getAllAvailableLenses = async (): Promise<string[]> => {
+        // Ensure lensNameMap is populated by querying all selectors
+        const lensSelectorList = await this.getLensSelectors()
+        
+        for (const lensSelectorName of lensSelectorList) {
+            try {
+                await this.getLensSelectorAvailableLenses(lensSelectorName)
+            } catch (error: any) {
+                Logger.logWarn('lenses.provider.ts', 'getAllAvailableLenses',
+                    `Failed to get lenses from selector ${lensSelectorName}: ${error?.message || error}`
+                )
+            }
+        }
+        
+        // Return all lens names (keys from the map)
+        return Object.keys(this.lensNameMap)
     }
 }
