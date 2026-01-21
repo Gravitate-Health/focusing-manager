@@ -34,8 +34,8 @@ export class PreprocessingProvider extends AxiosController {
     private extractServiceName = (url: string): string => {
         try {
             const urlObj = new URL(url);
-            // Extract hostname (domain name) without port
-            return urlObj.hostname;
+            // Extract just the first part of the hostname as the service name
+            return urlObj.hostname.split('.')[0];
         } catch (error) {
             Logger.logWarn("preprocessing.provider.ts", "extractServiceName", `Could not parse URL: ${url}`);
             return url;
