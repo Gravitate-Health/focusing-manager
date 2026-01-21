@@ -76,11 +76,6 @@ const getAllLensesNames = async (): Promise<string[]> => {
             // Get available lenses from lensSelector
             let response = await lensesProvider.getLensSelectorAvailableLenses(lensSelectorName)
             response["lenses"].forEach((lens: string) => {
-            //TODO: this is legacy, remove when all lenses are updated
-            if (lens.endsWith('.js')) {
-                // Remove .js extension of the lens
-                lens = lens.slice(0, lens.length - 3)
-            }
             // check if lens exists before pushing
             if (lensesList.includes(`${lens}`)) {
                 let fullLensName = `${lensSelectorName}/${lens}`
