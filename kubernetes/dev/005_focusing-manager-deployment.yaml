@@ -30,7 +30,7 @@ spec:
       serviceAccountName: focusing-manager-serviceaccount
       containers:
       - name: focusing-manager
-        image: gravitate-registry.cr.de-fra.ionos.com/focusing-manager:himms
+        image: ghcr.io/gravitate-health/focusing-manager:himms
         imagePullPolicy: Always
         env:
         - name: ENVIRONMENT

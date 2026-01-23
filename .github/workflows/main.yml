@@ -6,7 +6,3 @@ on:
 jobs:
     main-GH-workflow:
       uses: Gravitate-Health/reusable-workflows/.github/workflows/main.yml@main
-      secrets: 
-        REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
-        REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
-        KUBECONFIG_DEV: ${{ secrets.KUBECONFIG_DEV }}
