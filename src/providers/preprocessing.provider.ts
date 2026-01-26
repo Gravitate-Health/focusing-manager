@@ -2,6 +2,9 @@ import { AxiosError } from 'axios';
 import AxiosController from '../utils/axios';
 import { Logger } from '../utils/Logger';
 import { ServiceClientFactory } from '../utils/ServiceClientFactory';
+import { CacheFactory } from './cache/CacheFactory';
+import { IPreprocessingCache, PipelineStep } from './cache/IPreprocessingCache';
+import { generateEpiKey, pipelineToSignature } from './cache/utils';
 
 const PREPROCESSING_LABEL_SELECTOR = process.env.PREPROCESSING_LABEL_SELECTOR || "eu.gravitate-health.fosps.preprocessing=True";
 const PREPROCESSING_EXTERNAL_ENDPOINTS = process.env.PREPROCESSING_EXTERNAL_ENDPOINTS || ""; // Comma-separated list of URLs
@@ -11,9 +14,13 @@ export class PreprocessingProvider extends AxiosController {
     private serviceMap: Map<string, string> = new Map(); // Maps service name to URL
     private isRefreshing: boolean = false; // Prevent concurrent refreshes
     private refreshPromise: Promise<string[]> | null = null; // Share refresh promise
+    private cache: IPreprocessingCache;
 
     constructor(baseUrl: string) {
         super(baseUrl);
+        this.cache = CacheFactory.getCache();
+        Logger.logInfo('preprocessing.provider.ts', 'constructor', 
+            `Initialized with cache backend: ${this.cache.getName()}`);
     }
 
     parsePreprocessors = async (preprocessors: string[]) => {
@@ -170,31 +177,98 @@ export class PreprocessingProvider extends AxiosController {
     callServicesFromList = async (preprocessors: string[], epi: any): Promise<[any, object[]]> => {
         let errors: object[] = []
         
-        for (let i in preprocessors) {
-            let serviceName = preprocessors[i]
-            try {
-                epi = await this.callPreprocessingService(serviceName, epi)
+        try {
+            // Generate cache key for the source ePI
+            const epiKey = generateEpiKey(epi);
+            
+            // Build pipeline steps from preprocessor names
+            const pipelineSteps: PipelineStep[] = preprocessors.map(name => ({ name }));
+            
+            Logger.logDebug('preprocessing.provider.ts', 'callServicesFromList', 
+                `Pipeline: ${pipelineToSignature(pipelineSteps)}`);
+            
+            // Try to get cached result for longest matching prefix
+            const cacheHit = await this.cache.get(epiKey, pipelineSteps);
+            
+            let startIndex = 0;
+            if (cacheHit && cacheHit.matchedSteps > 0) {
+                epi = cacheHit.value;
+                startIndex = cacheHit.matchedSteps;
+                
                 Logger.logInfo('preprocessing.provider.ts', 'callServicesFromList', 
-                    `Successfully called preprocessing service: ${serviceName}`);
-            } catch (error) {
-                if (error instanceof AxiosError) {
-                    if (error.code === "ENOTFOUND") {
-                        Logger.logError('preprocessing.provider.ts', 'callServicesFromList', 
-                            `Preprocessing service not found: ${serviceName}`);
-                        errors.push({ serviceName: serviceName, error: "Service not found" })
-                    } else {
+                    `Cache hit: skipping first ${startIndex}/${preprocessors.length} preprocessors`);
+            }
+            
+            // Process remaining preprocessors
+            for (let i = startIndex; i < preprocessors.length; i++) {
+                let serviceName = preprocessors[i];
+                try {
+                    epi = await this.callPreprocessingService(serviceName, epi);
+                    Logger.logInfo('preprocessing.provider.ts', 'callServicesFromList', 
+                        `Successfully called preprocessing service: ${serviceName}`);
+                    
+                    // Cache the result after each successful preprocessing step
+                    const stepsUpToNow = pipelineSteps.slice(0, i + 1);
+                    await this.cache.set(epiKey, stepsUpToNow, epi);
+                    
+                    Logger.logDebug('preprocessing.provider.ts', 'callServicesFromList', 
+                        `Cached result after step ${i + 1}/${preprocessors.length}`);
+                    
+                } catch (error) {
+                    if (error instanceof AxiosError) {
+                        if (error.code === "ENOTFOUND") {
+                            Logger.logError('preprocessing.provider.ts', 'callServicesFromList', 
+                                `Preprocessing service not found: ${serviceName}`);
+                            errors.push({ serviceName: serviceName, error: "Service not found" })
+                        } else if (error.code === "ECONNABORTED") {
+                            Logger.logError('preprocessing.provider.ts', 'callServicesFromList', 
+                                `Preprocessing service timeout: ${serviceName}`);
+                            errors.push({ serviceName: serviceName, error: "Request timeout" })
+                        } else {
+                            Logger.logError('preprocessing.provider.ts', 'callServicesFromList', 
+                                `Error calling preprocessing service ${serviceName}: ${error.message}`);
+                            errors.push({ serviceName: serviceName, error: error.message })
+                        }
+                    } else if (error instanceof Error) {
                         Logger.logError('preprocessing.provider.ts', 'callServicesFromList', 
                             `Error calling preprocessing service ${serviceName}: ${error.message}`);
                         errors.push({ serviceName: serviceName, error: error.message })
+                    } else {
+                        Logger.logError('preprocessing.provider.ts', 'callServicesFromList', 
+                            `Unknown error calling preprocessing service ${serviceName}`);
+                        errors.push({ serviceName: serviceName, error: "Unknown error" })
                     }
-                } else if (error instanceof Error) {
-                    Logger.logError('preprocessing.provider.ts', 'callServicesFromList', 
-                        `Error calling preprocessing service ${serviceName}: ${error.message}`);
-                    errors.push({ serviceName: serviceName, error: error.message })
-                } else {
-                    Logger.logError('preprocessing.provider.ts', 'callServicesFromList', 
-                        `Unknown error calling preprocessing service ${serviceName}`);
-                    errors.push({ serviceName: serviceName, error: "Unknown error" })
+                }
+            }
+            
+            // Log cache statistics
+            const stats = this.cache.getStats();
+            Logger.logInfo('preprocessing.provider.ts', 'callServicesFromList', 
+                `Cache stats - hits: ${stats.hits}, partial: ${stats.partialHits}, misses: ${stats.misses}, sets: ${stats.sets}, errors: ${stats.errors}`);
+            
+        } catch (cacheError) {
+            Logger.logError('preprocessing.provider.ts', 'callServicesFromList', 
+                `Cache error (falling back to normal processing): ${cacheError}`);
+            
+            // Fallback: process all preprocessors without cache
+            for (let i = 0; i < preprocessors.length; i++) {
+                let serviceName = preprocessors[i];
+                try {
+                    epi = await this.callPreprocessingService(serviceName, epi);
+                    Logger.logInfo('preprocessing.provider.ts', 'callServicesFromList', 
+                        `Successfully called preprocessing service: ${serviceName}`);
+                } catch (error) {
+                    if (error instanceof AxiosError) {
+                        if (error.code === "ENOTFOUND") {
+                            errors.push({ serviceName: serviceName, error: "Service not found" })
+                        } else {
+                            errors.push({ serviceName: serviceName, error: error.message })
+                        }
+                    } else if (error instanceof Error) {
+                        errors.push({ serviceName: serviceName, error: error.message })
+                    } else {
+                        errors.push({ serviceName: serviceName, error: "Unknown error" })
+                    }
                 }
             }
         }
@@ -212,55 +286,71 @@ export class PreprocessingProvider extends AxiosController {
         return this.serviceMap.has(serviceName);
     }
 
-    setCategoryCode (epi: any, code: string):any  {
-    const composition = this.findResourceByType(epi, "Composition");
-    if (!composition) {
-        Logger.logWarn("lensesController.ts", "setCategoryCode", "Composition resource not found");
-        return;
+    // Public method to get cache statistics
+    getCacheStats = () => {
+        return this.cache.getStats();
     }
-    
-    try {
-        if (!composition.category) {
-            composition.category = [];
-        }
-        if (!composition.category[0]) {
-            composition.category[0] = { coding: [] };
-        }
-        if (!composition.category[0].coding) {
-            composition.category[0].coding = [];
-        }
-        if (!composition.category[0].coding[0]) {
-            composition.category[0].coding[0] = {};
-        }
-        composition.category[0].coding[0].code = code;
-    } catch (error) {
-        Logger.logWarn("lensesController.ts", "setCategoryCode", "Could not set category code");
+
+    // Public method to clear the cache
+    clearCache = async (): Promise<void> => {
+        await this.cache.clear();
+        Logger.logInfo('preprocessing.provider.ts', 'clearCache', 'Cache cleared');
     }
-}
 
+    // Public method to invalidate cache for a specific ePI
+    invalidateEpiCache = async (epi: any): Promise<void> => {
+        const epiKey = generateEpiKey(epi);
+        await this.cache.invalidateByEpi(epiKey);
+        Logger.logInfo('preprocessing.provider.ts', 'invalidateEpiCache', 
+            `Invalidated cache for ePI ${epiKey.substring(0, 8)}...`);
+    }
 
+    setCategoryCode(epi: any, code: string): any {
+        const composition = this.findResourceByType(epi, "Composition");
+        if (!composition) {
+            Logger.logWarn("lensesController.ts", "setCategoryCode", "Composition resource not found");
+            return;
+        }
+        
+        try {
+            if (!composition.category) {
+                composition.category = [];
+            }
+            if (!composition.category[0]) {
+                composition.category[0] = { coding: [] };
+            }
+            if (!composition.category[0].coding) {
+                composition.category[0].coding = [];
+            }
+            if (!composition.category[0].coding[0]) {
+                composition.category[0].coding[0] = {};
+            }
+            composition.category[0].coding[0].code = code;
+        } catch (error) {
+            Logger.logWarn("lensesController.ts", "setCategoryCode", "Could not set category code");
+        }
+    }
 
-// Helper function to find a resource by type - handles both bundles and direct resources
-findResourceByType (resource: any, resourceType: string): any {
-    if (!resource) {
+    // Helper function to find a resource by type - handles both bundles and direct resources
+    findResourceByType(resource: any, resourceType: string): any {
+        if (!resource) {
+            return null;
+        }
+        
+        // If it's the resource we're looking for, return it
+        if (resource.resourceType === resourceType) {
+            return resource;
+        }
+        
+        // If it's a Bundle, search in entries
+        if (resource.resourceType === "Bundle" && resource.entry && Array.isArray(resource.entry)) {
+            const entry = resource.entry.find((e: any) => 
+                e.resource && e.resource.resourceType === resourceType
+            );
+            return entry ? entry.resource : null;
+        }
+        
+        // Resource not found
         return null;
     }
-    
-    // If it's the resource we're looking for, return it
-    if (resource.resourceType === resourceType) {
-        return resource;
-    }
-    
-    // If it's a Bundle, search in entries
-    if (resource.resourceType === "Bundle" && resource.entry && Array.isArray(resource.entry)) {
-        const entry = resource.entry.find((e: any) => 
-            e.resource && e.resource.resourceType === resourceType
-        );
-        return entry ? entry.resource : null;
-    }
-    
-    // Resource not found
-    return null;
-}
-
 }

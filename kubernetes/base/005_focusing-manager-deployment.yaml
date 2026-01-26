@@ -47,6 +47,16 @@ spec:
           value: https://fosps.gravitatehealth.eu/profiles
         - name: PREPROCESSING_TIMEOUT
           value: "20000"
+        - name: PREPROCESSING_CACHE_BACKEND
+          value: "memory"
+        - name: PREPROCESSING_CACHE_TTL_MS
+          value: "1200000"
+        - name: PREPROCESSING_CACHE_MAX_ITEMS
+          value: "1000"
+        # - name: PREPROCESSING_CACHE_REDIS_URL
+        #   value: "redis://redis-service:6379"
+        # - name: PREPROCESSING_CACHE_COMPRESS
+        #   value: "false"
         ports:
         - containerPort: 3000
           protocol: TCP

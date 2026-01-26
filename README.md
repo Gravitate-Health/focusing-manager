@@ -55,7 +55,31 @@ These URLs *may* point to the same FHIR server.
     - Example: `30000` for 30 seconds
     - Preprocessing services can take significant time to process ePIs with semantic annotations
 
-**3. Kubernetes Dev**
+**3. Preprocessing Cache Configuration**
+
+The service supports caching of preprocessed ePIs to improve performance and reduce load on preprocessing services. Caching uses a prefix-based strategy where each step in the preprocessing pipeline is cached independently.
+
+- `PREPROCESSING_CACHE_BACKEND`: Cache implementation to use (defaults to `memory`)
+    - `none` or `disabled`: No caching
+    - `memory`: In-memory LRU cache (good for single-replica or development)
+    - `redis`: Redis-based cache (recommended for production with multiple replicas)
+    - `composite`: Two-level cache with memory (L1) + Redis (L2) - best performance in production
+- `PREPROCESSING_CACHE_TTL_MS`: Time-to-live for cache entries in milliseconds (defaults to `1200000` - 20 minutes)
+- `PREPROCESSING_CACHE_MAX_ITEMS`: Maximum number of items in memory cache (defaults to `1000`)
+- `PREPROCESSING_CACHE_REDIS_URL`: Redis connection URL (defaults to `redis://localhost:6379`)
+    - Required when using `redis` or `composite` backends
+    - Example: `redis://redis-service:6379` or `redis://:password@redis-host:6379/0`
+- `PREPROCESSING_CACHE_COMPRESS`: Enable gzip compression for cached values (defaults to `false`)
+    - Recommended for large ePIs when using Redis to reduce storage and network usage
+- `PREPROCESSING_CACHE_SCHEMA_VERSION`: Cache schema version for invalidation on format changes (defaults to `1`)
+
+Cache behavior:
+- Sequential preprocessing pipeline is cached at each step
+- On cache miss for full pipeline, longest matching prefix is used to skip already-processed steps
+- Each successful preprocessing step writes to cache for future reuse
+- Cache keys include ePI content hash + ordered list of preprocessing steps
+
+**4. Kubernetes Dev**
 *Optional* In production, the service uses the service account to query the cluster. Outside the cluster this is not possible. To develop this service outside the cluster, set the the following enviornment variables (or create a `.env` file) so the kubernetes client can connect to the cluster:
 
 - `ENVIRONMENT`: "dev"
@@ -103,6 +127,12 @@ Optional query parameters:
 
 - `lenses`: Comma-separated list of lens names (omit to use all), available lenses can be found by `GET /focusing/lenses`
 - `preprocessors`: Comma-separated list of preprocessor names (omit to use all), available preprocessor can be found by `GET /focusing/preprocessing`
+
+Monitoring endpoints:
+
+- `GET /focusing/preprocessing` - List available preprocessing services
+- `GET /focusing/preprocessing/cache/stats` - Get cache statistics (hits, misses, sets, errors)
+- `GET /focusing/lenses` - List available lenses
 
 Example:
 ```

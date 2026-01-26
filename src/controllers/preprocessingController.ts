@@ -32,6 +32,20 @@ export const getPreprocessingServices = async (_req: Request, res: Response) => 
   })
 }
 
+export const getCacheStats = async (_req: Request, res: Response) => {
+  try {
+    const stats = preprocessingProvider.getCacheStats();
+    res.status(HttpStatusCode.Ok).send({
+      cacheStats: stats
+    });
+  } catch (error) {
+    Logger.logError("preprocessingController.ts", "getCacheStats", `Error: ${error}`);
+    res.status(HttpStatusCode.InternalServerError).send({
+      error: "Failed to get cache statistics"
+    });
+  }
+}
+
 export const preprocess = async (req: Request, res: Response) => {
   let epiId: string, preprocessors: string[] | undefined, epi: any
   let reqPreprocessors = req.query.preprocessors as string[]
