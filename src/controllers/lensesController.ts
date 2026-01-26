@@ -267,7 +267,6 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     // PREPROCESSING 
     if (preprocessors) {
         //TODO: handle caching of preprocessing results
-        //TODO: timeout for preprocessing
         try {
             [epi, preprocessingErrors] = await preprocessingProvider.callServicesFromList(preprocessors, epi)
         } catch (error) {

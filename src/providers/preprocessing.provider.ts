@@ -5,6 +5,7 @@ import { ServiceClientFactory } from '../utils/ServiceClientFactory';
 
 const PREPROCESSING_LABEL_SELECTOR = process.env.PREPROCESSING_LABEL_SELECTOR || "eu.gravitate-health.fosps.preprocessing=True";
 const PREPROCESSING_EXTERNAL_ENDPOINTS = process.env.PREPROCESSING_EXTERNAL_ENDPOINTS || ""; // Comma-separated list of URLs
+const PREPROCESSING_TIMEOUT = parseInt(process.env.PREPROCESSING_TIMEOUT || "20000", 10); // Timeout in milliseconds (default: 20 seconds)
 
 export class PreprocessingProvider extends AxiosController {
     private serviceMap: Map<string, string> = new Map(); // Maps service name to URL
@@ -154,7 +155,9 @@ export class PreprocessingProvider extends AxiosController {
             `Calling preprocessing service: ${serviceName} at ${url}`);
         
         try {
-            let response = await this.request.post(url, epi)
+            let response = await this.request.post(url, epi, {
+                timeout: PREPROCESSING_TIMEOUT
+            });
             this.setCategoryCode(epi, "P");
             return response.data
         } catch (error) {

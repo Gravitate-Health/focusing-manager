@@ -51,6 +51,9 @@ These URLs *may* point to the same FHIR server.
 - `PREPROCESSING_EXTERNAL_ENDPOINTS`: *Optional* comma-separated list of *external* preprocessing service base URLs
     - Example: `http://preprocessor1.example.com:8080,http://preprocessor2.example.com:9090`
     - Note: Do not include the `/preprocess` path
+- `PREPROCESSING_TIMEOUT`: *Optional* timeout in milliseconds for preprocessing service calls (defaults to `20000` - 20 seconds)
+    - Example: `30000` for 30 seconds
+    - Preprocessing services can take significant time to process ePIs with semantic annotations
 
 **3. Kubernetes Dev**
 *Optional* In production, the service uses the service account to query the cluster. Outside the cluster this is not possible. To develop this service outside the cluster, set the the following enviornment variables (or create a `.env` file) so the kubernetes client can connect to the cluster:

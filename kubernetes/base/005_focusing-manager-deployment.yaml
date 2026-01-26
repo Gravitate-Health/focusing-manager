@@ -45,6 +45,8 @@ spec:
           value: https://fosps.gravitatehealth.eu/epi/api/fhir
         - name: PROFILE_URL
           value: https://fosps.gravitatehealth.eu/profiles
+        - name: PREPROCESSING_TIMEOUT
+          value: "20000"
         ports:
         - containerPort: 3000
           protocol: TCP

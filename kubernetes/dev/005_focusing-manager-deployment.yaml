@@ -45,6 +45,8 @@ spec:
           value: https://gravitate-health.lst.tfo.upm.es/epi/api/fhir
         - name: PROFILE_URL
           value: https://gravitate-health.lst.tfo.upm.es/profiles
+        - name: PREPROCESSING_TIMEOUT
+          value: "20000"
         ports:
         - containerPort: 3000
           protocol: TCP
