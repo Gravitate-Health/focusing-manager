@@ -4,5 +4,9 @@ on:
   push:
 
 jobs:
-    main-GH-workflow:
-      uses: Gravitate-Health/reusable-workflows/.github/workflows/main.yml@main
+  build:
+    uses: Gravitate-Health/reusable-workflows/.github/workflows/main.yml@main
+    secrets: inherit  # Pass secrets from calling workflow
+    permissions:
+      contents: read
+      packages: write

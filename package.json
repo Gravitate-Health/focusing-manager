@@ -1,10 +1,11 @@
 {
   "name": "focusing-manager",
-  "version": "1.33.0",
+  "version": "1.34.0",
   "description": "Gravitate-Health Focusing Manager",
   "main": "build/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "tsc --noEmit",
     "dev": "ts-node-dev ./src/index.ts",
     "build": "if [ -d \"$PWD/build\" ]; then rm -r \"$PWD/build\"; fi && tsc --incremental && cp -r ./src/templates ./build",
     "start": "node build/index.js"
@@ -27,7 +28,7 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@gravitate-health/lens-execution-environment": "*",
+    "@gravitate-health/lens-execution-environment": "^1.0.0",
     "@kubernetes/client-node": "^1.4.0",
     "axios": "^1.3.5",
     "dotenv": "^16.0.3",
