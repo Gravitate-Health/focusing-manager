@@ -5,6 +5,7 @@
   "main": "build/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "tsc --noEmit",
     "dev": "ts-node-dev ./src/index.ts",
     "build": "if [ -d \"$PWD/build\" ]; then rm -r \"$PWD/build\"; fi && tsc --incremental && cp -r ./src/templates ./build",
     "start": "node build/index.js"
