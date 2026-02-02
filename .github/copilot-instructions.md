@@ -203,7 +203,17 @@ Follow this comprehensive checklist when preparing a new release:
 
 ### Pre-Release Checks
 
-1. **Lint the codebase**
+1. **Verify correct branch**
+   ```bash
+   git branch --show-current
+   ```
+   Ensure you are on the correct release branch (typically `main` or `master`). If not, switch to the correct branch before proceeding:
+   ```bash
+   git checkout main
+   git pull origin main
+   ```
+
+2. **Lint the codebase**
    ```bash
    npm run lint
    ```
@@ -296,6 +306,9 @@ If all pre-release checks pass:
 Complete release workflow (assuming patch release):
 
 ```bash
+# Verify branch
+git branch --show-current  # Ensure you're on main/master
+
 # Pre-release checks
 npm run lint
 npm audit
