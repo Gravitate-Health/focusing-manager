@@ -197,6 +197,153 @@ Label selectors used: Services must have `eu.gravitate-health.fosps.focusing=Tru
 
 Located at `openapi.yaml` - defines contract for `/focusing` endpoints. **Important**: Response types differ by `Accept` header (`application/json` returns FHIR Bundle, `text/html` returns HTML string).
 
+## Release Process
+
+Follow this comprehensive checklist when preparing a new release:
+
+### Pre-Release Checks
+
+1. **Lint the codebase**
+   ```bash
+   npm run lint
+   ```
+   Fix any linting errors before proceeding.
+
+2. **Security audit**
+   ```bash
+   npm audit
+   ```
+   If vulnerabilities are reported, run `npm audit fix` to automatically update dependencies where possible. Review and manually fix critical/high severity issues.
+
+3. **Update lens execution environment dependency**
+   
+   Check for the latest version of `@gravitate-health/lens-execution-environment`:
+   ```bash
+   npm outdated @gravitate-health/lens-execution-environment
+   ```
+   
+   If a newer version is available, update it:
+   ```bash
+   npm install @gravitate-health/lens-execution-environment@latest
+   ```
+   
+   Test thoroughly after this update as it affects core lens execution logic.
+
+4. **Build the project**
+   ```bash
+   npm run build
+   ```
+   Ensure build completes without TypeScript compilation errors.
+
+5. **Test the application**
+   
+   ⚠️ **Manual testing required** (no automated test suite exists):
+   - Start the service: `npm start` or `npm run dev`
+   - Test main focusing endpoints with sample ePI/IPS data
+   - Verify preprocessing discovery (`GET /focusing/preprocessing`)
+   - Verify lens discovery (`GET /focusing/lenses`)
+   - Test both JSON and HTML response formats (`Accept` header)
+   - Validate error handling with invalid inputs
+
+6. **Test Docker build**
+   ```bash
+   docker build -t ghcr.io/gravitate-health/focusing-manager:test .
+   ```
+   
+   Optional: Run and smoke test the container:
+   ```bash
+   docker run -p 3000:3000 --env-file .env ghcr.io/gravitate-health/focusing-manager:test
+   # Test endpoints at http://localhost:3000/focusing
+   ```
+
+### Release Execution
+
+If all pre-release checks pass:
+
+7. **Bump version**
+   
+   Use `npm version` to update version in `package.json` and create a git commit/tag automatically:
+   
+   - **Patch release** (bug fixes): `npm version patch` (default if not specified)
+   - **Minor release** (new features, backward compatible): `npm version minor`
+   - **Major release** (breaking changes): `npm version major`
+   
+   This command will:
+   - Update version in `package.json`
+   - Create a git commit with message "v{version}"
+   - Create a git tag "v{version}"
+
+8. **Push to repository**
+   ```bash
+   git push && git push --tags
+   ```
+   
+   Push both commits and tags in sequence. Tags are required to trigger release workflows.
+
+### Automated Post-Release
+
+9. **Docker image publishing**
+   
+   **Automatic**: GitHub Actions workflow will detect the new tag and automatically:
+   - Build the Docker image
+   - Push to `ghcr.io/gravitate-health/focusing-manager:{version}`
+   - Tag as `:latest` if appropriate
+   
+   Monitor the Actions tab in GitHub to ensure the workflow completes successfully.
+
+### Quick Reference Commands
+
+Complete release workflow (assuming patch release):
+
+```bash
+# Pre-release checks
+npm run lint
+npm audit
+npm outdated @gravitate-health/lens-execution-environment  # Update if needed
+npm run build
+npm start  # Manual testing
+docker build -t ghcr.io/gravitate-health/focusing-manager:test .
+
+# Release (patch version)
+npm version patch
+git push && git push --tags
+
+# Monitor GitHub Actions for automated Docker publishing
+```
+
+### Release Notes Best Practices
+
+When creating release notes (manual or via GitHub Releases):
+- Reference fixed issues/PRs
+- Highlight breaking changes (especially for major releases)
+- Document new features and lens capabilities
+- Note any new environment variables or configuration requirements
+- List updated dependencies (especially `@gravitate-health/lens-execution-environment` version)
+- Include migration steps if required
+
+### Rollback Procedure
+
+If a release has critical issues:
+
+1. **Revert in Git**
+   ```bash
+   git revert HEAD  # Revert the version bump commit
+   git push
+   ```
+
+2. **Delete problematic tag** (if already pushed)
+   ```bash
+   git tag -d v{version}
+   git push origin :refs/tags/v{version}
+   ```
+
+3. **Redeploy previous version** in Kubernetes
+   ```bash
+   kubectl set image deployment/focusing-manager \
+     focusing-manager=ghcr.io/gravitate-health/focusing-manager:{previous-version} \
+     -n {namespace}
+   ```
+
 ## Future Maintenance Notes
 
 - **Testing**: No test framework exists - consider adding Jest/Mocha
