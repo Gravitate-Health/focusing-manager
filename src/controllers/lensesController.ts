@@ -100,21 +100,31 @@ export const focus = async (req: Request, res: Response) => {
     
     const { preprocessors, parsedLenses } = result;
 
-    // Get persona vector
-    const pv = await personaVectorParser(req.query.patientIdentifier as string);
+    // Get persona vector (optional)
+    const pv = await getPersonaVector(req, res);
 
     focusProccess(req, res, epi, ips, pv, preprocessors, parsedLenses);
 }
 
-const personaVectorParser = async (partientId: string) => {
-    // TODO: PersonaVector support
-    try {
-        let pv = await personaVectorProvider.getPersonaVectorById(partientId)
-        Logger.logDebug("lensesController.ts", "personaVectorParser", `Got PersonaVector: ${JSON.stringify(pv)}} -- `)
-        return pv;
-    } catch (error: any) {
-        console.log(`Could not find PersonaVector for Patient id: ${partientId}`);
+const getPersonaVector = async (req: Request, res: Response): Promise<any | null> => {
+    // If personaVectorId is provided in query, fetch from FHIR server
+    if (req.query.personaVectorId && req.query.personaVectorId !== "undefined") {
+        const personaVectorId = req.query.personaVectorId as string;
+        try {
+            let pvResponse = await personaVectorProvider.getPersonaVectorById(personaVectorId)
+            Logger.logInfo("lensesController.ts", "getPersonaVector", `Got PersonaVector with id: ${personaVectorId} -- `)
+            return pvResponse
+        } catch (error: any) {
+            Logger.logWarn("lensesController.ts", "getPersonaVector", `Could not find PersonaVector for id: ${personaVectorId}`);
+            return null
+        }
     }
+    // Otherwise, use PersonaVector from request body
+    else if (req.body.pv) {
+        return req.body.pv;
+    }
+    // PersonaVector is optional, so return null if not provided
+    return null;
 }
 
 const getEpi = async (req: Request, res: Response): Promise<any | null> => {
@@ -288,7 +298,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     // LENS EXECUTION ENVIRONMENT
     let focusingErrors: any[] = [...lensResolutionErrors]
     try {
-        const lensResult = await applyLenses(epi, ips, completeLenses)
+        const lensResult = await applyLenses(epi, ips, completeLenses, pv)
         epi = lensResult.epi
         focusingErrors = [...lensResolutionErrors, ...lensResult.focusingErrors]
         responseMessage.focusingErrors = focusingErrors
