@@ -5,7 +5,7 @@ import { PreprocessingProvider } from "../providers/preprocessing.provider";
 import { FhirEpiProvider } from "../providers/fhirEpi.provider";
 import { FhirIpsProvider } from "../providers/fhirIps.provider";
 import { LensesProvider } from "../providers/lenses.provider";
-import { ProfileProvider } from "../providers/profile.provider";
+import { PersonaVectorProvider } from "../providers/personaVector.provider";
 import { Liquid } from "liquidjs";
 import { readFileSync, stat } from "fs";
 import { objectEquals } from "../utils/utils"
@@ -13,13 +13,13 @@ import { applyLenses } from "@gravitate-health/lens-execution-environment";
 
 const FHIR_IPS_URL = process.env.FHIR_IPS_URL as string;
 const FHIR_EPI_URL = process.env.FHIR_EPI_URL as string;
-const PROFILE_URL = process.env.PROFILE_URL as string;
+const PERSONA_VECTOR_URL = process.env.PERSONA_VECTOR_URL as string;
 
 let preprocessingProvider = new PreprocessingProvider("")
 let lensesProvider = new LensesProvider("")
 let fhirEpiProvider = new FhirEpiProvider(FHIR_EPI_URL)
 let fhirIpsProvider = new FhirIpsProvider(FHIR_IPS_URL)
-let profileProvider = new ProfileProvider(PROFILE_URL)
+let personaVectorProvider = new PersonaVectorProvider(PERSONA_VECTOR_URL)
 let lensApplied = false
 
 // Helper function to find a resource by type - handles both bundles and direct resources
@@ -107,13 +107,13 @@ export const focus = async (req: Request, res: Response) => {
 }
 
 const personaVectorParser = async (partientId: string) => {
-    // TODO: change g-lens profile for PersonaVector
+    // TODO: PersonaVector support
     try {
-        let pv = await profileProvider.getProfileById(partientId)
-        Logger.logDebug("lensesController.ts", "focus", `Got G-Lens profile: ${JSON.stringify(pv)}} -- `)
+        let pv = await personaVectorProvider.getPersonaVectorById(partientId)
+        Logger.logDebug("lensesController.ts", "personaVectorParser", `Got PersonaVector: ${JSON.stringify(pv)}} -- `)
         return pv;
     } catch (error: any) {
-        console.log(`Could not find G-Lens Profile por Patient id: ${partientId}`);
+        console.log(`Could not find PersonaVector for Patient id: ${partientId}`);
     }
 }
 

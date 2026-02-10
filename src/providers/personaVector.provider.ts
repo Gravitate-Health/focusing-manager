@@ -2,14 +2,14 @@ import { AxiosResponse } from 'axios';
 import AxiosController from '../utils/axios';
 import { Logger } from "../utils/Logger";
 
-export class ProfileProvider extends AxiosController {
+export class PersonaVectorProvider extends AxiosController {
     constructor(baseUrl: string) {
         super(baseUrl);
     }
 
-    getProfileById = async (id: string): Promise<AxiosResponse> => {
-        let profile: any
-        Logger.logInfo('profile.provider.ts', 'getProfileById', `Getting profile with Id: ${id}`)
+    getPersonaVectorById = async (id: string): Promise<AxiosResponse> => {
+        let personaVector: any
+        Logger.logInfo('personaVector.provider.ts', 'getPersonaVectorById', `Getting persona vector with Id: ${id}`)
 
         try {
             // Temporal chagne due to a bug in $summary operation
@@ -17,7 +17,7 @@ export class ProfileProvider extends AxiosController {
             let url = `${this.baseUrl}/${id}`;
             return (await this.request.get(url)).data;
         } catch (error) {
-            Logger.logError('profile.provider.ts', "getProfileById", `Error getting profile for patient Id: ${id}`);
+            Logger.logError('personaVector.provider.ts', "getPersonaVectorById", `Error getting persona vector for patient Id: ${id}`);
             throw error;
         }
     }

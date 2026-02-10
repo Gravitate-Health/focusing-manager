@@ -41,7 +41,7 @@ These URLs *may* point to the same FHIR server.
 
 - `FHIR_EPI_URL`: URL to the FHIR ePI server endpoint, required for ePI id [focusing flows](#focusing-flows).
 - `FHIR_IPS_URL`: URL to the FHIR IPS server endpoint, required for IPS id [focusing flows](#focusing-flows).
-- `PROFILE_URL`: *Optional* URL to the FHIR server where profile (Persona Vector) is stored.
+- `PERSONA_VECTOR_URL`: *Optional* URL to the FHIR server where Persona Vector data is stored.
 
 **2. Service Discovery**
 

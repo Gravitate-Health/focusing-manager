@@ -43,8 +43,8 @@ spec:
           value: https://gravitate-health.lst.tfo.upm.es/ips/api/fhir
         - name: FHIR_EPI_URL
           value: https://gravitate-health.lst.tfo.upm.es/epi/api/fhir
-        - name: PROFILE_URL
-          value: https://gravitate-health.lst.tfo.upm.es/profiles
+        - name: PERSONA_VECTOR_URL
+          value: https://gravitate-health.lst.tfo.upm.es/personas
         - name: PREPROCESSING_TIMEOUT
           value: "20000"
         ports:
