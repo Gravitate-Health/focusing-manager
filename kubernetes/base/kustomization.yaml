@@ -8,3 +8,4 @@ resources:
   - 004_focusing-manager-service.yaml
   - 005_focusing-manager-deployment.yaml
   - 006_focusing-manager_vs.yaml
+  - 007_redis-cache.yaml
