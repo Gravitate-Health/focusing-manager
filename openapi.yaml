@@ -55,6 +55,11 @@ paths:
           1. Writing the patientId on query param.
           2. Passing all the IPS JSON Document through the request's body.
 
+        Optionally, you can specify a PersonaVector in 2 ways:
+        
+          1. Writing the personaVectorId on query param.
+          2. Passing all the PersonaVector JSON Document through the request's body (pv field).
+
         Desired response "Content-Type" (JSON or HTML) must be sent in the "Accept" header.
         The response contains the ePI with HTML tags and the following CSS classes: "highlight", "collapse".
         "Highlight" CSS class is used to remark information. It has precedence over the collapse class.
@@ -70,6 +75,7 @@ paths:
         - $ref: "#/components/parameters/preprocessorsList"
         - $ref: "#/components/parameters/lensesList"
         - $ref: "#/components/parameters/patientIdentifierquery"
+        - $ref: "#/components/parameters/personaVectorIdquery"
       responses:
         "200":
           $ref: "#/components/responses/200focus"
@@ -87,13 +93,16 @@ paths:
 
           1. Writing the patientId on query param.
           2. Passing all the IPS JSON Document through the request's body.
-
+        Optionally, you can specify a PersonaVector in 2 ways:
+        
+          1. Writing the personaVectorId on query param.
+          2. Passing all the PersonaVector JSON Document through the request's body (pv field).
         Desired response "Content-Type" (JSON or HTML) must be sent in the "Accept" header.
         The response contains the ePI with HTML tags and the following CSS classes: "highlight", "collapse".
         "Highlight" CSS class is used to remark information. It has precedence over the collapse class.
         "Collapse" CSS class is used to hide information.
       requestBody:
-        description: The body must have an ePI JSON Document, and could have an IPS JSON Document in case you dont specify a patientID on query params. Body should be written this way in case you have ePI and IPS Documents. In case you write a patientId on query parameter, you should delete IPS field from body.
+        description: The body must have an ePI JSON Document, and could have an IPS JSON Document and/or a PersonaVector in case you dont specify them via query params. Body should be written with epi, ips, and/or pv fields. In case you write patientId or personaVectorId on query parameters, you can omit those fields from the body.
         content:
           application/json:
             schema:
@@ -103,6 +112,7 @@ paths:
         - $ref: "#/components/parameters/preprocessorsList"
         - $ref: "#/components/parameters/lensesList"
         - $ref: "#/components/parameters/patientIdentifierquery"
+        - $ref: "#/components/parameters/personaVectorIdquery"
       responses:
         "200":
           $ref: "#/components/responses/200focus"
@@ -122,6 +132,9 @@ components:
         ips:
           type: string
           example: Full IPS JSON Document should be inside this parameter
+        pv:
+          type: string
+          example: Full PersonaVector JSON Document should be inside this parameter
     PreprocessingList:
       type: object
       properties:
@@ -161,6 +174,13 @@ components:
       in: query
       name: patientIdentifier
       description: Patient identifier, that is required only if you dont't specify a full IPS JSON Document on request's body.
+      required: false
+      schema:
+        type: string
+    personaVectorIdquery:
+      in: query
+      name: personaVectorId
+      description: PersonaVector identifier. Optional - use only if you don't specify a full PersonaVector JSON Document on request's body (pv field).
       required: false
       schema:
         type: string

@@ -43,8 +43,8 @@ spec:
           value: https://fosps.gravitatehealth.eu/ips/api/fhir
         - name: FHIR_EPI_URL
           value: https://fosps.gravitatehealth.eu/epi/api/fhir
-        - name: PROFILE_URL
-          value: https://fosps.gravitatehealth.eu/profiles
+        - name: PERSONA_VECTOR_URL
+          value: https://fosps.gravitatehealth.eu/personas
         - name: PREPROCESSING_TIMEOUT
           value: "20000"
         - name: PREPROCESSING_CACHE_BACKEND

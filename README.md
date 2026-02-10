@@ -41,7 +41,7 @@ These URLs *may* point to the same FHIR server.
 
 - `FHIR_EPI_URL`: URL to the FHIR ePI server endpoint, required for ePI id [focusing flows](#focusing-flows).
 - `FHIR_IPS_URL`: URL to the FHIR IPS server endpoint, required for IPS id [focusing flows](#focusing-flows).
-- `PROFILE_URL`: *Optional* URL to the FHIR server where profile (Persona Vector) is stored.
+- `PERSONA_VECTOR_URL`: *Optional* URL to the FHIR server where Persona Vector data is stored.
 
 **2. Service Discovery**
 
@@ -118,13 +118,20 @@ This service uses the [Kubernetes javascript client](https://github.com/kubernet
 
 This service has 4 ways of focusing ePIs, depending on which parameters you use:
 
-- PI ID + Patient Identifier: Fetch both from servers
+- ePI ID + Patient Identifier: Fetch both from servers
 - ePI ID + IPS JSON: Provide IPS in request body
 - ePI JSON + Patient Identifier: Provide ePI, fetch IPS
 - ePI JSON + IPS JSON: Provide both in request body
 
+Optionally, you can also provide a PersonaVector in the following ways:
+
+- PersonaVector ID query parameter: Fetch from server
+- PersonaVector JSON in request body (pv field): Provide directly
+
 Optional query parameters:
 
+- `patientIdentifier`: Patient identifier to fetch IPS
+- `personaVectorId`: PersonaVector identifier to fetch PersonaVector
 - `lenses`: Comma-separated list of lens names (omit to use all), available lenses can be found by `GET /focusing/lenses`
 - `preprocessors`: Comma-separated list of preprocessor names (omit to use all), available preprocessor can be found by `GET /focusing/preprocessing`
 
@@ -136,7 +143,7 @@ Monitoring endpoints:
 
 Example:
 ```
-curl 'https://fosps.gravitatehealth.eu/focusing/focus/epi123?patientIdentifier=patient456&lenses=lens1,lens2'
+curl 'https://fosps.gravitatehealth.eu/focusing/focus/epi123?patientIdentifier=patient456&personaVectorId=pv789&lenses=lens1,lens2'
 ```
 Getting help
 ------------

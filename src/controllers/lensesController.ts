@@ -5,7 +5,7 @@ import { PreprocessingProvider } from "../providers/preprocessing.provider";
 import { FhirEpiProvider } from "../providers/fhirEpi.provider";
 import { FhirIpsProvider } from "../providers/fhirIps.provider";
 import { LensesProvider } from "../providers/lenses.provider";
-import { ProfileProvider } from "../providers/profile.provider";
+import { PersonaVectorProvider } from "../providers/personaVector.provider";
 import { Liquid } from "liquidjs";
 import { readFileSync, stat } from "fs";
 import { objectEquals } from "../utils/utils"
@@ -13,13 +13,13 @@ import { applyLenses } from "@gravitate-health/lens-execution-environment";
 
 const FHIR_IPS_URL = process.env.FHIR_IPS_URL as string;
 const FHIR_EPI_URL = process.env.FHIR_EPI_URL as string;
-const PROFILE_URL = process.env.PROFILE_URL as string;
+const PERSONA_VECTOR_URL = process.env.PERSONA_VECTOR_URL as string;
 
 let preprocessingProvider = new PreprocessingProvider("")
 let lensesProvider = new LensesProvider("")
 let fhirEpiProvider = new FhirEpiProvider(FHIR_EPI_URL)
 let fhirIpsProvider = new FhirIpsProvider(FHIR_IPS_URL)
-let profileProvider = new ProfileProvider(PROFILE_URL)
+let personaVectorProvider = new PersonaVectorProvider(PERSONA_VECTOR_URL)
 let lensApplied = false
 
 // Helper function to find a resource by type - handles both bundles and direct resources
@@ -100,21 +100,31 @@ export const focus = async (req: Request, res: Response) => {
     
     const { preprocessors, parsedLenses } = result;
 
-    // Get persona vector
-    const pv = await personaVectorParser(req.query.patientIdentifier as string);
+    // Get persona vector (optional)
+    const pv = await getPersonaVector(req, res);
 
     focusProccess(req, res, epi, ips, pv, preprocessors, parsedLenses);
 }
 
-const personaVectorParser = async (partientId: string) => {
-    // TODO: change g-lens profile for PersonaVector
-    try {
-        let pv = await profileProvider.getProfileById(partientId)
-        Logger.logDebug("lensesController.ts", "focus", `Got G-Lens profile: ${JSON.stringify(pv)}} -- `)
-        return pv;
-    } catch (error: any) {
-        console.log(`Could not find G-Lens Profile por Patient id: ${partientId}`);
+const getPersonaVector = async (req: Request, res: Response): Promise<any | null> => {
+    // If personaVectorId is provided in query, fetch from FHIR server
+    if (req.query.personaVectorId && req.query.personaVectorId !== "undefined") {
+        const personaVectorId = req.query.personaVectorId as string;
+        try {
+            let pvResponse = await personaVectorProvider.getPersonaVectorById(personaVectorId)
+            Logger.logInfo("lensesController.ts", "getPersonaVector", `Got PersonaVector with id: ${personaVectorId} -- `)
+            return pvResponse
+        } catch (error: any) {
+            Logger.logWarn("lensesController.ts", "getPersonaVector", `Could not find PersonaVector for id: ${personaVectorId}`);
+            return null
+        }
     }
+    // Otherwise, use PersonaVector from request body
+    else if (req.body.pv) {
+        return req.body.pv;
+    }
+    // PersonaVector is optional, so return null if not provided
+    return null;
 }
 
 const getEpi = async (req: Request, res: Response): Promise<any | null> => {
@@ -288,7 +298,7 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     // LENS EXECUTION ENVIRONMENT
     let focusingErrors: any[] = [...lensResolutionErrors]
     try {
-        const lensResult = await applyLenses(epi, ips, completeLenses)
+        const lensResult = await applyLenses(epi, ips, completeLenses, pv)
         epi = lensResult.epi
         focusingErrors = [...lensResolutionErrors, ...lensResult.focusingErrors]
         responseMessage.focusingErrors = focusingErrors
