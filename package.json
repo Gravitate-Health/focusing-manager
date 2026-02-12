@@ -1,6 +1,6 @@
 {
   "name": "focusing-manager",
-  "version": "1.35.0",
+  "version": "1.36.0",
   "description": "Gravitate-Health Focusing Manager",
   "main": "build/index.js",
   "scripts": {
