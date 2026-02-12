@@ -71,32 +71,42 @@ After each successful preprocessing step, the result is cached for future reuse.
   PREPROCESSING_CACHE_COMPRESS=true
   ```
 
-### 4. CompositeCache (Recommended for Production)
-- **Use case**: Best performance in production
-- **Architecture**: Two-level cache (L1: Memory, L2: Redis)
+### 4. Composite Cache Hierarchies (Recommended for Production)
+- **Use case**: Multi-level caching for optimal performance
+- **Syntax**: Use `<` separator to define cache hierarchy (L1 < L2 < L3)
+- **Architecture**: Automatically chains multiple cache implementations
 - **Behavior**:
-  - Reads: Check L1 → L2 → Miss
-  - Writes: Write to both L1 and L2
-  - L2 hits promote to L1
-- **Pros**: Fast local access + cross-replica sharing
-- **Cons**: Most complex, requires Redis
-- **Configuration**:
+  - Reads: Check L1 → L2 → ... → LN → Miss
+  - Writes: Write to all levels
+  - Cache hits promote to all upper levels
+- **Pros**: Flexible, explicit configuration, optimal performance
+- **Cons**: Requires understanding of cache hierarchy
+- **Examples**:
   ```bash
-  PREPROCESSING_CACHE_BACKEND=composite
+  # Two-level: Memory (L1) + Redis (L2)
+  PREPROCESSING_CACHE_BACKEND=memory<redis
   PREPROCESSING_CACHE_REDIS_URL=redis://redis-service:6379
   PREPROCESSING_CACHE_MAX_ITEMS=1000
   PREPROCESSING_CACHE_TTL_MS=1200000
+  
+  # Three-level: Memory < Redis < Memory (exotic but supported)
+  PREPROCESSING_CACHE_BACKEND=memory<redis<memory
+  
+  # Single implementation (equivalent to not using <)
+  PREPROCESSING_CACHE_BACKEND=memory
   ```
+
+**Note**: The `<` operator represents cache hierarchy levels, where left-most is L1 (fastest), and subsequent levels are slower but more persistent. Any combination of implementations is supported, including repeated implementations (e.g., `memory<redis<memory`), though sensible hierarchies (fast-to-slow) are recommended for optimal performance.
 
 ## Environment Variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `PREPROCESSING_CACHE_BACKEND` | `memory` | Cache type: `none`, `memory`, `redis`, `composite` |
+| `PREPROCESSING_CACHE_BACKEND` | `memory` | Cache configuration: Single implementation (`none`, `memory`, `redis`) or composite hierarchy using `<` separator (e.g., `memory<redis`) |
 | `PREPROCESSING_CACHE_TTL_MS` | `1200000` | TTL in ms (20 minutes) |
 | `PREPROCESSING_CACHE_MAX_ITEMS` | `1000` | Max items in memory cache |
-| `PREPROCESSING_CACHE_REDIS_URL` | `redis://localhost:6379` | Redis connection URL |
-| `PREPROCESSING_CACHE_COMPRESS` | `false` | Enable gzip compression |
+| `PREPROCESSING_CACHE_REDIS_URL` | `redis://localhost:6379` | Redis connection URL (required for `redis` in backend config) |
+| `PREPROCESSING_CACHE_COMPRESS` | `false` | Enable gzip compression for Redis cache |
 | `PREPROCESSING_CACHE_SCHEMA_VERSION` | `1` | Cache schema version |
 
 ## API Endpoints

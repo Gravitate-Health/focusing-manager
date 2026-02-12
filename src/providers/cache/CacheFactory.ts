@@ -31,6 +31,8 @@ export class CacheFactory {
 
     /**
      * Create a new cache instance based on PREPROCESSING_CACHE_BACKEND env var
+     * Supports single implementations or composable hierarchies using < separator
+     * Examples: "memory", "redis", "memory<redis", "memory<redis<memory"
      */
     private static createCache(): IPreprocessingCache {
         const backend = CACHE_BACKEND.toLowerCase();
@@ -38,10 +40,52 @@ export class CacheFactory {
         Logger.logInfo('CacheFactory', 'createCache', 
             `Creating cache with backend=${backend}, ttl=${CACHE_TTL_MS}ms`);
 
+        // Parse composable cache configuration
+        if (backend.includes('<')) {
+            return this.createCompositeCache(backend);
+        }
+
+        // Single implementation
+        return this.createSingleCache(backend);
+    }
+
+    /**
+     * Create a composite cache hierarchy from a configuration string
+     * Example: "memory<redis" creates CompositeCache(memory, redis)
+     * Example: "memory<redis<memory" creates CompositeCache(memory, CompositeCache(redis, memory))
+     */
+    private static createCompositeCache(config: string): IPreprocessingCache {
+        const parts = config.split('<').map(s => s.trim()).filter(s => s.length > 0);
+        
+        if (parts.length < 2) {
+            Logger.logWarn('CacheFactory', 'createCompositeCache',
+                `Invalid composite config '${config}', falling back to memory`);
+            return new MemoryCache(CACHE_MAX_ITEMS, CACHE_TTL_MS, CACHE_SCHEMA_VERSION);
+        }
+
+        Logger.logInfo('CacheFactory', 'createCompositeCache',
+            `Creating composite cache hierarchy: ${parts.join(' < ')}`);
+
+        // Build cache tree from left to right
+        // "memory<redis<memory" -> CompositeCache(memory, CompositeCache(redis, memory))
+        let cache = this.createSingleCache(parts[parts.length - 1]);
+        
+        for (let i = parts.length - 2; i >= 0; i--) {
+            const l1Cache = this.createSingleCache(parts[i]);
+            cache = new CompositeCache(l1Cache, cache);
+        }
+
+        return cache;
+    }
+
+    /**
+     * Create a single cache implementation
+     */
+    private static createSingleCache(backend: string): IPreprocessingCache {
         switch (backend) {
             case 'none':
             case 'disabled':
-                Logger.logInfo('CacheFactory', 'createCache', 'Cache disabled');
+                Logger.logInfo('CacheFactory', 'createSingleCache', 'Cache disabled');
                 return new NoOpCache();
 
             case 'memory':
@@ -59,22 +103,8 @@ export class CacheFactory {
                     CACHE_COMPRESS
                 );
 
-            case 'composite':
-                const memCache = new MemoryCache(
-                    CACHE_MAX_ITEMS,
-                    CACHE_TTL_MS,
-                    CACHE_SCHEMA_VERSION
-                );
-                const redisCache = new RedisCache(
-                    CACHE_REDIS_URL,
-                    CACHE_TTL_MS,
-                    CACHE_SCHEMA_VERSION,
-                    CACHE_COMPRESS
-                );
-                return new CompositeCache(memCache, redisCache);
-
             default:
-                Logger.logWarn('CacheFactory', 'createCache', 
+                Logger.logWarn('CacheFactory', 'createSingleCache', 
                     `Unknown cache backend '${backend}', falling back to memory`);
                 return new MemoryCache(
                     CACHE_MAX_ITEMS,

@@ -75,15 +75,20 @@ These URLs *may* point to the same FHIR server.
 
 The service supports caching of preprocessed ePIs to improve performance and reduce load on preprocessing services. Caching uses a prefix-based strategy where each step in the preprocessing pipeline is cached independently.
 
-- `PREPROCESSING_CACHE_BACKEND`: Cache implementation to use (defaults to `memory`)
-    - `none` or `disabled`: No caching
-    - `memory`: In-memory LRU cache (good for single-replica or development)
-    - `redis`: Redis-based cache (recommended for production with multiple replicas)
-    - `composite`: Two-level cache with memory (L1) + Redis (L2) - best performance in production
+- `PREPROCESSING_CACHE_BACKEND`: Cache configuration (defaults to `memory`)
+    - Single implementations:
+        - `none` or `disabled`: No caching
+        - `memory`: In-memory LRU cache (good for single-replica or development)
+        - `redis`: Redis-based cache (for production with multiple replicas)
+    - Composite hierarchies using `<` separator:
+        - `memory<redis`: Two-level cache (Memory L1, Redis L2) - **recommended for production**
+        - `memory<redis<memory`: Three-level cache (exotic example)
+        - Any combination of implementations is supported, e.g., `redis<memory` or `memory<memory`
+    - The `<` operator denotes cache hierarchy where leftmost is L1 (fastest/first checked)
 - `PREPROCESSING_CACHE_TTL_MS`: Time-to-live for cache entries in milliseconds (defaults to `1200000` - 20 minutes)
 - `PREPROCESSING_CACHE_MAX_ITEMS`: Maximum number of items in memory cache (defaults to `1000`)
 - `PREPROCESSING_CACHE_REDIS_URL`: Redis connection URL (defaults to `redis://localhost:6379`)
-    - Required when using `redis` or `composite` backends
+    - Required when `redis` appears in `PREPROCESSING_CACHE_BACKEND`
     - Example: `redis://redis-service:6379` or `redis://:password@redis-host:6379/0`
 - `PREPROCESSING_CACHE_COMPRESS`: Enable gzip compression for cached values (defaults to `false`)
     - Recommended for large ePIs when using Redis to reduce storage and network usage
@@ -94,6 +99,7 @@ Cache behavior:
 - On cache miss for full pipeline, longest matching prefix is used to skip already-processed steps
 - Each successful preprocessing step writes to cache for future reuse
 - Cache keys include ePI content hash + ordered list of preprocessing steps
+- Multi-level caches: reads check L1→L2→...→LN, writes propagate to all levels, hits promote to upper levels
 
 **5. Kubernetes Dev**
 *Optional* In production, the service uses the service account to query the cluster. Outside the cluster this is not possible. To develop this service outside the cluster, set the the following enviornment variables (or create a `.env` file) so the kubernetes client can connect to the cluster:

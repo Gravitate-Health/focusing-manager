@@ -49,10 +49,13 @@ spec:
           value: "20000"
         - name: PREPROCESSING_CACHE_BACKEND
           value: "memory"
+          # For production with Redis, use composite hierarchy:
+          # value: "memory<redis"
         - name: PREPROCESSING_CACHE_TTL_MS
           value: "1200000"
         - name: PREPROCESSING_CACHE_MAX_ITEMS
           value: "1000"
+        # Uncomment for Redis or composite cache configurations:
         # - name: PREPROCESSING_CACHE_REDIS_URL
         #   value: "redis://redis-service:6379"
         # - name: PREPROCESSING_CACHE_COMPRESS
