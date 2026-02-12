@@ -11,6 +11,7 @@ import { readFileSync, stat } from "fs";
 import { objectEquals } from "../utils/utils"
 import { applyLenses, LensExecutionConfig } from "@gravitate-health/lens-execution-environment";
 import { getLeeLoggingConfig } from "../utils/leeLogging";
+import { getFhirFormatFromContentType, parseFhirResource } from "../utils/fhirParser";
 
 const FHIR_IPS_URL = process.env.FHIR_IPS_URL as string;
 const FHIR_EPI_URL = process.env.FHIR_EPI_URL as string;
@@ -23,6 +24,40 @@ let fhirEpiProvider = new FhirEpiProvider(FHIR_EPI_URL)
 let fhirIpsProvider = new FhirIpsProvider(FHIR_IPS_URL)
 let personaVectorProvider = new PersonaVectorProvider(PERSONA_VECTOR_URL)
 let lensApplied = false
+
+/**
+ * Parse FHIR resource from request body based on Content-Type header
+ * Supports JSON, XML, and RDF formats
+ * Returns Promise for RDF formats, synchronous value for JSON/XML
+ */
+const parseRequestResource = async (req: Request, data: any, resourceName: string): Promise<any> => {
+    const contentType = req.get('Content-Type');
+    const format = getFhirFormatFromContentType(contentType);
+    
+    Logger.logDebug("lensesController.ts", "parseRequestResource", 
+        `Parsing ${resourceName} with Content-Type: ${contentType} (format: ${format})`);
+    
+    // If data is already an object (parsed by Express middleware), return as-is
+    if (typeof data === 'object' && format === 'json') {
+        return data;
+    }
+    
+    // If data is a string, parse based on format
+    if (typeof data === 'string') {
+        try {
+            const result = parseFhirResource(data, format);
+            // Handle both sync (JSON/XML) and async (RDF) results
+            return await Promise.resolve(result);
+        } catch (error: any) {
+            Logger.logError("lensesController.ts", "parseRequestResource", 
+                `Failed to parse ${resourceName}: ${error.message}`);
+            throw new Error(`Invalid ${format.toUpperCase()} format for ${resourceName}`);
+        }
+    }
+    
+    // Data is already parsed, return as-is
+    return data;
+}
 
 // Helper function to find a resource by type - handles both bundles and direct resources
 const findResourceByType = (resource: any, resourceType: string): any => {
@@ -121,9 +156,9 @@ const getPersonaVector = async (req: Request, res: Response): Promise<any | null
             return null
         }
     }
-    // Otherwise, use PersonaVector from request body
+    // Otherwise, parse PersonaVector from request body based on Content-Type
     else if (req.body.pv) {
-        return req.body.pv;
+        return await parseRequestResource(req, req.body.pv, 'pv');
     }
     // PersonaVector is optional, so return null if not provided
     return null;
@@ -146,9 +181,9 @@ const getEpi = async (req: Request, res: Response): Promise<any | null> => {
             return null
         }
     }
-    // Otherwise, use ePI from request body
+    // Otherwise, parse ePI from request body based on Content-Type
     else if (req.body.epi) {
-        return req.body.epi;
+        return await parseRequestResource(req, req.body.epi, 'epi');
     }
     // No ePI provided
     else {
@@ -175,9 +210,9 @@ const getIps = async (req: Request, res: Response): Promise<any | null> => {
             return null
         }
     }
-    // Otherwise, use IPS from request body
+    // Otherwise, parse IPS from request body based on Content-Type
     else if (req.body.ips) {
-        return req.body.ips;
+        return await parseRequestResource(req, req.body.ips, 'ips');
     }
     // No IPS provided
     else {

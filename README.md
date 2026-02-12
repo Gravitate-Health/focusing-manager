@@ -139,6 +139,41 @@ This service has 4 ways of focusing ePIs, depending on which parameters you use:
 - ePI JSON + Patient Identifier: Provide ePI, fetch IPS
 - ePI JSON + IPS JSON: Provide both in request body
 
+### FHIR Format Support
+
+The service accepts FHIR resources in multiple formats via the `Content-Type` header:
+
+**Supported Request Content Types:**
+- `application/fhir+json` or `application/json` - FHIR JSON format (default, i.e. if not set)
+- `application/fhir+xml` or `application/xml` - FHIR XML format
+- `application/fhir+turtle` or `text/turtle` - FHIR RDF Turtle format 
+- `text/n3` - FHIR N3 RDF format 
+
+**Example XML Request:**
+```bash
+curl -X POST 'https://fosps.gravitatehealth.eu/focusing/focus' \
+  -H 'Content-Type: application/fhir+xml' \
+  -H 'Accept: application/json' \
+  --data '<?xml version="1.0" encoding="UTF-8"?>
+<Bundle xmlns="http://hl7.org/fhir">
+  <resourceType value="Bundle"/>
+  <type value="document"/>
+  ...
+</Bundle>'
+```
+
+**Response Format:** Determined by the `Accept` header:
+- `application/json` - Returns FHIR JSON (default)
+- `text/html` - Returns HTML rendering of the focused ePI
+
+**RDF Support:** The service now includes full RDF support via the N3.js library:
+- Parse RDF Turtle and N3 formats in request bodies
+- Convert RDF triples to FHIR JSON for internal processing
+- Serialize FHIR JSON back to RDF formats (if needed)
+- Automatic handling of FHIR namespaces and data types
+
+### Parameters
+
 Optionally, you can also provide a PersonaVector in the following ways:
 
 - PersonaVector ID query parameter: Fetch from server
