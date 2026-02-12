@@ -9,11 +9,12 @@ import { PersonaVectorProvider } from "../providers/personaVector.provider";
 import { Liquid } from "liquidjs";
 import { readFileSync, stat } from "fs";
 import { objectEquals } from "../utils/utils"
-import { applyLenses } from "@gravitate-health/lens-execution-environment";
+import { applyLenses, LensExecutionConfig } from "@gravitate-health/lens-execution-environment";
 
 const FHIR_IPS_URL = process.env.FHIR_IPS_URL as string;
 const FHIR_EPI_URL = process.env.FHIR_EPI_URL as string;
 const PERSONA_VECTOR_URL = process.env.PERSONA_VECTOR_URL as string;
+const LENS_EXECUTION_TIMEOUT = parseInt(process.env.LENS_EXECUTION_TIMEOUT || "1000", 10);
 
 let preprocessingProvider = new PreprocessingProvider("")
 let lensesProvider = new LensesProvider("")
@@ -298,7 +299,10 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     // LENS EXECUTION ENVIRONMENT
     let focusingErrors: any[] = [...lensResolutionErrors]
     try {
-        const lensResult = await applyLenses(epi, ips, completeLenses, pv)
+        const lensExecutionConfig: LensExecutionConfig = {
+            lensExecutionTimeout: LENS_EXECUTION_TIMEOUT
+        };
+        const lensResult = await applyLenses(epi, ips, completeLenses, pv, lensExecutionConfig)
         epi = lensResult.epi
         focusingErrors = [...lensResolutionErrors, ...lensResult.focusingErrors]
         responseMessage.focusingErrors = focusingErrors

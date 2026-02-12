@@ -47,6 +47,8 @@ spec:
           value: https://fosps.gravitatehealth.eu/personas
         - name: PREPROCESSING_TIMEOUT
           value: "20000"
+        - name: LENS_EXECUTION_TIMEOUT
+          value: "1000"
         - name: PREPROCESSING_CACHE_BACKEND
           value: "memory"
         - name: PREPROCESSING_CACHE_TTL_MS

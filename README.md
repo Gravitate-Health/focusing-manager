@@ -55,7 +55,14 @@ These URLs *may* point to the same FHIR server.
     - Example: `30000` for 30 seconds
     - Preprocessing services can take significant time to process ePIs with semantic annotations
 
-**3. Preprocessing Cache Configuration**
+**3. Lens Execution Configuration**
+
+- `LENS_EXECUTION_TIMEOUT`: *Optional* timeout in milliseconds for individual lens execution (defaults to `1000` - 1 second)
+    - Example: `2000` for 2 seconds
+    - Controls maximum allowed execution time per lens to prevent long-running or hanging lenses
+    - If a lens exceeds this timeout, it will be terminated and an error will be reported
+
+**4. Preprocessing Cache Configuration**
 
 The service supports caching of preprocessed ePIs to improve performance and reduce load on preprocessing services. Caching uses a prefix-based strategy where each step in the preprocessing pipeline is cached independently.
 
@@ -79,7 +86,7 @@ Cache behavior:
 - Each successful preprocessing step writes to cache for future reuse
 - Cache keys include ePI content hash + ordered list of preprocessing steps
 
-**4. Kubernetes Dev**
+**5. Kubernetes Dev**
 *Optional* In production, the service uses the service account to query the cluster. Outside the cluster this is not possible. To develop this service outside the cluster, set the the following enviornment variables (or create a `.env` file) so the kubernetes client can connect to the cluster:
 
 - `ENVIRONMENT`: "dev"
