@@ -10,6 +10,7 @@ import { Liquid } from "liquidjs";
 import { readFileSync, stat } from "fs";
 import { objectEquals } from "../utils/utils"
 import { applyLenses, LensExecutionConfig } from "@gravitate-health/lens-execution-environment";
+import { getLeeLoggingConfig } from "../utils/leeLogging";
 
 const FHIR_IPS_URL = process.env.FHIR_IPS_URL as string;
 const FHIR_EPI_URL = process.env.FHIR_EPI_URL as string;
@@ -300,7 +301,8 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
     let focusingErrors: any[] = [...lensResolutionErrors]
     try {
         const lensExecutionConfig: LensExecutionConfig = {
-            lensExecutionTimeout: LENS_EXECUTION_TIMEOUT
+            lensExecutionTimeout: LENS_EXECUTION_TIMEOUT,
+            logging: getLeeLoggingConfig()
         };
         const lensResult = await applyLenses(epi, ips, completeLenses, pv, lensExecutionConfig)
         epi = lensResult.epi

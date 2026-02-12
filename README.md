@@ -62,6 +62,15 @@ These URLs *may* point to the same FHIR server.
     - Controls maximum allowed execution time per lens to prevent long-running or hanging lenses
     - If a lens exceeds this timeout, it will be terminated and an error will be reported
 
+- `LEE_LOG_LEVEL`: *Optional* minimum log level for Lens Execution Environment (and executed lenses) logs (defaults to `INFO`)
+    - Allowed values: `DEBUG`, `INFO`, `WARN`, `ERROR`, `FATAL`
+    - Example: `DEBUG` for verbose logging, `ERROR` for errors only
+    - Filters logs from both LEE core and lens execution based on severity
+
+- `LEE_LOGGING_ENABLED`: *Optional* enable/disable LEE core logging (defaults to `true`)
+    - Set to `false` to completely disable logging from the Lens Execution Environment core
+    - Example: `false` to silence LEE logs, better privacy and performance for **production environments**.
+
 **4. Preprocessing Cache Configuration**
 
 The service supports caching of preprocessed ePIs to improve performance and reduce load on preprocessing services. Caching uses a prefix-based strategy where each step in the preprocessing pipeline is cached independently.

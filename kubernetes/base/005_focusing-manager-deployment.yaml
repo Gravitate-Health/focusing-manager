@@ -49,6 +49,12 @@ spec:
           value: "20000"
         - name: LENS_EXECUTION_TIMEOUT
           value: "1000"
+        - name: LEE_LOG_LEVEL
+          value: "INFO"
+        - name: LEE_LOGGING_ENABLED
+          value: "true"
+        - name: LENS_LOGGING_ENABLED
+          value: "true"
         - name: PREPROCESSING_CACHE_BACKEND
           value: "memory"
         - name: PREPROCESSING_CACHE_TTL_MS
