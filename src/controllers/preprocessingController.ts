@@ -1,6 +1,6 @@
 
 import { Logger } from "../utils/Logger";
-import axios, { AxiosError, HttpStatusCode } from "axios";
+import { HttpStatusCode } from "axios";
 import { Response, Request } from "express";
 import { FhirEpiProvider } from "../providers/fhirEpi.provider";
 import { PreprocessingProvider } from "../providers/preprocessing.provider";
@@ -83,10 +83,10 @@ export const preprocess = async (req: Request, res: Response) => {
   console.log(`Requested ePI ID: ${epiId}`);
   console.log(`Requested preprocessors: ${preprocessors}`);
 
-  let preprocessedEpi, preprocessingErrors
+  let preprocessedEpi
   // Call preprocessors
   if (preprocessors) {
-    [preprocessedEpi, preprocessingErrors] = await preprocessingProvider.callServicesFromList(preprocessors, epi)
+    [preprocessedEpi] = await preprocessingProvider.callServicesFromList(preprocessors, epi)
   }
 
   if (req.accepts('html') == 'html') {

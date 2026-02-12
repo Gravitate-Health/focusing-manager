@@ -2,7 +2,7 @@ import { Logger } from "./Logger";
 import { JSDOM } from "jsdom";
 import * as N3 from 'n3';
 const { Parser, Writer, DataFactory } = N3;
-const { namedNode, literal, quad } = DataFactory;
+const { namedNode, literal } = DataFactory;
 
 /**
  * Supported FHIR content types for request/response handling
@@ -167,7 +167,7 @@ async function parseFhirRdf(rdfString: string, format: 'turtle' | 'n3'): Promise
         const parser = new Parser({ format: format === 'turtle' ? 'text/turtle' : 'text/n3' });
         const quads: N3.Quad[] = [];
         
-        parser.parse(rdfString, (error, quad, prefixes) => {
+        parser.parse(rdfString, (error, quad, _prefixes) => {
             if (error) {
                 Logger.logError("fhirParser.ts", "parseFhirRdf", 
                     `RDF parsing error: ${error.message}`);
@@ -180,7 +180,7 @@ async function parseFhirRdf(rdfString: string, format: 'turtle' | 'n3'): Promise
             } else {
                 // Parsing complete, convert triples to JSON
                 try {
-                    const fhirJson = convertRdfToFhirJson(quads, prefixes);
+                    const fhirJson = convertRdfToFhirJson(quads);
                     resolve(fhirJson);
                 } catch (conversionError: any) {
                     Logger.logError("fhirParser.ts", "parseFhirRdf", 
@@ -196,7 +196,7 @@ async function parseFhirRdf(rdfString: string, format: 'turtle' | 'n3'): Promise
  * Convert RDF quads to FHIR JSON structure
  * Follows FHIR RDF format specification
  */
-function convertRdfToFhirJson(quads: N3.Quad[], prefixes: any): any {
+function convertRdfToFhirJson(quads: N3.Quad[]): any {
     const FHIR_NS = 'http://hl7.org/fhir/';
     const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
     

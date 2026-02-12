@@ -26,7 +26,6 @@ export class MemoryCache implements IPreprocessingCache {
     private readonly maxItems: number;
     private readonly defaultTtlMs: number;
     private readonly schemaVersion: string;
-    private currentSize: number = 0;
 
     constructor(
         maxItems: number = 1000,
@@ -107,7 +106,6 @@ export class MemoryCache implements IPreprocessingCache {
 
             this.cache.set(key, entry);
             this.updateAccessOrder(key);
-            this.currentSize += size;
             this.stats.sets++;
 
             Logger.logDebug('MemoryCache', 'set', 
@@ -130,10 +128,6 @@ export class MemoryCache implements IPreprocessingCache {
             }
 
             for (const key of keysToDelete) {
-                const entry = this.cache.get(key);
-                if (entry) {
-                    this.currentSize -= entry.size;
-                }
                 this.cache.delete(key);
                 this.removeFromAccessOrder(key);
             }
@@ -153,7 +147,6 @@ export class MemoryCache implements IPreprocessingCache {
     async clear(): Promise<void> {
         this.cache.clear();
         this.accessOrder = [];
-        this.currentSize = 0;
         Logger.logInfo('MemoryCache', 'clear', 'Cache cleared');
     }
 
@@ -178,12 +171,7 @@ export class MemoryCache implements IPreprocessingCache {
         if (this.accessOrder.length === 0) return;
 
         const keyToEvict = this.accessOrder[0];
-        const entry = this.cache.get(keyToEvict);
         
-        if (entry) {
-            this.currentSize -= entry.size;
-        }
-
         this.cache.delete(keyToEvict);
         this.accessOrder.shift();
         

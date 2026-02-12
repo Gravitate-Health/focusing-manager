@@ -1,4 +1,4 @@
-import { Axios, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import AxiosController from '../utils/axios';
 import { Logger } from '../utils/Logger';
 

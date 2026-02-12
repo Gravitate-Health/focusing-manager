@@ -13,17 +13,17 @@ export class NoOpCache implements IPreprocessingCache {
         partialHits: 0
     };
 
-    async get(epiKey: string, steps: PipelineStep[]): Promise<CacheHit<any> | null> {
+    async get(_epiKey: string, _steps: PipelineStep[]): Promise<CacheHit<any> | null> {
         this.stats.misses++;
         return null;
     }
 
-    async set(epiKey: string, steps: PipelineStep[], value: any, ttlMs?: number): Promise<void> {
+    async set(_epiKey: string, _steps: PipelineStep[], _value: any, _ttlMs?: number): Promise<void> {
         this.stats.sets++;
         // Do nothing
     }
 
-    async invalidateByEpi(epiKey: string): Promise<void> {
+    async invalidateByEpi(_epiKey: string): Promise<void> {
         // Do nothing
     }
 

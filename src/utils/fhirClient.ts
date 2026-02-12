@@ -1,5 +1,4 @@
-import axios, { HttpStatusCode } from "axios";
-import { Logger } from "./Logger";
+import axios from "axios";
 
 let FHIR_IPS_URL = process.env.FHIR_IPS_URL;
 let FHIR_EPI_URL = process.env.FHIR_EPI_URL;

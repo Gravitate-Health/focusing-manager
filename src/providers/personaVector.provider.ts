@@ -8,7 +8,6 @@ export class PersonaVectorProvider extends AxiosController {
     }
 
     getPersonaVectorById = async (id: string): Promise<AxiosResponse> => {
-        let personaVector: any
         Logger.logInfo('personaVector.provider.ts', 'getPersonaVectorById', `Getting persona vector with Id: ${id}`)
 
         try {

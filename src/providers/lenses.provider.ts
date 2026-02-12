@@ -1,10 +1,8 @@
-import { parse } from 'dotenv';
 import AxiosController from '../utils/axios';
 import { ServiceClientFactory } from '../utils/ServiceClientFactory';
 import { Logger } from "../utils/Logger";
 
 const FOCUSING_LABEL_SELECTOR = process.env.FOCUSING_LABEL_SELECTOR || "eu.gravitate-health.fosps.focusing=True";
-const LEE_URL = process.env.LEE_URL || "";
 
 export class LensesProvider extends AxiosController {
     private lensSelectorMap: Record<string, string> = {}
@@ -101,7 +99,6 @@ export class LensesProvider extends AxiosController {
     }
 
     getLensFromSelector = async (lensSelectorName: string, lensName: string) => {
-        let lensesList: string[] = []
         let lensCompleteName = `${lensName}`
         let baseUrl = this.lensSelectorMap[lensSelectorName]
         if (!baseUrl) {

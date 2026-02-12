@@ -7,8 +7,7 @@ import { FhirIpsProvider } from "../providers/fhirIps.provider";
 import { LensesProvider } from "../providers/lenses.provider";
 import { PersonaVectorProvider } from "../providers/personaVector.provider";
 import { Liquid } from "liquidjs";
-import { readFileSync, stat } from "fs";
-import { objectEquals } from "../utils/utils"
+import { readFileSync } from "fs";
 import { applyLenses, LensExecutionConfig } from "@gravitate-health/lens-execution-environment";
 import { getLeeLoggingConfig } from "../utils/leeLogging";
 import { getFhirFormatFromContentType, parseFhirResource } from "../utils/fhirParser";
@@ -23,7 +22,6 @@ let lensesProvider = new LensesProvider("")
 let fhirEpiProvider = new FhirEpiProvider(FHIR_EPI_URL)
 let fhirIpsProvider = new FhirIpsProvider(FHIR_IPS_URL)
 let personaVectorProvider = new PersonaVectorProvider(PERSONA_VECTOR_URL)
-let lensApplied = false
 
 /**
  * Parse FHIR resource from request body based on Content-Type header
@@ -57,44 +55,6 @@ const parseRequestResource = async (req: Request, data: any, resourceName: strin
     
     // Data is already parsed, return as-is
     return data;
-}
-
-// Helper function to find a resource by type - handles both bundles and direct resources
-const findResourceByType = (resource: any, resourceType: string): any => {
-    if (!resource) {
-        return null;
-    }
-    
-    // If it's the resource we're looking for, return it
-    if (resource.resourceType === resourceType) {
-        return resource;
-    }
-    
-    // If it's a Bundle, search in entries
-    if (resource.resourceType === "Bundle" && resource.entry && Array.isArray(resource.entry)) {
-        const entry = resource.entry.find((e: any) => 
-            e.resource && e.resource.resourceType === resourceType
-        );
-        return entry ? entry.resource : null;
-    }
-    
-    // Resource not found
-    return null;
-}
-
-const getCategoryCode = (epi: any) => {
-    const composition = findResourceByType(epi, "Composition");
-    if (!composition) {
-        Logger.logWarn("lensesController.ts", "getCategoryCode", "Composition resource not found");
-        return null;
-    }
-    
-    try {
-        return composition.category?.[0]?.coding?.[0]?.code || null;
-    } catch (error) {
-        Logger.logWarn("lensesController.ts", "getCategoryCode", "Could not extract category code");
-        return null;
-    }
 }
 
 const getAllPreprocessorNames = async (): Promise<string[]> => {
@@ -138,12 +98,12 @@ export const focus = async (req: Request, res: Response) => {
     const { preprocessors, parsedLenses } = result;
 
     // Get persona vector (optional)
-    const pv = await getPersonaVector(req, res);
+    const pv = await getPersonaVector(req);
 
     focusProccess(req, res, epi, ips, pv, preprocessors, parsedLenses);
 }
 
-const getPersonaVector = async (req: Request, res: Response): Promise<any | null> => {
+const getPersonaVector = async (req: Request): Promise<any | null> => {
     // If personaVectorId is provided in query, fetch from FHIR server
     if (req.query.personaVectorId && req.query.personaVectorId !== "undefined") {
         const personaVectorId = req.query.personaVectorId as string;
@@ -288,7 +248,6 @@ const logAndSendResponseWithHeaders = (res: Response, responseMessage: any, stat
 
 const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv: any, preprocessors: string[] | undefined, parsedLensesNames: any[] | undefined) => {
     // Log too long Logger.logDebug("lensesController.ts", "focus", `Got ePI: ${JSON.stringify(epi)}} -- `)
-    var originalEpi = JSON.parse(JSON.stringify(epi));
 
     let responseMessage:
         {
@@ -379,9 +338,4 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
         logAndSendResponseWithHeaders(res, responseMessage, HttpStatusCode.Ok)
         return
     }
-}
-
-const getExtensions = (epi: any) => {
-    const composition = findResourceByType(epi, "Composition");
-    return composition.extension || [];
 }

@@ -1,4 +1,3 @@
-import {AxiosError} from 'axios';
 
 export interface ResponseErrorBody {}
 

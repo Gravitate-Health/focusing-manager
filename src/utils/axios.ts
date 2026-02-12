@@ -1,6 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { Logger } from '../utils/Logger';
-import { stringify } from 'qs';
 import ResponseError from '../error/ResponseError';
 
 class AxiosController {
@@ -49,8 +48,6 @@ class AxiosController {
 
 
   private _handleResponseError = async (error: any) => {
-    const originalConfig = error.config as AxiosRequestConfig;
-
     let errorUrl = error.config.url;
     if (error.response) {
       // The request was made and the server responded with a status code outside of 2xx
