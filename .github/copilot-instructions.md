@@ -59,7 +59,115 @@ Build process: TypeScript compiles `src/` → `build/`, then copies `src/templat
 
 ### Testing
 
-⚠️ **No automated tests exist** (`"test": "echo \"Error: no test specified\" && exit 1"` in `package.json`). Manual testing via API calls is current practice.
+The project uses **Jest** with **nock** for HTTP mocking and **supertest** for API endpoint testing. Test coverage includes unit tests and comprehensive integration tests.
+
+#### Test Structure
+
+```
+test/
+├── focus.integration.test.ts          # 36 tests - Complete focus endpoint scenarios
+├── preprocessing.integration.test.ts  # 19 tests - Preprocessing & cache functionality
+├── lenses.integration.test.ts         # 24 tests - Lens discovery & execution
+├── helpers/
+│   ├── mockClients.ts                # Mock service clients & FHIR clients
+│   └── testApp.ts                    # Express app configuration for tests
+├── fixtures/                         # Test data (ePI, IPS, PV, lenses)
+└── setup.ts                          # Jest global setup
+
+Total: 79 tests covering all major workflows
+```
+
+#### Running Tests
+
+```bash
+npm test                               # Run all tests
+npm test -- focus.integration.test.ts  # Run specific test file
+npm test -- --coverage                 # Run with coverage report
+npm test -- --detectOpenHandles        # Debug hanging tests
+```
+
+#### Test Coverage
+
+**Focus Integration Tests (`focus.integration.test.ts`)** - 36 tests:
+- ✅ **Resource Combinations**: ePI, IPS, PV in various combinations (implicit/referenced)
+- ✅ **Format Support**: JSON, XML, TTL for all FHIR resources
+- ✅ **Lens Selection**: Specific lens filtering, multiple lenses
+- ✅ **Error Handling**: 10 edge cases for resource not found (404), network timeouts, invalid responses
+  - ePI ID not found
+  - Patient ID not found (IPS)
+  - PV ID not found
+  - Lens ID not found
+  - Multiple resources not found
+  - Malformed IDs (security: path traversal attempts)
+  - Empty IDs
+  - Network timeouts
+  - Invalid JSON responses
+- ✅ **Response Formats**: JSON and HTML rendering
+- ✅ **Preprocessing**: Category-based preprocessing (Raw "R" vs Preprocessed "P")
+- ✅ **Service Discovery**: Lens and preprocessor service discovery
+
+**Preprocessing Integration Tests (`preprocessing.integration.test.ts`)** - 19 tests:
+- ✅ **Service Discovery**: GET /preprocessing endpoint
+- ✅ **Execution**: POST /preprocessing/:epiId with various scenarios
+- ✅ **Cache Functionality**: Comprehensive cache behavior testing
+  - Cache misses (no cached data)
+  - Cache hits (full cached data)
+  - Partial cache hits (some preprocessors cached)
+  - Cache stats endpoint (GET /preprocessing/cache/stats)
+  - Cache prefix matching
+  - LRU eviction behavior
+- ✅ **Error Handling**: Invalid ePI IDs, network errors, service failures
+- ✅ **Multiple Preprocessors**: Parallel execution and aggregation
+
+**Lenses Integration Tests (`lenses.integration.test.ts`)** - 24 tests:
+- ✅ **Discovery**: GET /lenses endpoint with multiple selectors
+- ✅ **Fetching**: Individual lens retrieval (LEE handles base64 decoding)
+- ✅ **Execution**: Lens application in complete focus workflow
+- ✅ **Error Scenarios**: Network errors, invalid lens code, runtime errors
+- ✅ **Name Mapping**: Handling duplicate lens names across selectors
+- ✅ **Integration**: Full pipeline with preprocessing + lens execution
+
+#### Test Infrastructure
+
+**Mock Clients** (`test/helpers/mockClients.ts`):
+- `MockServiceClient`: Simulates k8s/Docker service discovery for lens and preprocessor services
+- `MockFhirClient`: Mocks FHIR servers (ePI, IPS, PersonaVector)
+- Fixture loaders: `getEpiFixture()`, `getIpsFixture()`, `getPvFixture()`, `getLensFixture()`
+- ID extractors: `getEpiIdFromFixture()`, `getPatientIdFromIpsFixture()`
+
+**HTTP Mocking**: Uses `nock` to intercept HTTP requests:
+- Lens services return `{ lenses: ['lens-id-1', 'lens-id-2'] }` format
+- Individual lens fetches return complete FHIR Library resources
+- FHIR servers return Bundle or resource responses
+- Error scenarios: 404, 500, timeouts, malformed responses
+
+**Key Testing Patterns**:
+1. Always mock ServiceClientFactory to return MockServiceClient
+2. Use nock for external HTTP calls (FHIR servers, lens services, preprocessors)
+3. Clean up nock after each test with `nock.cleanAll()`
+4. Test both success and error paths
+5. Verify response status codes and structure
+
+#### Test Configuration
+
+**jest.config.js**:
+```javascript
+{
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  testMatch: ['**/*.test.ts'],
+  collectCoverageFrom: ['src/**/*.ts'],
+  setupFilesAfterEnv: ['./test/setup.ts']
+}
+```
+
+#### Important Test Notes
+
+- **Lens Format**: `/lenses` endpoint must return `{ lenses: ['id1', 'id2'] }`, not plain arrays
+- **LEE Integration**: Lenses are returned as complete FHIR Library resources; LEE handles extraction
+- **FHIR Resources**: Tests handle both Bundle and direct resource formats
+- **Timeouts**: Some tests increase timeout for FHIR resource fetching (10000ms)
+- **Flexible Assertions**: Tests accept multiple status codes `[200, 500]` for environment-dependent scenarios
 
 ## API Endpoints & Focusing Flows
 
@@ -245,17 +353,36 @@ Follow this comprehensive checklist when preparing a new release:
    ```
    Ensure build completes without TypeScript compilation errors.
 
-5. **Test the application**
+5. **Run automated tests**
+   ```bash
+   npm test
+   ```
    
-   ⚠️ **Manual testing required** (no automated test suite exists):
-   - Start the service: `npm start` or `npm run dev`
+   ✅ **All 79 tests must pass** before release:
+   - 36 focus integration tests (including 10 edge cases)
+   - 19 preprocessing tests (including cache functionality)
+   - 24 lenses tests (including error scenarios)
+   
+   If tests fail:
+   - Review test output for specific failures
+   - Fix issues in source code
+   - Re-run tests until all pass
+   - Consider running with coverage: `npm test -- --coverage`
+
+6. **Manual smoke testing** (optional but recommended)
+   
+   Start the service and verify critical paths:
+   ```bash
+   npm start  # or npm run dev
+   ```
+   
    - Test main focusing endpoints with sample ePI/IPS data
    - Verify preprocessing discovery (`GET /focusing/preprocessing`)
    - Verify lens discovery (`GET /focusing/lenses`)
    - Test both JSON and HTML response formats (`Accept` header)
    - Validate error handling with invalid inputs
 
-6. **Test Docker build**
+7. **Test Docker build**
    ```bash
    docker build -t ghcr.io/gravitate-health/focusing-manager:test .
    ```
@@ -270,7 +397,7 @@ Follow this comprehensive checklist when preparing a new release:
 
 If all pre-release checks pass:
 
-7. **Bump version**
+8. **Bump version**
    
    Use `npm version` to update version in `package.json` and create a git commit/tag automatically:
    
@@ -283,7 +410,7 @@ If all pre-release checks pass:
    - Create a git commit with message "v{version}"
    - Create a git tag "v{version}"
 
-8. **Push to repository**
+9. **Push to repository**
    ```bash
    git push && git push --tags
    ```
@@ -292,7 +419,7 @@ If all pre-release checks pass:
 
 ### Automated Post-Release
 
-9. **Docker image publishing**
+10. **Docker image publishing**
    
    **Automatic**: GitHub Actions workflow will detect the new tag and automatically:
    - Build the Docker image
@@ -314,7 +441,8 @@ npm run lint
 npm audit
 npm outdated @gravitate-health/lens-execution-environment  # Update if needed
 npm run build
-npm start  # Manual testing
+npm test  # Run automated test suite (79 tests)
+npm start  # Optional manual testing
 docker build -t ghcr.io/gravitate-health/focusing-manager:test .
 
 # Release (patch version)
@@ -359,7 +487,8 @@ If a release has critical issues:
 
 ## Future Maintenance Notes
 
-- **Testing**: No test framework exists - consider adding Jest/Mocha
+- **Testing**: ✅ Jest test framework implemented with 79 tests covering focus, preprocessing, and lens functionality
+- **Test Coverage**: Consider expanding coverage to include unit tests for individual utility functions
 - **TypeScript strictness**: `noImplicitAny` disabled, many `any` types used
 - **Persona Vector**: Code references "G-Lens profile" (legacy naming) - transitioning to "PersonaVector"
 - **Lens validation**: No schema validation for lens code - relies on try/catch around `new Function()`
@@ -371,5 +500,6 @@ When working with this codebase:
 1. **Always check FHIR resource structure** with `findResourceByType()` before accessing properties
 2. **Test both JSON and HTML response formats** - Liquid template rendering is separate code path
 3. **Verify service discovery** works in target environment (k8s/Docker/dev)
-4. **Log errors comprehensively** - no automated alerting exists
-5. **Be cautious with lens code execution** - security implications of `new Function()`
+4. **Run automated tests** before committing changes: `npm test`
+5. **Log errors comprehensively** - no automated alerting exists
+6. **Be cautious with lens code execution** - security implications of `new Function()`

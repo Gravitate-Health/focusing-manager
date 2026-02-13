@@ -1,0 +1,289 @@
+{
+  "resourceType": "Library",
+  "id": "conditions-lens",
+  "meta": {
+    "profile": [
+      "http://hl7.eu/fhir/ig/gravitate-health/StructureDefinition/lens"
+    ]
+  },
+  "extension": [
+    {
+      "url": "http://hl7.eu/fhir/ig/gravitate-health/StructureDefinition/lee-version",
+      "valueString": "dev"
+    }
+  ],
+  "url": "https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Library/590",
+  "identifier": [
+    {
+      "system": "http://gravitate-health.lst.tfo.upm.es",
+      "value": "conditions-lens"
+    }
+  ],
+  "version": "0.0.1",
+  "name": "Conditions and health problems Lens",
+  "_name": {
+    "extension": [
+      {
+        "url": "http://hl7.org/fhir/StructureDefinition/translation",
+        "extension": [
+          {
+            "url": "lang",
+            "valueCode": "es"
+          },
+          {
+            "url": "content",
+            "valueString": "Lente de Condiciones y Problemas de Salud"
+          }
+        ]
+      },
+      {
+        "url": "http://hl7.org/fhir/StructureDefinition/translation",
+        "extension": [
+          {
+            "url": "lang",
+            "valueCode": "pt"
+          },
+          {
+            "url": "content",
+            "valueString": "Lente de Condições e Problemas de Saúde"
+          }
+        ]
+      },
+      {
+        "url": "http://hl7.org/fhir/StructureDefinition/translation",
+        "extension": [
+          {
+            "url": "lang",
+            "valueCode": "da"
+          },
+          {
+            "url": "content",
+            "valueString": "Linse for Tilstande og Sundhedsproblemer"
+          }
+        ]
+      }
+    ]
+  },
+  "date": "2026-02-12T15:21:50.055Z",
+  "title": "Condition and health problems Lens",
+  "_title": {
+    "extension": [
+      {
+        "url": "http://hl7.org/fhir/StructureDefinition/translation",
+        "extension": [
+          {
+            "url": "lang",
+            "valueCode": "es"
+          },
+          {
+            "url": "content",
+            "valueString": "Lente de Condiciones y Problemas de Salud"
+          }
+        ]
+      },
+      {
+        "url": "http://hl7.org/fhir/StructureDefinition/translation",
+        "extension": [
+          {
+            "url": "lang",
+            "valueCode": "pt"
+          },
+          {
+            "url": "content",
+            "valueString": "Lente de Condições e Problemas de Saúde"
+          }
+        ]
+      },
+      {
+        "url": "http://hl7.org/fhir/StructureDefinition/translation",
+        "extension": [
+          {
+            "url": "lang",
+            "valueCode": "da"
+          },
+          {
+            "url": "content",
+            "valueString": "Linse for Tilstande og Sundhedsproblemer"
+          }
+        ]
+      }
+    ]
+  },
+  "status": "draft",
+  "experimental": true,
+  "type": {
+    "coding": [
+      {
+        "code": "logical-library"
+      }
+    ]
+  },
+  "publisher": "Gravitate Health Project - UPM Team",
+  "contact": [
+    {
+      "name": "Gravitate Health",
+      "telecom": [
+        {
+          "system": "url",
+          "value": "https://www.gravitatehealth.eu/"
+        }
+      ]
+    }
+  ],
+  "description": "A lens that highlight any information related to all kinds of conditions",
+  "_description": {
+    "extension": [
+      {
+        "url": "http://hl7.org/fhir/StructureDefinition/translation",
+        "extension": [
+          {
+            "url": "lang",
+            "valueCode": "es"
+          },
+          {
+            "url": "content",
+            "valueString": "Una lente que resalta cualquier información relacionada con todo tipo de condiciones."
+          }
+        ]
+      },
+      {
+        "url": "http://hl7.org/fhir/StructureDefinition/translation",
+        "extension": [
+          {
+            "url": "lang",
+            "valueCode": "pt"
+          },
+          {
+            "url": "content",
+            "valueString": "Uma lente que destaca qualquer informação relacionada com todos os tipos de condições."
+          }
+        ]
+      },
+      {
+        "url": "http://hl7.org/fhir/StructureDefinition/translation",
+        "extension": [
+          {
+            "url": "lang",
+            "valueCode": "da"
+          },
+          {
+            "url": "content",
+            "valueString": "En linse, der fremhæver al information relateret til alle slags tilstande."
+          }
+        ]
+      }
+    ]
+  },
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "code": "EU",
+          "system": "urn:iso:std:iso:3166"
+        }
+      ]
+    }
+  ],
+  "purpose": "Clarify the important things related to your conditions on an ePI",
+  "_purpose": {
+    "extension": [
+      {
+        "url": "http://hl7.org/fhir/StructureDefinition/translation",
+        "extension": [
+          {
+            "url": "lang",
+            "valueCode": "es"
+          },
+          {
+            "url": "content",
+            "valueString": "Aclarar los aspectos importantes relacionados con tus condiciones en una ePI."
+          }
+        ]
+      },
+      {
+        "url": "http://hl7.org/fhir/StructureDefinition/translation",
+        "extension": [
+          {
+            "url": "lang",
+            "valueCode": "pt"
+          },
+          {
+            "url": "content",
+            "valueString": "Esclarecer os pontos importantes relacionados com as tuas condições em uma ePI."
+          }
+        ]
+      },
+      {
+        "url": "http://hl7.org/fhir/StructureDefinition/translation",
+        "extension": [
+          {
+            "url": "lang",
+            "valueCode": "da"
+          },
+          {
+            "url": "content",
+            "valueString": "Klargør de vigtige ting vedrørende dine tilstande i en ePI."
+          }
+        ]
+      }
+    ]
+  },
+  "usage": "This lens requires a preprocessed ePI, and an IPS to work. You can import this lens directly to your FHIR Server which suports Library Resource type.",
+  "_usage": {
+    "extension": [
+      {
+        "url": "http://hl7.org/fhir/StructureDefinition/translation",
+        "extension": [
+          {
+            "url": "lang",
+            "valueCode": "es"
+          },
+          {
+            "url": "content",
+            "valueString": "Esta lente requiere una ePI preprocesada y un IPS para funcionar. Puedes importar esta lente directamente en tu servidor FHIR que soporte el tipo de recurso Library."
+          }
+        ]
+      },
+      {
+        "url": "http://hl7.org/fhir/StructureDefinition/translation",
+        "extension": [
+          {
+            "url": "lang",
+            "valueCode": "pt"
+          },
+          {
+            "url": "content",
+            "valueString": "Esta lente requer uma ePI pré-processada e um IPS para funcionar. Podes importar esta lente diretamente para o teu servidor FHIR que suporte o tipo de recurso Library."
+          }
+        ]
+      },
+      {
+        "url": "http://hl7.org/fhir/StructureDefinition/translation",
+        "extension": [
+          {
+            "url": "lang",
+            "valueCode": "da"
+          },
+          {
+            "url": "content",
+            "valueString": "Denne linse kræver en forbehandlet ePI og en IPS for at fungere. Du kan importere denne linse direkte til din FHIR-server, som understøtter ressource-typen Library."
+          }
+        ]
+      }
+    ]
+  },
+  "copyright": "© 2024 Gravitate Health",
+  "parameter": [
+    {
+      "use": "in",
+      "documentation": "parameter if it exists",
+      "type": "CodeableConcept"
+    }
+  ],
+  "content": [
+    {
+      "contentType": "application/javascript",
+      "data": "bGV0IHB2RGF0YSA9IHB2OwpsZXQgaHRtbERhdGEgPSBodG1sOwoKbGV0IGVwaURhdGEgPSBlcGk7CmxldCBpcHNEYXRhID0gaXBzOwoKbGV0IGdldFNwZWNpZmljYXRpb24gPSAoKSA9PiB7CiAgICByZXR1cm4gIjEuMC4wIjsKfTsKCi8vIC0tLSBMYW5ndWFnZSBkaWN0aW9uYXJ5IGZvciB1c2VyLWZhY2luZyBtZXNzYWdlcyAtLS0KY29uc3QgbGFuZ3VhZ2VEaWN0ID0gewogICAgZW46IHsKICAgICAgICByZXBvcnQ6IChjb25kaXRpb25zKSA9PiBjb25kaXRpb25zLmxlbmd0aAogICAgICAgICAgICA/IGBZb3UgYXJlIHNlZWluZyB0aGlzIGJlY2F1c2UgeW91IGhhdmU6ICR7Y29uZGl0aW9ucy5qb2luKCIsICIpfS5gCiAgICAgICAgICAgIDogIk5vIHJlbGV2YW50IGNvbmRpdGlvbnMgZGV0ZWN0ZWQuIiwKICAgICAgICBleHBsYW5hdGlvbjogKGNvbmRpdGlvbnMpID0+IGNvbmRpdGlvbnMubGVuZ3RoCiAgICAgICAgICAgID8gYFRoZSBmb2xsb3dpbmcgY29uZGl0aW9ucyB3ZXJlIGRldGVjdGVkIGFuZCBoaWdobGlnaHRlZDogJHtjb25kaXRpb25zLmpvaW4oIiwgIil9LmAKICAgICAgICAgICAgOiAiTm8gY29uZGl0aW9ucyBmb3VuZCBpbiB5b3VyIGhlYWx0aCByZWNvcmQuIgogICAgfSwKICAgIGVzOiB7CiAgICAgICAgcmVwb3J0OiAoY29uZGl0aW9ucykgPT4gY29uZGl0aW9ucy5sZW5ndGgKICAgICAgICAgICAgPyBgVmVzIGVzdG8gcG9ycXVlIHRpZW5lczogJHtjb25kaXRpb25zLmpvaW4oIiwgIil9LmAKICAgICAgICAgICAgOiAiTm8gc2UgZGV0ZWN0YXJvbiBjb25kaWNpb25lcyByZWxldmFudGVzLiIsCiAgICAgICAgZXhwbGFuYXRpb246IChjb25kaXRpb25zKSA9PiBjb25kaXRpb25zLmxlbmd0aAogICAgICAgICAgICA/IGBTZSBkZXRlY3Rhcm9uIHkgcmVzYWx0YXJvbiBsYXMgc2lndWllbnRlcyBjb25kaWNpb25lczogJHtjb25kaXRpb25zLmpvaW4oIiwgIil9LmAKICAgICAgICAgICAgOiAiTm8gc2UgZW5jb250cmFyb24gY29uZGljaW9uZXMgZW4gc3UgaGlzdG9yaWFsIGRlIHNhbHVkLiIKICAgIH0sCiAgICBwdDogewogICAgICAgIHJlcG9ydDogKGNvbmRpdGlvbnMpID0+IGNvbmRpdGlvbnMubGVuZ3RoCiAgICAgICAgICAgID8gYFZvY8OqIGVzdMOhIHZlbmRvIGlzc28gcG9ycXVlIHRlbTogJHtjb25kaXRpb25zLmpvaW4oIiwgIil9LmAKICAgICAgICAgICAgOiAiTmVuaHVtYSBjb25kacOnw6NvIHJlbGV2YW50ZSBkZXRlY3RhZGEuIiwKICAgICAgICBleHBsYW5hdGlvbjogKGNvbmRpdGlvbnMpID0+IGNvbmRpdGlvbnMubGVuZ3RoCiAgICAgICAgICAgID8gYEFzIHNlZ3VpbnRlcyBjb25kacOnw7VlcyBmb3JhbSBkZXRlY3RhZGFzIGUgZGVzdGFjYWRhczogJHtjb25kaXRpb25zLmpvaW4oIiwgIil9LmAKICAgICAgICAgICAgOiAiTmVuaHVtYSBjb25kacOnw6NvIGVuY29udHJhZGEgbm8gc2V1IGhpc3TDs3JpY28gZGUgc2HDumRlLiIKICAgIH0sCiAgICBkYTogewogICAgICAgIHJlcG9ydDogKGNvbmRpdGlvbnMpID0+IGNvbmRpdGlvbnMubGVuZ3RoCiAgICAgICAgICAgID8gYER1IHNlciBkZXR0ZSwgZm9yZGkgZHUgaGFyOiAke2NvbmRpdGlvbnMuam9pbigiLCAiKX0uYAogICAgICAgICAgICA6ICJJbmdlbiByZWxldmFudGUgdGlsc3RhbmRlIGZ1bmRldC4iLAogICAgICAgIGV4cGxhbmF0aW9uOiAoY29uZGl0aW9ucykgPT4gY29uZGl0aW9ucy5sZW5ndGgKICAgICAgICAgICAgPyBgRsO4bGdlbmRlIHRpbHN0YW5kZSBibGV2IGZ1bmRldCBvZyBmcmVtaMOmdmV0OiAke2NvbmRpdGlvbnMuam9pbigiLCAiKX0uYAogICAgICAgICAgICA6ICJJbmdlbiB0aWxzdGFuZGUgZnVuZGV0IGkgZGluIGpvdXJuYWwuIgogICAgfQp9OwoKbGV0IGRldGVjdGVkQ29uZGl0aW9ucyA9IFtdOwoKbGV0IGVuaGFuY2UgPSBhc3luYyAoKSA9PiB7CiAgICAvLyAtLS0gTGFuZ3VhZ2UgZGV0ZWN0aW9uIGZyb20gZVBJIC0tLQogICAgbGV0IGxhbmd1YWdlRGV0ZWN0ZWQgPSBudWxsOwogICAgaWYgKGVwaSAmJiBlcGkuZW50cnkpIHsKICAgICAgICBlcGkuZW50cnkuZm9yRWFjaCgoZW50cnkpID0+IHsKICAgICAgICAgICAgY29uc3QgcmVzID0gZW50cnkucmVzb3VyY2U7CiAgICAgICAgICAgIGlmIChyZXM/LnJlc291cmNlVHlwZSA9PT0gIkNvbXBvc2l0aW9uIiAmJiByZXMubGFuZ3VhZ2UpIHsKICAgICAgICAgICAgICAgIGxhbmd1YWdlRGV0ZWN0ZWQgPSByZXMubGFuZ3VhZ2U7CiAgICAgICAgICAgICAgICBjb25zb2xlLmxvZygi8J+MjSBEZXRlY3RlZCBmcm9tIENvbXBvc2l0aW9uLmxhbmd1YWdlOiIsIGxhbmd1YWdlRGV0ZWN0ZWQpOwogICAgICAgICAgICB9CiAgICAgICAgfSk7CiAgICB9CiAgICBpZiAoIWxhbmd1YWdlRGV0ZWN0ZWQgJiYgZXBpICYmIGVwaS5sYW5ndWFnZSkgewogICAgICAgIGxhbmd1YWdlRGV0ZWN0ZWQgPSBlcGkubGFuZ3VhZ2U7CiAgICAgICAgY29uc29sZS5sb2coIvCfjI0gRGV0ZWN0ZWQgZnJvbSBCdW5kbGUubGFuZ3VhZ2U6IiwgbGFuZ3VhZ2VEZXRlY3RlZCk7CiAgICB9CiAgICBpZiAoIWxhbmd1YWdlRGV0ZWN0ZWQpIHsKICAgICAgICBjb25zb2xlLndhcm4oIuKaoO+4jyBObyBsYW5ndWFnZSBkZXRlY3RlZCBpbiBDb21wb3NpdGlvbiBvciBCdW5kbGUuIik7CiAgICB9CiAgICAvLyBQcm92ZXMgdGhhdCBJUFMgZXhpc3RzCiAgICBpZiAoaXBzID09ICIiIHx8IGlwcyA9PSBudWxsKSB7CiAgICAgICAgdGhyb3cgbmV3IEVycm9yKCJGYWlsZWQgdG8gbG9hZCBJUFM6IHRoZSBMRUUgaXMgZ2V0dGluZyBhIGVtcHR5IElQUyIpOwogICAgfQogICAgLy8gSW5zdGFudGlhdGVzIHRoZSBhcnJheSBvZiBjb25kaXRpb24gY29kZXMKICAgIGxldCBhcnJheU9mQ29uZGl0aW9uQ29kZXMgPSBbXTsKICAgIGRldGVjdGVkQ29uZGl0aW9ucyA9IFtdOwogICAgLy8gSXRlcmF0ZXMgdGhyb3VnaCB0aGUgSVBTIGVudHJ5IHNlYXJjaGluZyBmb3IgY29uZGl0aW9ucwogICAgaXBzLmVudHJ5LmZvckVhY2goKGVsZW1lbnQpID0+IHsKICAgICAgICBpZiAoZWxlbWVudC5yZXNvdXJjZS5yZXNvdXJjZVR5cGUgPT0gIkNvbmRpdGlvbiIpIHsKICAgICAgICAgICAgaWYgKGVsZW1lbnQucmVzb3VyY2UuY29kZSAhPSB1bmRlZmluZWQpIHsKICAgICAgICAgICAgICAgIGVsZW1lbnQucmVzb3VyY2UuY29kZS5jb2RpbmcuZm9yRWFjaCgoY29kaW5nKSA9PiB7CiAgICAgICAgICAgICAgICAgICAgYXJyYXlPZkNvbmRpdGlvbkNvZGVzLnB1c2goewogICAgICAgICAgICAgICAgICAgICAgICBjb2RlOiBjb2RpbmcuY29kZSwKICAgICAgICAgICAgICAgICAgICAgICAgc3lzdGVtOiBjb2Rpbmcuc3lzdGVtLAogICAgICAgICAgICAgICAgICAgIH0pOwogICAgICAgICAgICAgICAgfSk7CiAgICAgICAgICAgICAgICAvLyBUcnkgdG8gZ2V0IHRoZSBkaXNwbGF5IG5hbWUgZm9yIHRoZSBjb25kaXRpb24KICAgICAgICAgICAgICAgIGlmIChlbGVtZW50LnJlc291cmNlLmNvZGUudGV4dCkgewogICAgICAgICAgICAgICAgICAgIGRldGVjdGVkQ29uZGl0aW9ucy5wdXNoKGVsZW1lbnQucmVzb3VyY2UuY29kZS50ZXh0KTsKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQogICAgICAgIH0KICAgIH0pOwogICAgLy8gSWYgdGhlcmUgYXJlIG5vIGNvbmRpdGlvbnMsIHJldHVybiB0aGUgZVBJIGFzIGl0IGlzCiAgICBpZiAoYXJyYXlPZkNvbmRpdGlvbkNvZGVzLmxlbmd0aCA9PSAwKSB7CiAgICAgICAgcmV0dXJuIGh0bWxEYXRhOwogICAgfQogICAgLy8gZVBJIHRyYW5zbGF0aW9uIGZyb20gdGVybWlub2xvZ3kgY29kZXMgdG8gdGhlaXIgaHVtYW4gcmVhZGFibGUgdHJhbnNsYXRpb25zIGluIHRoZSBzZWN0aW9ucwogICAgbGV0IGNvbXBvc2l0aW9ucyA9IDA7CiAgICBsZXQgY2F0ZWdvcmllcyA9IFtdOwogICAgZXBpLmVudHJ5LmZvckVhY2goKGVudHJ5KSA9PiB7CiAgICAgICAgaWYgKGVudHJ5LnJlc291cmNlLnJlc291cmNlVHlwZSA9PSAiQ29tcG9zaXRpb24iKSB7CiAgICAgICAgICAgIGNvbXBvc2l0aW9ucysrOwogICAgICAgICAgICBlbnRyeS5yZXNvdXJjZS5leHRlbnNpb24uZm9yRWFjaCgoZWxlbWVudCkgPT4gewogICAgICAgICAgICAgICAgaWYgKGVsZW1lbnQuZXh0ZW5zaW9uWzFdLnVybCA9PSAiY29uY2VwdCIpIHsKICAgICAgICAgICAgICAgICAgICBpZiAoZWxlbWVudC5leHRlbnNpb25bMV0udmFsdWVDb2RlYWJsZVJlZmVyZW5jZS5jb25jZXB0ICE9IHVuZGVmaW5lZCkgewogICAgICAgICAgICAgICAgICAgICAgICBlbGVtZW50LmV4dGVuc2lvblsxXS52YWx1ZUNvZGVhYmxlUmVmZXJlbmNlLmNvbmNlcHQuY29kaW5nLmZvckVhY2goCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAoY29kaW5nKSA9PiB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaWYgKGVxdWFscyhhcnJheU9mQ29uZGl0aW9uQ29kZXMsIHsgY29kZTogY29kaW5nLmNvZGUsIHN5c3RlbTogY29kaW5nLnN5c3RlbSB9KSkgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjYXRlZ29yaWVzLnB1c2goZWxlbWVudC5leHRlbnNpb25bMF0udmFsdWVTdHJpbmcpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICAgICAgKTsKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0pOwogICAgICAgIH0KICAgIH0pOwogICAgaWYgKGNvbXBvc2l0aW9ucyA9PSAwKSB7CiAgICAgICAgdGhyb3cgbmV3IEVycm9yKCdCYWQgZVBJOiBubyBjYXRlZ29yeSAiQ29tcG9zaXRpb24iIGZvdW5kJyk7CiAgICB9CiAgICBpZiAoY2F0ZWdvcmllcy5sZW5ndGggPT0gMCkgewogICAgICAgIHJldHVybiBodG1sRGF0YTsKICAgIH0KICAgIC8vIEZvY3VzIChhZGRzIGhpZ2hsaWdodCBjbGFzcykgdGhlIGh0bWwgYXBwbHlpbmcgZXZlcnkgY2F0ZWdvcnkgZm91bmQKICAgIHJldHVybiBhd2FpdCBhbm5vdGF0ZUhUTUxzZWN0aW9uKGNhdGVnb3JpZXMsICJoaWdobGlnaHQiKTsKfTsKCmxldCBhbm5vdGF0aW9uUHJvY2VzcyA9IChsaXN0T2ZDYXRlZ29yaWVzLCBlbmhhbmNlVGFnLCBkb2N1bWVudCwgcmVzcG9uc2UpID0+IHsKICAgIGxpc3RPZkNhdGVnb3JpZXMuZm9yRWFjaCgoY2hlY2spID0+IHsKICAgICAgICBpZiAocmVzcG9uc2UuaW5jbHVkZXMoY2hlY2spKSB7CiAgICAgICAgICAgIGxldCBlbGVtZW50cyA9IGRvY3VtZW50LmdldEVsZW1lbnRzQnlDbGFzc05hbWUoY2hlY2spOwogICAgICAgICAgICBmb3IgKGxldCBpID0gMDsgaSA8IGVsZW1lbnRzLmxlbmd0aDsgaSsrKSB7CiAgICAgICAgICAgICAgICBlbGVtZW50c1tpXS5jbGFzc0xpc3QuYWRkKGVuaGFuY2VUYWcpOwogICAgICAgICAgICAgICAgZWxlbWVudHNbaV0uY2xhc3NMaXN0LmFkZCgiY29uZGl0aW9ucy1sZW5zIik7CiAgICAgICAgICAgIH0KICAgICAgICAgICAgaWYgKGRvY3VtZW50LmdldEVsZW1lbnRzQnlUYWdOYW1lKCJoZWFkIikubGVuZ3RoID4gMCkgewogICAgICAgICAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudHNCeVRhZ05hbWUoImhlYWQiKVswXS5yZW1vdmUoKTsKICAgICAgICAgICAgfQogICAgICAgICAgICBpZiAoZG9jdW1lbnQuZ2V0RWxlbWVudHNCeVRhZ05hbWUoImJvZHkiKS5sZW5ndGggPiAwKSB7CiAgICAgICAgICAgICAgICByZXNwb25zZSA9IGRvY3VtZW50LmdldEVsZW1lbnRzQnlUYWdOYW1lKCJib2R5IilbMF0uaW5uZXJIVE1MOwogICAgICAgICAgICAgICAgY29uc29sZS5sb2coIlJlc3BvbnNlOiAiICsgcmVzcG9uc2UpOwogICAgICAgICAgICB9IGVsc2UgewogICAgICAgICAgICAgICAgY29uc29sZS5sb2coIlJlc3BvbnNlOiAiICsgZG9jdW1lbnQuZG9jdW1lbnRFbGVtZW50LmlubmVySFRNTCk7CiAgICAgICAgICAgICAgICByZXNwb25zZSA9IGRvY3VtZW50LmRvY3VtZW50RWxlbWVudC5pbm5lckhUTUw7CiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICB9KTsKCiAgICBpZiAocmVzcG9uc2UgPT0gbnVsbCB8fCByZXNwb25zZSA9PSAiIikgewogICAgICAgIHRocm93IG5ldyBFcnJvcigKICAgICAgICAgICAgIkFubm90YXRpb24gcHJvY2Nlc3MgZmFpbGVkOiBSZXR1cm5lZCBlbXB0eSBvciBudWxsIHJlc3BvbnNlIgogICAgICAgICk7CiAgICAgICAgLy9yZXR1cm4gaHRtbERhdGEKICAgIH0gZWxzZSB7CiAgICAgICAgY29uc29sZS5sb2coIlJlc3BvbnNlOiAiICsgcmVzcG9uc2UpOwogICAgICAgIHJldHVybiByZXNwb25zZTsKICAgIH0KfQoKbGV0IGFubm90YXRlSFRNTHNlY3Rpb24gPSBhc3luYyAobGlzdE9mQ2F0ZWdvcmllcywgZW5oYW5jZVRhZykgPT4gewogICAgbGV0IHJlc3BvbnNlID0gaHRtbERhdGE7CiAgICBsZXQgZG9jdW1lbnQ7CgogICAgaWYgKHR5cGVvZiB3aW5kb3cgPT09ICJ1bmRlZmluZWQiKSB7CiAgICAgICAgbGV0IGpzZG9tID0gYXdhaXQgaW1wb3J0KCJqc2RvbSIpOwogICAgICAgIGxldCB7IEpTRE9NIH0gPSBqc2RvbTsKICAgICAgICBsZXQgZG9tID0gbmV3IEpTRE9NKGh0bWxEYXRhKTsKICAgICAgICBkb2N1bWVudCA9IGRvbS53aW5kb3cuZG9jdW1lbnQ7CiAgICAgICAgcmV0dXJuIGFubm90YXRpb25Qcm9jZXNzKGxpc3RPZkNhdGVnb3JpZXMsIGVuaGFuY2VUYWcsIGRvY3VtZW50LCByZXNwb25zZSk7CiAgICB9IGVsc2UgewogICAgICAgIGRvY3VtZW50ID0gd2luZG93LmRvY3VtZW50OwogICAgICAgIHJldHVybiBhbm5vdGF0aW9uUHJvY2VzcyhsaXN0T2ZDYXRlZ29yaWVzLCBlbmhhbmNlVGFnLCBkb2N1bWVudCwgcmVzcG9uc2UpOwogICAgfQp9OwoKbGV0IGVxdWFscyA9IChhcnJheSwgb2JqZWN0KSA9PiB7CiAgICByZXR1cm4gYXJyYXkuc29tZSgoZWxlbWVudCkgPT4gewogICAgICAgIHJldHVybiAoZWxlbWVudC5jb2RlID09PSBvYmplY3QuY29kZSkgJiYgKGVsZW1lbnQuc3lzdGVtID09PSBvYmplY3Quc3lzdGVtKTsKICAgIH0pOwp9CgpsZXQgZ2V0TGFuZ3VhZ2VNZXNzYWdlcyA9IChsYW5nID0gImVuIikgPT4gewogICAgY29uc3Qgbm9ybWFsaXplZExhbmcgPSAobGFuZyB8fCAiZW4iKS50b0xvd2VyQ2FzZSgpOwogICAgaWYgKGxhbmd1YWdlRGljdFtub3JtYWxpemVkTGFuZ10pIHsKICAgICAgICByZXR1cm4gbGFuZ3VhZ2VEaWN0W25vcm1hbGl6ZWRMYW5nXTsKICAgIH0KCiAgICBjb25zdCBiYXNlTGFuZyA9IG5vcm1hbGl6ZWRMYW5nLnNwbGl0KCItIilbMF07CiAgICByZXR1cm4gbGFuZ3VhZ2VEaWN0W2Jhc2VMYW5nXSB8fCBsYW5ndWFnZURpY3QuZW47Cn07CgpsZXQgZXhwbGFuYXRpb25mdW5jdGlvbiA9IGFzeW5jIChsYW5nID0gImVuIikgPT4gewogICAgY29uc3QgbWVzc2FnZXMgPSBnZXRMYW5ndWFnZU1lc3NhZ2VzKGxhbmcpOwogICAgcmV0dXJuIG1lc3NhZ2VzLmV4cGxhbmF0aW9uKGRldGVjdGVkQ29uZGl0aW9ucyk7Cn07CgpsZXQgcmVwb3J0ZnVuY3Rpb24gPSBhc3luYyAobGFuZyA9ICJlbiIpID0+IHsKICAgIGNvbnN0IG1lc3NhZ2VzID0gZ2V0TGFuZ3VhZ2VNZXNzYWdlcyhsYW5nKTsKICAgIHJldHVybiB7CiAgICAgICAgbWVzc2FnZTogbWVzc2FnZXMucmVwb3J0KGRldGVjdGVkQ29uZGl0aW9ucyksCiAgICAgICAgY29uZGl0aW9uczogWy4uLmRldGVjdGVkQ29uZGl0aW9uc10sCiAgICAgICAgc3RhdHVzOiAiIgogICAgfTsKfTsKCnJldHVybiB7CiAgICBlbmhhbmNlOiBlbmhhbmNlLAogICAgZ2V0U3BlY2lmaWNhdGlvbjogZ2V0U3BlY2lmaWNhdGlvbiwKICAgIGV4cGxhbmF0aW9uOiBleHBsYW5hdGlvbmZ1bmN0aW9uLAogICAgcmVwb3J0OiByZXBvcnRmdW5jdGlvbgp9Owo="
+    }
+  ]
+}

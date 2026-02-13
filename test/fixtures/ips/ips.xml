@@ -1,0 +1,1129 @@
+<Bundle xmlns="http://hl7.org/fhir">
+    <meta>
+        <profile value="http://hl7.org/fhir/uv/ips/StructureDefinition/Bundle-uv-ips"/>
+    </meta>
+    <identifier>
+        <system value="urn:ietf:rfc:4122"/>
+        <value value="88e76422-32ed-4956-9888-cfd84914b91b"/>
+    </identifier>
+    <type value="document"/>
+    <timestamp value="2026-02-13T00:35:22.821+00:00"/>
+    <entry>
+        <fullUrl value="urn:uuid:a5f1d347-af33-401e-92bc-51de006acd7b"/>
+        <resource>
+            <Composition xmlns="http://hl7.org/fhir">
+                <text>
+                    <status value="generated"/>
+                    <div xmlns="http://www.w3.org/1999/xhtml">
+                        <h1>International Patient Summary Document</h1>
+                    </div>
+                </text>
+                <status value="final"/>
+                <type>
+                    <coding>
+                        <system value="http://loinc.org"/>
+                        <code value="60591-5"/>
+                        <display value="Patient Summary Document"/>
+                    </coding>
+                </type>
+                <subject>
+                    <reference value="Patient/pedro-patient"/>
+                </subject>
+                <date value="2026-02-13T00:35:21.806+00:00"/>
+                <author>
+                    <reference value="urn:uuid:269080ce-e535-4dee-bab9-d6a7f2a61209"/>
+                </author>
+                <title value="Patient Summary as of 02/13/2026"/>
+                <confidentiality value="N"/>
+                <section>
+                    <title value="Allergies and Intolerances"/>
+                    <code>
+                        <coding>
+                            <system value="http://loinc.org"/>
+                            <code value="48765-2"/>
+                            <display value="Allergies and adverse reactions Document"/>
+                        </coding>
+                    </code>
+                    <text>
+                        <status value="generated"/>
+                        <div xmlns="http://www.w3.org/1999/xhtml">
+                            <h5>Allergies And Intolerances</h5>
+                            <table class="hapiPropertyTable">
+                                <thead>
+                                    <tr>
+                                        <th>Allergen</th>
+                                        <th>Status</th>
+                                        <th>Category</th>
+                                        <th>Reaction</th>
+                                        <th>Severity</th>
+                                        <th>Comments</th>
+                                        <th>Onset</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr id="AllergyIntolerance-urn:uuid:5f575a57-6704-4477-8204-3b2db9367e6a">
+                                        <td> No information about allergies </td>
+                                        <td> active </td>
+                                        <td/>
+                                        <td/>
+                                        <td/>
+                                        <td/>
+                                        <td/>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </text>
+                    <entry>
+                        <reference value="urn:uuid:5f575a57-6704-4477-8204-3b2db9367e6a"/>
+                    </entry>
+                </section>
+                <section>
+                    <title value="Medication List"/>
+                    <code>
+                        <coding>
+                            <system value="http://loinc.org"/>
+                            <code value="10160-0"/>
+                            <display value="History of Medication use Narrative"/>
+                        </coding>
+                    </code>
+                    <text>
+                        <status value="generated"/>
+                        <div xmlns="http://www.w3.org/1999/xhtml">
+                            <h5>Medication Summary: Medication Statements</h5>
+                            <table class="hapiPropertyTable">
+                                <thead>
+                                    <tr>
+                                        <th>Medication</th>
+                                        <th>Status</th>
+                                        <th>Route</th>
+                                        <th>Sig</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr id="MedicationStatement-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-1/_history/1">
+                                        <td> Dovato 50 mg/300 mg 30 tablets 
+                                 
+                                            <br/> lamivudine and dolutegravir, 300 mg/50 mg, tablets
+                                            <br/> Dolutegravir- and lamivudine-containing product in oral dose form
+                                            <br/> lamivudine and dolutegravir
+                                        </td>
+                                        <td>Active</td>
+                                        <td> Oral use </td>
+                                        <td/>
+                                        <td/>
+                                    </tr>
+                                    <tr id="MedicationStatement-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-2/_history/1">
+                                        <td> MIRTAZAPINA CINFA 30 mg Coated Tablet 
+                                 
+                                            <br/> mirtazapine 30 mg, tablets
+                                            <br/> mirtazapine
+                                        </td>
+                                        <td>Active</td>
+                                        <td> Oral use </td>
+                                        <td/>
+                                        <td/>
+                                    </tr>
+                                    <tr id="MedicationStatement-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-3/_history/1">
+                                        <td> CALCIO/VITAMINA D3 ROVI 1000 mg/880 UI COMPRIMIDOS EFERVESCENTES 
+                                 
+                                            <br/> Calcium Vitamin D
+                                        </td>
+                                        <td>Active</td>
+                                        <td> Oral use </td>
+                                        <td/>
+                                        <td/>
+                                    </tr>
+                                    <tr id="MedicationStatement-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-4/_history/1">
+                                        <td> BLASTON 1 mg tablets 
+                                 
+                                            <br/> cinitrapide 1 mg tablet
+                                            <br/> Cinitapride
+                                        </td>
+                                        <td>Active</td>
+                                        <td> Oral use </td>
+                                        <td/>
+                                        <td/>
+                                    </tr>
+                                    <tr id="MedicationStatement-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-5/_history/1">
+                                        <td> AQUILEA ARTICULACIONES COLAGENO Y MAGNESIO 375GR </td>
+                                        <td>Active</td>
+                                        <td> Oral use </td>
+                                        <td/>
+                                        <td/>
+                                    </tr>
+                                    <tr id="MedicationStatement-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-6/_history/1">
+                                        <td> SORIA NATURAL VITAMINA C 36 COMPRIMIDOS 
+                                 
+                                            <br/> ascorbic acid (vit C)
+                                        </td>
+                                        <td>Active</td>
+                                        <td> Oral use </td>
+                                        <td/>
+                                        <td/>
+                                    </tr>
+                                    <tr id="MedicationStatement-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-7/_history/1">
+                                        <td> NATURES PLUS SPIRU-TEIN BATIDO PROTEINA SABOR COOKIES 525GR </td>
+                                        <td>Active</td>
+                                        <td> Oral use </td>
+                                        <td/>
+                                        <td/>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </text>
+                    <entry>
+                        <reference value="MedicationStatement/pedro-med-stat-1"/>
+                    </entry>
+                    <entry>
+                        <reference value="MedicationStatement/pedro-med-stat-2"/>
+                    </entry>
+                    <entry>
+                        <reference value="MedicationStatement/pedro-med-stat-3"/>
+                    </entry>
+                    <entry>
+                        <reference value="MedicationStatement/pedro-med-stat-4"/>
+                    </entry>
+                    <entry>
+                        <reference value="MedicationStatement/pedro-med-stat-5"/>
+                    </entry>
+                    <entry>
+                        <reference value="MedicationStatement/pedro-med-stat-6"/>
+                    </entry>
+                    <entry>
+                        <reference value="MedicationStatement/pedro-med-stat-7"/>
+                    </entry>
+                </section>
+                <section>
+                    <title value="Problem List"/>
+                    <code>
+                        <coding>
+                            <system value="http://loinc.org"/>
+                            <code value="11450-4"/>
+                            <display value="Problem list - Reported"/>
+                        </coding>
+                    </code>
+                    <text>
+                        <status value="generated"/>
+                        <div xmlns="http://www.w3.org/1999/xhtml">
+                            <h5>Problem List</h5>
+                            <table class="hapiPropertyTable">
+                                <thead>
+                                    <tr>
+                                        <th>Medical Problems</th>
+                                        <th>Status</th>
+                                        <th>Comments</th>
+                                        <th>Onset Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr id="Condition-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Condition/pedro-cond-1/_history/1">
+                                        <td> Depressive disorder (disorder) </td>
+                                        <td> active </td>
+                                        <td/>
+                                        <td/>
+                                    </tr>
+                                    <tr id="Condition-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Condition/pedro-cond-2/_history/1">
+                                        <td> Human immunodeficiency virus infection </td>
+                                        <td> active </td>
+                                        <td/>
+                                        <td> Mon Jan 01 00:00:00 GMT 2018 </td>
+                                    </tr>
+                                    <tr id="Condition-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Condition/pedro-cond-3/_history/1">
+                                        <td> Irritable bowel syndrome </td>
+                                        <td> active </td>
+                                        <td/>
+                                        <td/>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </text>
+                    <entry>
+                        <reference value="Condition/pedro-cond-1"/>
+                    </entry>
+                    <entry>
+                        <reference value="Condition/pedro-cond-2"/>
+                    </entry>
+                    <entry>
+                        <reference value="Condition/pedro-cond-3"/>
+                    </entry>
+                </section>
+            </Composition>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Patient/pedro-patient"/>
+        <resource>
+            <Patient xmlns="http://hl7.org/fhir">
+                <id value="pedro-patient"/>
+                <meta>
+                    <versionId value="1"/>
+                    <lastUpdated value="2026-02-12T01:24:28.721+00:00"/>
+                    <source value="#a8408131-cd76-91"/>
+                </meta>
+                <text>
+                    <status value="generated"/>
+                    <div xmlns="http://www.w3.org/1999/xhtml">Age: 42 years. I live alone, single. Electronics store salesperson Smoker since the age of 20 Interests: cultural events and concerts. I enjoy mountain activities, skiing in winter and hiking the rest of the year. Health Conditions HIV (diagnosed with 38 years) Depression</div>
+                </text>
+                <extension url="http://hl7.org/fhir/StructureDefinition/patient-citizenship">
+                    <extension url="code">
+                        <valueCodeableConcept>
+                            <coding>
+                                <system value="urn:iso:std:iso:3166"/>
+                                <code value="ES"/>
+                                <display value="Spain"/>
+                            </coding>
+                        </valueCodeableConcept>
+                    </extension>
+                </extension>
+                <identifier>
+                    <system value="https://www.gravitatehealth.eu/sid/doc"/>
+                    <value value="Pedro-1"/>
+                </identifier>
+                <identifier>
+                    <system value="keycloak-id"/>
+                    <value value="b17f0a96-cb4a-45cd-be09-cbadbe428948"/>
+                </identifier>
+                <active value="true"/>
+                <name>
+                    <family value="Gravitate"/>
+                    <given value="Pedro"/>
+                </name>
+                <gender value="male"/>
+                <birthDate value="1980-10-05"/>
+            </Patient>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:5f575a57-6704-4477-8204-3b2db9367e6a"/>
+        <resource>
+            <AllergyIntolerance xmlns="http://hl7.org/fhir">
+                <extension url="http://hl7.org/fhir/StructureDefinition/narrativeLink">
+                    <valueUrl value="urn:uuid:a5f1d347-af33-401e-92bc-51de006acd7b#AllergyIntolerance-urn:uuid:5f575a57-6704-4477-8204-3b2db9367e6a"/>
+                </extension>
+                <clinicalStatus>
+                    <coding>
+                        <system value="http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"/>
+                        <code value="active"/>
+                    </coding>
+                </clinicalStatus>
+                <code>
+                    <coding>
+                        <system value="http://hl7.org/fhir/uv/ips/CodeSystem/absent-unknown-uv-ips"/>
+                        <code value="no-allergy-info"/>
+                        <display value="No information about allergies"/>
+                    </coding>
+                </code>
+                <patient>
+                    <reference value="Patient/pedro-patient"/>
+                </patient>
+            </AllergyIntolerance>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-1"/>
+        <resource>
+            <MedicationStatement xmlns="http://hl7.org/fhir">
+                <id value="pedro-med-stat-1"/>
+                <meta>
+                    <versionId value="1"/>
+                    <lastUpdated value="2026-02-12T01:25:00.607+00:00"/>
+                    <source value="#f5db19e6-920c-9f"/>
+                </meta>
+                <extension url="http://hl7.org/fhir/StructureDefinition/narrativeLink">
+                    <valueUrl value="urn:uuid:a5f1d347-af33-401e-92bc-51de006acd7b#MedicationStatement-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-1/_history/1"/>
+                </extension>
+                <status value="active"/>
+                <medicationReference>
+                    <reference value="Medication/9d7be868-8264-4d94-ad04-ef04ecc92e52"/>
+                    <display value="Dovato 50 mg/300 mg (Dolutegravir/ Lamivudine) tablets"/>
+                </medicationReference>
+                <subject>
+                    <reference value="Patient/pedro-patient"/>
+                    <display value="Pedro Gravitate"/>
+                </subject>
+                <dosage>
+                    <route>
+                        <coding>
+                            <system value="http://standardterms.edqm.eu"/>
+                            <code value="20053000"/>
+                            <display value="Oral use"/>
+                        </coding>
+                    </route>
+                </dosage>
+            </MedicationStatement>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-2"/>
+        <resource>
+            <MedicationStatement xmlns="http://hl7.org/fhir">
+                <id value="pedro-med-stat-2"/>
+                <meta>
+                    <versionId value="1"/>
+                    <lastUpdated value="2026-02-12T01:25:00.676+00:00"/>
+                    <source value="#afa53e6a-dc2a-97"/>
+                </meta>
+                <extension url="http://hl7.org/fhir/StructureDefinition/narrativeLink">
+                    <valueUrl value="urn:uuid:a5f1d347-af33-401e-92bc-51de006acd7b#MedicationStatement-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-2/_history/1"/>
+                </extension>
+                <status value="active"/>
+                <medicationReference>
+                    <reference value="Medication/fdb5c97f-0a46-41ba-bc34-2efd2ef2f7e4"/>
+                    <display value="Mirtazapine 30 mg Coated Tablet"/>
+                </medicationReference>
+                <subject>
+                    <reference value="Patient/pedro-patient"/>
+                    <display value="Pedro Gravitate"/>
+                </subject>
+                <dosage>
+                    <route>
+                        <coding>
+                            <system value="http://standardterms.edqm.eu"/>
+                            <code value="20053000"/>
+                            <display value="Oral use"/>
+                        </coding>
+                    </route>
+                </dosage>
+            </MedicationStatement>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-3"/>
+        <resource>
+            <MedicationStatement xmlns="http://hl7.org/fhir">
+                <id value="pedro-med-stat-3"/>
+                <meta>
+                    <versionId value="1"/>
+                    <lastUpdated value="2026-02-12T01:25:00.721+00:00"/>
+                    <source value="#a6716a8d-a083-90"/>
+                </meta>
+                <extension url="http://hl7.org/fhir/StructureDefinition/narrativeLink">
+                    <valueUrl value="urn:uuid:a5f1d347-af33-401e-92bc-51de006acd7b#MedicationStatement-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-3/_history/1"/>
+                </extension>
+                <status value="active"/>
+                <medicationReference>
+                    <reference value="Medication/6f4151e9-91f6-4f1e-adc3-fb94dda7785g"/>
+                    <display value="CALCIO/VITAMINA D3 ROVI 1000 mg/880 UI COMPRIMIDOS EFERVESCENTES"/>
+                </medicationReference>
+                <subject>
+                    <reference value="Patient/pedro-patient"/>
+                    <display value="Pedro Gravitate"/>
+                </subject>
+                <dosage>
+                    <route>
+                        <coding>
+                            <system value="http://standardterms.edqm.eu"/>
+                            <code value="20053000"/>
+                            <display value="Oral use"/>
+                        </coding>
+                    </route>
+                </dosage>
+            </MedicationStatement>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-4"/>
+        <resource>
+            <MedicationStatement xmlns="http://hl7.org/fhir">
+                <id value="pedro-med-stat-4"/>
+                <meta>
+                    <versionId value="1"/>
+                    <lastUpdated value="2026-02-12T01:25:00.774+00:00"/>
+                    <source value="#ced23093-11ed-9e"/>
+                </meta>
+                <extension url="http://hl7.org/fhir/StructureDefinition/narrativeLink">
+                    <valueUrl value="urn:uuid:a5f1d347-af33-401e-92bc-51de006acd7b#MedicationStatement-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-4/_history/1"/>
+                </extension>
+                <status value="active"/>
+                <medicationReference>
+                    <reference value="Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77854"/>
+                    <display value="cinitrapide 1 mg"/>
+                </medicationReference>
+                <subject>
+                    <reference value="Patient/pedro-patient"/>
+                    <display value="Pedro Gravitate"/>
+                </subject>
+                <dosage>
+                    <route>
+                        <coding>
+                            <system value="http://standardterms.edqm.eu"/>
+                            <code value="20053000"/>
+                            <display value="Oral use"/>
+                        </coding>
+                    </route>
+                </dosage>
+            </MedicationStatement>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-5"/>
+        <resource>
+            <MedicationStatement xmlns="http://hl7.org/fhir">
+                <id value="pedro-med-stat-5"/>
+                <meta>
+                    <versionId value="1"/>
+                    <lastUpdated value="2026-02-12T01:25:00.856+00:00"/>
+                    <source value="#ce34c977-7b52-90"/>
+                </meta>
+                <extension url="http://hl7.org/fhir/StructureDefinition/narrativeLink">
+                    <valueUrl value="urn:uuid:a5f1d347-af33-401e-92bc-51de006acd7b#MedicationStatement-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-5/_history/1"/>
+                </extension>
+                <status value="active"/>
+                <medicationReference>
+                    <reference value="Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77855"/>
+                    <display value="Collagen and magnesium supplements"/>
+                </medicationReference>
+                <subject>
+                    <reference value="Patient/pedro-patient"/>
+                    <display value="Pedro Gravitate"/>
+                </subject>
+                <dosage>
+                    <route>
+                        <coding>
+                            <system value="http://standardterms.edqm.eu"/>
+                            <code value="20053000"/>
+                            <display value="Oral use"/>
+                        </coding>
+                    </route>
+                </dosage>
+            </MedicationStatement>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-6"/>
+        <resource>
+            <MedicationStatement xmlns="http://hl7.org/fhir">
+                <id value="pedro-med-stat-6"/>
+                <meta>
+                    <versionId value="1"/>
+                    <lastUpdated value="2026-02-12T01:25:00.897+00:00"/>
+                    <source value="#9c43c9b1-75d2-92"/>
+                </meta>
+                <extension url="http://hl7.org/fhir/StructureDefinition/narrativeLink">
+                    <valueUrl value="urn:uuid:a5f1d347-af33-401e-92bc-51de006acd7b#MedicationStatement-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-6/_history/1"/>
+                </extension>
+                <status value="active"/>
+                <medicationReference>
+                    <reference value="Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77856"/>
+                    <display value="Vitaminc C supplement"/>
+                </medicationReference>
+                <subject>
+                    <reference value="Patient/pedro-patient"/>
+                    <display value="Pedro Gravitate"/>
+                </subject>
+                <dosage>
+                    <route>
+                        <coding>
+                            <system value="http://standardterms.edqm.eu"/>
+                            <code value="20053000"/>
+                            <display value="Oral use"/>
+                        </coding>
+                    </route>
+                </dosage>
+            </MedicationStatement>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-7"/>
+        <resource>
+            <MedicationStatement xmlns="http://hl7.org/fhir">
+                <id value="pedro-med-stat-7"/>
+                <meta>
+                    <versionId value="1"/>
+                    <lastUpdated value="2026-02-12T01:25:00.937+00:00"/>
+                    <source value="#417f71cd-44c8-98"/>
+                </meta>
+                <extension url="http://hl7.org/fhir/StructureDefinition/narrativeLink">
+                    <valueUrl value="urn:uuid:a5f1d347-af33-401e-92bc-51de006acd7b#MedicationStatement-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-7/_history/1"/>
+                </extension>
+                <status value="active"/>
+                <medicationReference>
+                    <reference value="Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77857"/>
+                    <display value="Protein supplements"/>
+                </medicationReference>
+                <subject>
+                    <reference value="Patient/pedro-patient"/>
+                    <display value="Pedro Gravitate"/>
+                </subject>
+                <dosage>
+                    <route>
+                        <coding>
+                            <system value="http://standardterms.edqm.eu"/>
+                            <code value="20053000"/>
+                            <display value="Oral use"/>
+                        </coding>
+                    </route>
+                </dosage>
+            </MedicationStatement>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77856"/>
+        <resource>
+            <Medication xmlns="http://hl7.org/fhir">
+                <id value="6f4151e9-91f6-4f1e-adc3-fb94dda77856"/>
+                <meta>
+                    <versionId value="1"/>
+                    <lastUpdated value="2026-02-12T01:24:41.025+00:00"/>
+                    <source value="#224268a0-775b-9e"/>
+                </meta>
+                <code>
+                    <coding>
+                        <system value="https://spor.ema.europa.eu/pmswi"/>
+                        <code value="0x173fdc0ef097ed4dbe3915fba2e90586"/>
+                        <display value="SORIA NATURAL VITAMINA C 36 COMPRIMIDOS"/>
+                    </coding>
+                    <coding>
+                        <system value="http://www.whocc.no/atc"/>
+                        <code value="A11GA01"/>
+                        <display value="ascorbic acid (vit C)"/>
+                    </coding>
+                </code>
+                <form>
+                    <coding>
+                        <system value="http://standardterms.edqm.eu"/>
+                        <code value="10227000"/>
+                        <display value="Modified-release tablet"/>
+                    </coding>
+                    <text value="Modified-release tablet"/>
+                </form>
+                <ingredient>
+                    <itemCodeableConcept>
+                        <coding>
+                            <system value="http://fdasis.nlm.nih.gov"/>
+                            <code value="PQ6CK8PD0R"/>
+                            <display value="ASCORBIC ACID"/>
+                        </coding>
+                        <text value="Vitamin C"/>
+                    </itemCodeableConcept>
+                </ingredient>
+            </Medication>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77857"/>
+        <resource>
+            <Medication xmlns="http://hl7.org/fhir">
+                <id value="6f4151e9-91f6-4f1e-adc3-fb94dda77857"/>
+                <meta>
+                    <versionId value="1"/>
+                    <lastUpdated value="2026-02-12T01:24:41.060+00:00"/>
+                    <source value="#d0c79ce8-b0ad-90"/>
+                </meta>
+                <code>
+                    <coding>
+                        <system value="https://spor.ema.europa.eu/pmswi"/>
+                        <code value="0x81bb4f17d1ea7aabcd39383d33a4f2d6"/>
+                        <display value="NATURES PLUS SPIRU-TEIN BATIDO PROTEINA SABOR COOKIES 525GR"/>
+                    </coding>
+                </code>
+                <form>
+                    <coding>
+                        <system value="http://standardterms.edqm.eu"/>
+                        <code value="10201000"/>
+                        <display value="Oral powder"/>
+                    </coding>
+                    <text value="Oral powder"/>
+                </form>
+                <ingredient>
+                    <itemCodeableConcept>
+                        <coding>
+                            <system value="http://fdasis.nlm.nih.gov"/>
+                            <code value="R44IWB3RN5"/>
+                            <display value="SOY PROTEIN"/>
+                        </coding>
+                        <text value="SOY PROTEIN"/>
+                    </itemCodeableConcept>
+                </ingredient>
+            </Medication>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77854"/>
+        <resource>
+            <Medication xmlns="http://hl7.org/fhir">
+                <id value="6f4151e9-91f6-4f1e-adc3-fb94dda77854"/>
+                <meta>
+                    <versionId value="1"/>
+                    <lastUpdated value="2026-02-12T01:24:40.924+00:00"/>
+                    <source value="#87f6d4ce-1a29-9d"/>
+                </meta>
+                <code>
+                    <coding>
+                        <system value="https://spor.ema.europa.eu/pmswi"/>
+                        <code value="59.032"/>
+                        <display value="BLASTON 1 mg tablets"/>
+                    </coding>
+                    <coding>
+                        <system value="https://www.who-umc.org/phpid"/>
+                        <code value="0xbb82cd10ab2add752b2b9224931077b2"/>
+                        <display value="cinitrapide 1 mg tablet"/>
+                    </coding>
+                    <coding>
+                        <system value="http://www.whocc.no/atc"/>
+                        <code value="A03FA08"/>
+                        <display value="Cinitapride"/>
+                    </coding>
+                </code>
+                <form>
+                    <coding>
+                        <system value="http://standardterms.edqm.eu"/>
+                        <code value="10219000"/>
+                        <display value="Tablet"/>
+                    </coding>
+                    <text value="Tablet"/>
+                </form>
+                <ingredient>
+                    <itemCodeableConcept>
+                        <coding>
+                            <system value="http://fdasis.nlm.nih.gov"/>
+                            <code value="R8I97I2L24"/>
+                            <display value="CINITAPRIDE"/>
+                        </coding>
+                        <text value="CINITAPRIDE"/>
+                    </itemCodeableConcept>
+                    <strength>
+                        <numerator>
+                            <value value="1"/>
+                            <system value="http://unitsofmeasure.org"/>
+                            <code value="mg"/>
+                        </numerator>
+                        <denominator>
+                            <value value="1"/>
+                            <unit value="Tablet"/>
+                            <system value="http://standardterms.edqm.eu"/>
+                            <code value="15054000"/>
+                        </denominator>
+                    </strength>
+                </ingredient>
+            </Medication>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77855"/>
+        <resource>
+            <Medication xmlns="http://hl7.org/fhir">
+                <id value="6f4151e9-91f6-4f1e-adc3-fb94dda77855"/>
+                <meta>
+                    <versionId value="1"/>
+                    <lastUpdated value="2026-02-12T01:24:40.967+00:00"/>
+                    <source value="#edc2025e-ad1e-99"/>
+                </meta>
+                <code>
+                    <coding>
+                        <system value="https://spor.ema.europa.eu/pmswi"/>
+                        <code value="0xb9846396e9e1eedc4a344e7b64d57107"/>
+                        <display value="AQUILEA ARTICULACIONES COLAGENO Y MAGNESIO 375GR"/>
+                    </coding>
+                </code>
+                <form>
+                    <coding>
+                        <system value="http://standardterms.edqm.eu"/>
+                        <code value="10201000"/>
+                        <display value="Oral powder"/>
+                    </coding>
+                    <text value="Oral powder"/>
+                </form>
+                <ingredient>
+                    <itemCodeableConcept>
+                        <coding>
+                            <system value="http://fdasis.nlm.nih.gov"/>
+                            <code value="I38ZP9992A"/>
+                            <display value="MAGNESIUM"/>
+                        </coding>
+                        <text value="MAGNESIUM"/>
+                    </itemCodeableConcept>
+                </ingredient>
+                <ingredient>
+                    <itemCodeableConcept>
+                        <coding>
+                            <system value="http://fdasis.nlm.nih.gov"/>
+                            <code value="S270N0TRQY"/>
+                            <display value="HYALURONIC ACID"/>
+                        </coding>
+                        <text value="HYALURONIC ACID"/>
+                    </itemCodeableConcept>
+                </ingredient>
+                <ingredient>
+                    <itemCodeableConcept>
+                        <coding>
+                            <system value="http://fdasis.nlm.nih.gov"/>
+                            <code value="PT3TGI7OIP"/>
+                            <display value="HUMAN TYPE I COLLAGEN"/>
+                        </coding>
+                        <text value="HUMAN TYPE I COLLAGEN"/>
+                    </itemCodeableConcept>
+                </ingredient>
+            </Medication>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/fdb5c97f-0a46-41ba-bc34-2efd2ef2f7e4"/>
+        <resource>
+            <Medication xmlns="http://hl7.org/fhir">
+                <id value="fdb5c97f-0a46-41ba-bc34-2efd2ef2f7e4"/>
+                <meta>
+                    <versionId value="1"/>
+                    <lastUpdated value="2026-02-12T01:24:40.840+00:00"/>
+                    <source value="#6b868401-c7fd-95"/>
+                </meta>
+                <code>
+                    <coding>
+                        <system value="https://spor.ema.europa.eu/pmswi"/>
+                        <code value="67.068"/>
+                        <display value="MIRTAZAPINA CINFA 30 mg Coated Tablet"/>
+                    </coding>
+                    <coding>
+                        <system value="https://www.who-umc.org/phpid"/>
+                        <code value="0x6c47381b040e5b588db23b2272f28eec"/>
+                        <display value="mirtazapine 30 mg, tablets"/>
+                    </coding>
+                    <coding>
+                        <system value="http://www.whocc.no/atc"/>
+                        <code value="N06AX11"/>
+                        <display value="mirtazapine"/>
+                    </coding>
+                </code>
+                <form>
+                    <coding>
+                        <system value="http://standardterms.edqm.eu"/>
+                        <code value="10220000"/>
+                        <display value="Coated tablet"/>
+                    </coding>
+                </form>
+                <ingredient>
+                    <itemCodeableConcept>
+                        <coding>
+                            <system value="http://fdasis.nlm.nih.gov"/>
+                            <code value="A051Q2099Q"/>
+                            <display value="Mirtazapine"/>
+                        </coding>
+                        <text value="Mirtazapine"/>
+                    </itemCodeableConcept>
+                    <strength>
+                        <numerator>
+                            <value value="30"/>
+                            <system value="http://unitsofmeasure.org"/>
+                            <code value="g"/>
+                        </numerator>
+                        <denominator>
+                            <value value="1"/>
+                            <unit value="Tablet"/>
+                            <system value="http://standardterms.edqm.eu"/>
+                            <code value="15054000"/>
+                        </denominator>
+                    </strength>
+                </ingredient>
+            </Medication>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/6f4151e9-91f6-4f1e-adc3-fb94dda7785g"/>
+        <resource>
+            <Medication xmlns="http://hl7.org/fhir">
+                <id value="6f4151e9-91f6-4f1e-adc3-fb94dda7785g"/>
+                <meta>
+                    <versionId value="1"/>
+                    <lastUpdated value="2026-02-12T01:24:40.890+00:00"/>
+                    <source value="#ab1c600d-950d-9f"/>
+                </meta>
+                <code>
+                    <coding>
+                        <system value="https://spor.ema.europa.eu/pmswi"/>
+                        <code value="68290"/>
+                        <display value="CALCIO/VITAMINA D3 ROVI 1000 mg/880 UI COMPRIMIDOS EFERVESCENTES"/>
+                    </coding>
+                    <coding>
+                        <system value="https://www.who-umc.org/phpid"/>
+                        <code value="0xF79CABF272B6A7EEF104DDDA44E82716"/>
+                        <display value="Calcium Vitamin D"/>
+                    </coding>
+                </code>
+                <form>
+                    <coding>
+                        <system value="http://standardterms.edqm.eu"/>
+                        <code value="10222000"/>
+                        <display value="Effervescent tablet"/>
+                    </coding>
+                    <text value="Effervescent tablet"/>
+                </form>
+                <ingredient>
+                    <itemCodeableConcept>
+                        <coding>
+                            <system value="http://fdasis.nlm.nih.gov"/>
+                            <code value="H0G9379FGK"/>
+                            <display value="Calcium carbonate"/>
+                        </coding>
+                        <text value="calcium carbonate"/>
+                    </itemCodeableConcept>
+                    <strength>
+                        <numerator>
+                            <value value="1000"/>
+                            <system value="http://unitsofmeasure.org"/>
+                            <code value="mg"/>
+                        </numerator>
+                        <denominator>
+                            <value value="1"/>
+                            <unit value="Tablet"/>
+                            <system value="http://standardterms.edqm.eu"/>
+                            <code value="15054000"/>
+                        </denominator>
+                    </strength>
+                </ingredient>
+                <ingredient>
+                    <itemCodeableConcept>
+                        <coding>
+                            <system value="http://fdasis.nlm.nih.gov"/>
+                            <code value="1C6V77QF41"/>
+                            <display value="cholecalciferol"/>
+                        </coding>
+                        <text value="cholecalciferol"/>
+                    </itemCodeableConcept>
+                    <strength>
+                        <numerator>
+                            <value value="880"/>
+                            <system value="http://unitsofmeasure.org"/>
+                            <code value="{UI}"/>
+                        </numerator>
+                        <denominator>
+                            <value value="1"/>
+                            <unit value="Tablet"/>
+                            <system value="http://standardterms.edqm.eu"/>
+                            <code value="15054000"/>
+                        </denominator>
+                    </strength>
+                </ingredient>
+            </Medication>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/9d7be868-8264-4d94-ad04-ef04ecc92e52"/>
+        <resource>
+            <Medication xmlns="http://hl7.org/fhir">
+                <id value="9d7be868-8264-4d94-ad04-ef04ecc92e52"/>
+                <meta>
+                    <versionId value="1"/>
+                    <lastUpdated value="2026-02-12T01:24:40.808+00:00"/>
+                    <source value="#58f6fe1e-d265-91"/>
+                </meta>
+                <code>
+                    <coding>
+                        <system value="https://spor.ema.europa.eu/pmswi"/>
+                        <code value="EU/1/19/1370/001"/>
+                        <display value="Dovato 50 mg/300 mg 30 tablets"/>
+                    </coding>
+                    <coding>
+                        <system value="https://www.who-umc.org/phpid"/>
+                        <code value="0x073AF2E5B92AE19E8B67635AFFB3D6CA"/>
+                        <display value="lamivudine and dolutegravir, 300 mg/50 mg, tablets"/>
+                    </coding>
+                    <coding>
+                        <system value="http://snomed.info/sct"/>
+                        <code value="787165000"/>
+                        <display value="Dolutegravir- and lamivudine-containing product in oral dose form"/>
+                    </coding>
+                    <coding>
+                        <system value="http://www.whocc.no/atc"/>
+                        <code value="J05AR25"/>
+                        <display value="lamivudine and dolutegravir"/>
+                    </coding>
+                </code>
+                <form>
+                    <coding>
+                        <system value="http://standardterms.edqm.eu"/>
+                        <code value="10220000"/>
+                        <display value="Coated tablet"/>
+                    </coding>
+                </form>
+                <ingredient>
+                    <itemCodeableConcept>
+                        <coding>
+                            <system value="http://fdasis.nlm.nih.gov"/>
+                            <code value="2T8Q726O95"/>
+                            <display value="lamivudine"/>
+                        </coding>
+                        <text value="lamivudine"/>
+                    </itemCodeableConcept>
+                    <strength>
+                        <numerator>
+                            <value value="300"/>
+                            <system value="http://unitsofmeasure.org"/>
+                            <code value="mg"/>
+                        </numerator>
+                        <denominator>
+                            <value value="1"/>
+                            <unit value="Tablet"/>
+                            <system value="http://standardterms.edqm.eu"/>
+                            <code value="15054000"/>
+                        </denominator>
+                    </strength>
+                </ingredient>
+                <ingredient>
+                    <itemCodeableConcept>
+                        <coding>
+                            <system value="http://fdasis.nlm.nih.gov"/>
+                            <code value="DKO1W9H7M1"/>
+                            <display value="dolutegravir"/>
+                        </coding>
+                        <text value="dolutegravir"/>
+                    </itemCodeableConcept>
+                    <strength>
+                        <numerator>
+                            <value value="50"/>
+                            <system value="http://unitsofmeasure.org"/>
+                            <code value="mg"/>
+                        </numerator>
+                        <denominator>
+                            <value value="1"/>
+                            <unit value="Tablet"/>
+                            <system value="http://standardterms.edqm.eu"/>
+                            <code value="15054000"/>
+                        </denominator>
+                    </strength>
+                </ingredient>
+            </Medication>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Condition/pedro-cond-1"/>
+        <resource>
+            <Condition xmlns="http://hl7.org/fhir">
+                <id value="pedro-cond-1"/>
+                <meta>
+                    <versionId value="1"/>
+                    <lastUpdated value="2026-02-12T01:24:32.736+00:00"/>
+                    <source value="#c1d489bf-5b82-9c"/>
+                    <profile value="http://hl7.org/fhir/uv/ips/StructureDefinition/Condition-uv-ips"/>
+                </meta>
+                <extension url="http://hl7.org/fhir/StructureDefinition/narrativeLink">
+                    <valueUrl value="urn:uuid:a5f1d347-af33-401e-92bc-51de006acd7b#Condition-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Condition/pedro-cond-1/_history/1"/>
+                </extension>
+                <clinicalStatus>
+                    <coding>
+                        <system value="http://terminology.hl7.org/CodeSystem/condition-clinical"/>
+                        <code value="active"/>
+                    </coding>
+                </clinicalStatus>
+                <verificationStatus>
+                    <coding>
+                        <code value="confirmed"/>
+                    </coding>
+                </verificationStatus>
+                <code>
+                    <coding>
+                        <system value="http://snomed.info/sct"/>
+                        <code value="35489007"/>
+                        <display value="Depressive disorder (disorder)"/>
+                    </coding>
+                    <text value="Depressive disorder (disorder)"/>
+                </code>
+                <subject>
+                    <reference value="Patient/pedro-patient"/>
+                    <display value="Pedro Gravitate"/>
+                </subject>
+            </Condition>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Condition/pedro-cond-2"/>
+        <resource>
+            <Condition xmlns="http://hl7.org/fhir">
+                <id value="pedro-cond-2"/>
+                <meta>
+                    <versionId value="1"/>
+                    <lastUpdated value="2026-02-12T01:24:32.791+00:00"/>
+                    <source value="#f31281d6-b66c-95"/>
+                    <profile value="http://hl7.org/fhir/uv/ips/StructureDefinition/Condition-uv-ips"/>
+                </meta>
+                <extension url="http://hl7.org/fhir/StructureDefinition/narrativeLink">
+                    <valueUrl value="urn:uuid:a5f1d347-af33-401e-92bc-51de006acd7b#Condition-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Condition/pedro-cond-2/_history/1"/>
+                </extension>
+                <clinicalStatus>
+                    <coding>
+                        <system value="http://terminology.hl7.org/CodeSystem/condition-clinical"/>
+                        <code value="active"/>
+                    </coding>
+                </clinicalStatus>
+                <verificationStatus>
+                    <coding>
+                        <code value="confirmed"/>
+                    </coding>
+                </verificationStatus>
+                <code>
+                    <coding>
+                        <system value="http://snomed.info/sct"/>
+                        <code value="86406008"/>
+                        <display value="Human immunodeficiency virus infection"/>
+                    </coding>
+                    <text value="Human immunodeficiency virus infection"/>
+                </code>
+                <subject>
+                    <reference value="Patient/pedro-patient"/>
+                    <display value="Pedro Gravitate"/>
+                </subject>
+                <onsetDateTime value="2018"/>
+                <asserter>
+                    <display value="Dr. Xavier García"/>
+                </asserter>
+            </Condition>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Condition/pedro-cond-3"/>
+        <resource>
+            <Condition xmlns="http://hl7.org/fhir">
+                <id value="pedro-cond-3"/>
+                <meta>
+                    <versionId value="1"/>
+                    <lastUpdated value="2026-02-12T01:24:32.951+00:00"/>
+                    <source value="#c4fc7b05-e9f7-94"/>
+                    <profile value="http://hl7.org/fhir/uv/ips/StructureDefinition/Condition-uv-ips"/>
+                </meta>
+                <extension url="http://hl7.org/fhir/StructureDefinition/narrativeLink">
+                    <valueUrl value="urn:uuid:a5f1d347-af33-401e-92bc-51de006acd7b#Condition-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Condition/pedro-cond-3/_history/1"/>
+                </extension>
+                <clinicalStatus>
+                    <coding>
+                        <system value="http://terminology.hl7.org/CodeSystem/condition-clinical"/>
+                        <code value="active"/>
+                    </coding>
+                </clinicalStatus>
+                <verificationStatus>
+                    <coding>
+                        <code value="confirmed"/>
+                    </coding>
+                </verificationStatus>
+                <code>
+                    <coding>
+                        <system value="http://snomed.info/sct"/>
+                        <code value="10743008"/>
+                        <display value="Irritable bowel syndrome"/>
+                    </coding>
+                    <text value="Irritable bowel syndrome"/>
+                </code>
+                <subject>
+                    <reference value="Patient/pedro-patient"/>
+                    <display value="Pedro Gravitate"/>
+                </subject>
+            </Condition>
+        </resource>
+    </entry>
+    <entry>
+        <fullUrl value="urn:uuid:269080ce-e535-4dee-bab9-d6a7f2a61209"/>
+        <resource>
+            <Organization xmlns="http://hl7.org/fhir">
+                <name value="eHealthLab - University of Cyprus"/>
+                <address>
+                    <line value="1 University Avenue"/>
+                    <city value="Nicosia"/>
+                    <postalCode value="2109"/>
+                    <country value="CY"/>
+                </address>
+            </Organization>
+        </resource>
+    </entry>
+</Bundle>

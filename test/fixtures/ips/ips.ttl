@@ -1,0 +1,996 @@
+@prefix fhir: <http://hl7.org/fhir/> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sct:  <http://snomed.info/id#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+<https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/6f4151e9-91f6-4f1e-adc3-fb94dda7785g/_history/1>
+        rdf:type                    fhir:Medication;
+        fhir:Medication.code        [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "0xF79CABF272B6A7EEF104DDDA44E82716" ];
+                                                                     fhir:Coding.display  [ fhir:value  "Calcium Vitamin D" ];
+                                                                     fhir:Coding.system   [ fhir:value  "https://www.who-umc.org/phpid"^^xsd:anyURI ];
+                                                                     fhir:index           1
+                                                                   ];
+                                      fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "68290" ];
+                                                                     fhir:Coding.display  [ fhir:value  "CALCIO/VITAMINA D3 ROVI 1000 mg/880 UI COMPRIMIDOS EFERVESCENTES" ];
+                                                                     fhir:Coding.system   [ fhir:value  "https://spor.ema.europa.eu/pmswi"^^xsd:anyURI ];
+                                                                     fhir:index           0
+                                                                   ]
+                                    ];
+        fhir:Medication.form        [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "10222000" ];
+                                                                     fhir:Coding.display  [ fhir:value  "Effervescent tablet" ];
+                                                                     fhir:Coding.system   [ fhir:value  "http://standardterms.edqm.eu"^^xsd:anyURI ];
+                                                                     fhir:index           0
+                                                                   ];
+                                      fhir:CodeableConcept.text    [ fhir:value
+                                                        "Effervescent tablet" ]
+                                    ];
+        fhir:Medication.ingredient  [ fhir:Medication.ingredient.itemCodeableConcept
+                                              [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "1C6V77QF41" ];
+                                                                               fhir:Coding.display  [ fhir:value  "cholecalciferol" ];
+                                                                               fhir:Coding.system   [ fhir:value  "http://fdasis.nlm.nih.gov"^^xsd:anyURI ];
+                                                                               fhir:index           0
+                                                                             ];
+                                                fhir:CodeableConcept.text    [ fhir:value
+                                                                  "cholecalciferol" ]
+                                              ];
+                                      fhir:Medication.ingredient.strength
+                                              [ fhir:Ratio.denominator  [ fhir:Quantity.code    [ fhir:value  "15054000" ];
+                                                                          fhir:Quantity.system  [ fhir:value  "http://standardterms.edqm.eu"^^xsd:anyURI ];
+                                                                          fhir:Quantity.unit    [ fhir:value  "Tablet" ];
+                                                                          fhir:Quantity.value   [ fhir:value  "1"^^xsd:decimal ]
+                                                                        ];
+                                                fhir:Ratio.numerator    [ fhir:Quantity.code    [ fhir:value  "{UI}" ];
+                                                                          fhir:Quantity.system  [ fhir:value  "http://unitsofmeasure.org"^^xsd:anyURI ];
+                                                                          fhir:Quantity.value   [ fhir:value  "880"^^xsd:decimal ]
+                                                                        ]
+                                              ];
+                                      fhir:index  1
+                                    ];
+        fhir:Medication.ingredient  [ fhir:Medication.ingredient.itemCodeableConcept
+                                              [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "H0G9379FGK" ];
+                                                                               fhir:Coding.display  [ fhir:value  "Calcium carbonate" ];
+                                                                               fhir:Coding.system   [ fhir:value  "http://fdasis.nlm.nih.gov"^^xsd:anyURI ];
+                                                                               fhir:index           0
+                                                                             ];
+                                                fhir:CodeableConcept.text    [ fhir:value
+                                                                  "calcium carbonate" ]
+                                              ];
+                                      fhir:Medication.ingredient.strength
+                                              [ fhir:Ratio.denominator  [ fhir:Quantity.code    [ fhir:value  "15054000" ];
+                                                                          fhir:Quantity.system  [ fhir:value  "http://standardterms.edqm.eu"^^xsd:anyURI ];
+                                                                          fhir:Quantity.unit    [ fhir:value  "Tablet" ];
+                                                                          fhir:Quantity.value   [ fhir:value  "1"^^xsd:decimal ]
+                                                                        ];
+                                                fhir:Ratio.numerator    [ fhir:Quantity.code    [ fhir:value  "mg" ];
+                                                                          fhir:Quantity.system  [ fhir:value  "http://unitsofmeasure.org"^^xsd:anyURI ];
+                                                                          fhir:Quantity.value   [ fhir:value  "1000"^^xsd:decimal ]
+                                                                        ]
+                                              ];
+                                      fhir:index  0
+                                    ];
+        fhir:Resource.id            [ fhir:value  "6f4151e9-91f6-4f1e-adc3-fb94dda7785g" ];
+        fhir:Resource.meta          [ fhir:Meta.lastUpdated  [ fhir:value  "2026-02-12T01:24:40.890+00:00"^^xsd:dateTime ];
+                                      fhir:Meta.source       [ fhir:value  "#ab1c600d-950d-9f"^^xsd:anyURI ];
+                                      fhir:Meta.versionId    [ fhir:value  "1" ]
+                                    ] .
+
+<urn:uuid:1595d90e-556c-4c06-a2bc-aff8f085c606>
+        rdf:type                       fhir:AllergyIntolerance;
+        fhir:AllergyIntolerance.clinicalStatus
+                [ fhir:CodeableConcept.coding  [ fhir:Coding.code    [ fhir:value  "active" ];
+                                                 fhir:Coding.system  [ fhir:value  "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"^^xsd:anyURI ];
+                                                 fhir:index          0
+                                               ]
+                ];
+        fhir:AllergyIntolerance.code   [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "no-allergy-info" ];
+                                                                        fhir:Coding.display  [ fhir:value  "No information about allergies" ];
+                                                                        fhir:Coding.system   [ fhir:value  "http://hl7.org/fhir/uv/ips/CodeSystem/absent-unknown-uv-ips"^^xsd:anyURI ];
+                                                                        fhir:index           0
+                                                                      ]
+                                       ];
+        fhir:AllergyIntolerance.patient
+                [ fhir:Reference.reference  [ fhir:value  "Patient/pedro-patient" ]
+                ];
+        fhir:DomainResource.extension  [ fhir:Extension.url       [ fhir:value  "http://hl7.org/fhir/StructureDefinition/narrativeLink"^^xsd:anyURI ];
+                                         fhir:Extension.valueUrl  [ fhir:value  "urn:uuid:a0ee862b-a285-41e4-a284-c5449827b045#AllergyIntolerance-urn:uuid:1595d90e-556c-4c06-a2bc-aff8f085c606" ];
+                                         fhir:index               0
+                                       ] .
+
+[ rdf:type                fhir:Bundle;
+  fhir:Bundle.entry       [ fhir:Bundle.entry.fullUrl   [ fhir:value  "https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-3"^^xsd:anyURI ];
+                            fhir:Bundle.entry.resource  <https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-3/_history/1>;
+                            fhir:index                  5
+                          ];
+  fhir:Bundle.entry       [ fhir:Bundle.entry.fullUrl   [ fhir:value  "https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/fdb5c97f-0a46-41ba-bc34-2efd2ef2f7e4"^^xsd:anyURI ];
+                            fhir:Bundle.entry.resource  <https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/fdb5c97f-0a46-41ba-bc34-2efd2ef2f7e4/_history/1>;
+                            fhir:index                  14
+                          ];
+  fhir:Bundle.entry       [ fhir:Bundle.entry.fullUrl   [ fhir:value  "urn:uuid:ff95a9f2-0ac6-4834-9ba9-7a14e5718e0e"^^xsd:anyURI ];
+                            fhir:Bundle.entry.resource  <urn:uuid:ff95a9f2-0ac6-4834-9ba9-7a14e5718e0e>;
+                            fhir:index                  20
+                          ];
+  fhir:Bundle.entry       [ fhir:Bundle.entry.fullUrl   [ fhir:value  "https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-1"^^xsd:anyURI ];
+                            fhir:Bundle.entry.resource  <https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-1/_history/1>;
+                            fhir:index                  3
+                          ];
+  fhir:Bundle.entry       [ fhir:Bundle.entry.fullUrl   [ fhir:value  "https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-2"^^xsd:anyURI ];
+                            fhir:Bundle.entry.resource  <https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-2/_history/1>;
+                            fhir:index                  4
+                          ];
+  fhir:Bundle.entry       [ fhir:Bundle.entry.fullUrl   [ fhir:value  "https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/9d7be868-8264-4d94-ad04-ef04ecc92e52"^^xsd:anyURI ];
+                            fhir:Bundle.entry.resource  <https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/9d7be868-8264-4d94-ad04-ef04ecc92e52/_history/1>;
+                            fhir:index                  16
+                          ];
+  fhir:Bundle.entry       [ fhir:Bundle.entry.fullUrl   [ fhir:value  "https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77855"^^xsd:anyURI ];
+                            fhir:Bundle.entry.resource  <https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77855/_history/1>;
+                            fhir:index                  13
+                          ];
+  fhir:Bundle.entry       [ fhir:Bundle.entry.fullUrl   [ fhir:value  "https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77856"^^xsd:anyURI ];
+                            fhir:Bundle.entry.resource  <https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77856/_history/1>;
+                            fhir:index                  10
+                          ];
+  fhir:Bundle.entry       [ fhir:Bundle.entry.fullUrl   [ fhir:value  "https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-5"^^xsd:anyURI ];
+                            fhir:Bundle.entry.resource  <https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-5/_history/1>;
+                            fhir:index                  7
+                          ];
+  fhir:Bundle.entry       [ fhir:Bundle.entry.fullUrl   [ fhir:value  "urn:uuid:a0ee862b-a285-41e4-a284-c5449827b045"^^xsd:anyURI ];
+                            fhir:Bundle.entry.resource  <urn:uuid:a0ee862b-a285-41e4-a284-c5449827b045>;
+                            fhir:index                  0
+                          ];
+  fhir:Bundle.entry       [ fhir:Bundle.entry.fullUrl   [ fhir:value  "urn:uuid:1595d90e-556c-4c06-a2bc-aff8f085c606"^^xsd:anyURI ];
+                            fhir:Bundle.entry.resource  <urn:uuid:1595d90e-556c-4c06-a2bc-aff8f085c606>;
+                            fhir:index                  2
+                          ];
+  fhir:Bundle.entry       [ fhir:Bundle.entry.fullUrl   [ fhir:value  "https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Patient/pedro-patient"^^xsd:anyURI ];
+                            fhir:Bundle.entry.resource  <https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Patient/pedro-patient/_history/1>;
+                            fhir:index                  1
+                          ];
+  fhir:Bundle.entry       [ fhir:Bundle.entry.fullUrl   [ fhir:value  "https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-7"^^xsd:anyURI ];
+                            fhir:Bundle.entry.resource  <https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-7/_history/1>;
+                            fhir:index                  9
+                          ];
+  fhir:Bundle.entry       [ fhir:Bundle.entry.fullUrl   [ fhir:value  "https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77857"^^xsd:anyURI ];
+                            fhir:Bundle.entry.resource  <https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77857/_history/1>;
+                            fhir:index                  11
+                          ];
+  fhir:Bundle.entry       [ fhir:Bundle.entry.fullUrl   [ fhir:value  "https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Condition/pedro-cond-1"^^xsd:anyURI ];
+                            fhir:Bundle.entry.resource  <https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Condition/pedro-cond-1/_history/1>;
+                            fhir:index                  17
+                          ];
+  fhir:Bundle.entry       [ fhir:Bundle.entry.fullUrl   [ fhir:value  "https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Condition/pedro-cond-3"^^xsd:anyURI ];
+                            fhir:Bundle.entry.resource  <https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Condition/pedro-cond-3/_history/1>;
+                            fhir:index                  19
+                          ];
+  fhir:Bundle.entry       [ fhir:Bundle.entry.fullUrl   [ fhir:value  "https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-4"^^xsd:anyURI ];
+                            fhir:Bundle.entry.resource  <https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-4/_history/1>;
+                            fhir:index                  6
+                          ];
+  fhir:Bundle.entry       [ fhir:Bundle.entry.fullUrl   [ fhir:value  "https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77854"^^xsd:anyURI ];
+                            fhir:Bundle.entry.resource  <https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77854/_history/1>;
+                            fhir:index                  12
+                          ];
+  fhir:Bundle.entry       [ fhir:Bundle.entry.fullUrl   [ fhir:value  "https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/6f4151e9-91f6-4f1e-adc3-fb94dda7785g"^^xsd:anyURI ];
+                            fhir:Bundle.entry.resource  <https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/6f4151e9-91f6-4f1e-adc3-fb94dda7785g/_history/1>;
+                            fhir:index                  15
+                          ];
+  fhir:Bundle.entry       [ fhir:Bundle.entry.fullUrl   [ fhir:value  "https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-6"^^xsd:anyURI ];
+                            fhir:Bundle.entry.resource  <https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-6/_history/1>;
+                            fhir:index                  8
+                          ];
+  fhir:Bundle.entry       [ fhir:Bundle.entry.fullUrl   [ fhir:value  "https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Condition/pedro-cond-2"^^xsd:anyURI ];
+                            fhir:Bundle.entry.resource  <https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Condition/pedro-cond-2/_history/1>;
+                            fhir:index                  18
+                          ];
+  fhir:Bundle.identifier  [ fhir:Identifier.system  [ fhir:value  "urn:ietf:rfc:4122"^^xsd:anyURI ];
+                            fhir:Identifier.value   [ fhir:value  "6b92de52-3068-4e1f-8d88-10036fe28719" ]
+                          ];
+  fhir:Bundle.timestamp   [ fhir:value  "2026-02-13T00:36:46.404+00:00"^^xsd:dateTime ];
+  fhir:Bundle.type        [ fhir:value  "document" ];
+  fhir:Resource.meta      [ fhir:Meta.profile  [ fhir:index  0;
+                                                 fhir:value  "http://hl7.org/fhir/uv/ips/StructureDefinition/Bundle-uv-ips"
+                                               ]
+                          ];
+  fhir:nodeRole           fhir:treeRoot
+] .
+
+<https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-7/_history/1>
+        rdf:type                       fhir:MedicationStatement;
+        fhir:DomainResource.extension  [ fhir:Extension.url       [ fhir:value  "http://hl7.org/fhir/StructureDefinition/narrativeLink"^^xsd:anyURI ];
+                                         fhir:Extension.valueUrl  [ fhir:value  "urn:uuid:a0ee862b-a285-41e4-a284-c5449827b045#MedicationStatement-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-7/_history/1" ];
+                                         fhir:index               0
+                                       ];
+        fhir:MedicationStatement.dosage
+                [ fhir:Dosage.route  [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "20053000" ];
+                                                                      fhir:Coding.display  [ fhir:value  "Oral use" ];
+                                                                      fhir:Coding.system   [ fhir:value  "http://standardterms.edqm.eu"^^xsd:anyURI ];
+                                                                      fhir:index           0
+                                                                    ]
+                                     ];
+                  fhir:index         0
+                ];
+        fhir:MedicationStatement.medicationReference
+                [ fhir:Reference.display    [ fhir:value  "Protein supplements" ];
+                  fhir:Reference.reference  [ fhir:value  "Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77857" ]
+                ];
+        fhir:MedicationStatement.status
+                [ fhir:value  "active" ];
+        fhir:MedicationStatement.subject
+                [ fhir:Reference.display    [ fhir:value  "Pedro Gravitate" ];
+                  fhir:Reference.reference  [ fhir:value  "Patient/pedro-patient" ]
+                ];
+        fhir:Resource.id               [ fhir:value
+                          "pedro-med-stat-7" ];
+        fhir:Resource.meta             [ fhir:Meta.lastUpdated  [ fhir:value  "2026-02-12T01:25:00.937+00:00"^^xsd:dateTime ];
+                                         fhir:Meta.source       [ fhir:value  "#417f71cd-44c8-98"^^xsd:anyURI ];
+                                         fhir:Meta.versionId    [ fhir:value  "1" ]
+                                       ] .
+
+<https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-6/_history/1>
+        rdf:type                       fhir:MedicationStatement;
+        fhir:DomainResource.extension  [ fhir:Extension.url       [ fhir:value  "http://hl7.org/fhir/StructureDefinition/narrativeLink"^^xsd:anyURI ];
+                                         fhir:Extension.valueUrl  [ fhir:value  "urn:uuid:a0ee862b-a285-41e4-a284-c5449827b045#MedicationStatement-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-6/_history/1" ];
+                                         fhir:index               0
+                                       ];
+        fhir:MedicationStatement.dosage
+                [ fhir:Dosage.route  [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "20053000" ];
+                                                                      fhir:Coding.display  [ fhir:value  "Oral use" ];
+                                                                      fhir:Coding.system   [ fhir:value  "http://standardterms.edqm.eu"^^xsd:anyURI ];
+                                                                      fhir:index           0
+                                                                    ]
+                                     ];
+                  fhir:index         0
+                ];
+        fhir:MedicationStatement.medicationReference
+                [ fhir:Reference.display    [ fhir:value  "Vitaminc C supplement" ];
+                  fhir:Reference.reference  [ fhir:value  "Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77856" ]
+                ];
+        fhir:MedicationStatement.status
+                [ fhir:value  "active" ];
+        fhir:MedicationStatement.subject
+                [ fhir:Reference.display    [ fhir:value  "Pedro Gravitate" ];
+                  fhir:Reference.reference  [ fhir:value  "Patient/pedro-patient" ]
+                ];
+        fhir:Resource.id               [ fhir:value
+                          "pedro-med-stat-6" ];
+        fhir:Resource.meta             [ fhir:Meta.lastUpdated  [ fhir:value  "2026-02-12T01:25:00.897+00:00"^^xsd:dateTime ];
+                                         fhir:Meta.source       [ fhir:value  "#9c43c9b1-75d2-92"^^xsd:anyURI ];
+                                         fhir:Meta.versionId    [ fhir:value  "1" ]
+                                       ] .
+
+<https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/fdb5c97f-0a46-41ba-bc34-2efd2ef2f7e4/_history/1>
+        rdf:type                    fhir:Medication;
+        fhir:Medication.code        [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "N06AX11" ];
+                                                                     fhir:Coding.display  [ fhir:value  "mirtazapine" ];
+                                                                     fhir:Coding.system   [ fhir:value  "http://www.whocc.no/atc"^^xsd:anyURI ];
+                                                                     fhir:index           2
+                                                                   ];
+                                      fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "0x6c47381b040e5b588db23b2272f28eec" ];
+                                                                     fhir:Coding.display  [ fhir:value  "mirtazapine 30 mg, tablets" ];
+                                                                     fhir:Coding.system   [ fhir:value  "https://www.who-umc.org/phpid"^^xsd:anyURI ];
+                                                                     fhir:index           1
+                                                                   ];
+                                      fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "67.068" ];
+                                                                     fhir:Coding.display  [ fhir:value  "MIRTAZAPINA CINFA 30 mg Coated Tablet" ];
+                                                                     fhir:Coding.system   [ fhir:value  "https://spor.ema.europa.eu/pmswi"^^xsd:anyURI ];
+                                                                     fhir:index           0
+                                                                   ]
+                                    ];
+        fhir:Medication.form        [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "10220000" ];
+                                                                     fhir:Coding.display  [ fhir:value  "Coated tablet" ];
+                                                                     fhir:Coding.system   [ fhir:value  "http://standardterms.edqm.eu"^^xsd:anyURI ];
+                                                                     fhir:index           0
+                                                                   ]
+                                    ];
+        fhir:Medication.ingredient  [ fhir:Medication.ingredient.itemCodeableConcept
+                                              [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "A051Q2099Q" ];
+                                                                               fhir:Coding.display  [ fhir:value  "Mirtazapine" ];
+                                                                               fhir:Coding.system   [ fhir:value  "http://fdasis.nlm.nih.gov"^^xsd:anyURI ];
+                                                                               fhir:index           0
+                                                                             ];
+                                                fhir:CodeableConcept.text    [ fhir:value
+                                                                  "Mirtazapine" ]
+                                              ];
+                                      fhir:Medication.ingredient.strength
+                                              [ fhir:Ratio.denominator  [ fhir:Quantity.code    [ fhir:value  "15054000" ];
+                                                                          fhir:Quantity.system  [ fhir:value  "http://standardterms.edqm.eu"^^xsd:anyURI ];
+                                                                          fhir:Quantity.unit    [ fhir:value  "Tablet" ];
+                                                                          fhir:Quantity.value   [ fhir:value  "1"^^xsd:decimal ]
+                                                                        ];
+                                                fhir:Ratio.numerator    [ fhir:Quantity.code    [ fhir:value  "g" ];
+                                                                          fhir:Quantity.system  [ fhir:value  "http://unitsofmeasure.org"^^xsd:anyURI ];
+                                                                          fhir:Quantity.value   [ fhir:value  "30"^^xsd:decimal ]
+                                                                        ]
+                                              ];
+                                      fhir:index  0
+                                    ];
+        fhir:Resource.id            [ fhir:value  "fdb5c97f-0a46-41ba-bc34-2efd2ef2f7e4" ];
+        fhir:Resource.meta          [ fhir:Meta.lastUpdated  [ fhir:value  "2026-02-12T01:24:40.840+00:00"^^xsd:dateTime ];
+                                      fhir:Meta.source       [ fhir:value  "#6b868401-c7fd-95"^^xsd:anyURI ];
+                                      fhir:Meta.versionId    [ fhir:value  "1" ]
+                                    ] .
+
+<https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-2/_history/1>
+        rdf:type                       fhir:MedicationStatement;
+        fhir:DomainResource.extension  [ fhir:Extension.url       [ fhir:value  "http://hl7.org/fhir/StructureDefinition/narrativeLink"^^xsd:anyURI ];
+                                         fhir:Extension.valueUrl  [ fhir:value  "urn:uuid:a0ee862b-a285-41e4-a284-c5449827b045#MedicationStatement-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-2/_history/1" ];
+                                         fhir:index               0
+                                       ];
+        fhir:MedicationStatement.dosage
+                [ fhir:Dosage.route  [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "20053000" ];
+                                                                      fhir:Coding.display  [ fhir:value  "Oral use" ];
+                                                                      fhir:Coding.system   [ fhir:value  "http://standardterms.edqm.eu"^^xsd:anyURI ];
+                                                                      fhir:index           0
+                                                                    ]
+                                     ];
+                  fhir:index         0
+                ];
+        fhir:MedicationStatement.medicationReference
+                [ fhir:Reference.display    [ fhir:value  "Mirtazapine 30 mg Coated Tablet" ];
+                  fhir:Reference.reference  [ fhir:value  "Medication/fdb5c97f-0a46-41ba-bc34-2efd2ef2f7e4" ]
+                ];
+        fhir:MedicationStatement.status
+                [ fhir:value  "active" ];
+        fhir:MedicationStatement.subject
+                [ fhir:Reference.display    [ fhir:value  "Pedro Gravitate" ];
+                  fhir:Reference.reference  [ fhir:value  "Patient/pedro-patient" ]
+                ];
+        fhir:Resource.id               [ fhir:value
+                          "pedro-med-stat-2" ];
+        fhir:Resource.meta             [ fhir:Meta.lastUpdated  [ fhir:value  "2026-02-12T01:25:00.676+00:00"^^xsd:dateTime ];
+                                         fhir:Meta.source       [ fhir:value  "#afa53e6a-dc2a-97"^^xsd:anyURI ];
+                                         fhir:Meta.versionId    [ fhir:value  "1" ]
+                                       ] .
+
+<https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-1/_history/1>
+        rdf:type                       fhir:MedicationStatement;
+        fhir:DomainResource.extension  [ fhir:Extension.url       [ fhir:value  "http://hl7.org/fhir/StructureDefinition/narrativeLink"^^xsd:anyURI ];
+                                         fhir:Extension.valueUrl  [ fhir:value  "urn:uuid:a0ee862b-a285-41e4-a284-c5449827b045#MedicationStatement-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-1/_history/1" ];
+                                         fhir:index               0
+                                       ];
+        fhir:MedicationStatement.dosage
+                [ fhir:Dosage.route  [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "20053000" ];
+                                                                      fhir:Coding.display  [ fhir:value  "Oral use" ];
+                                                                      fhir:Coding.system   [ fhir:value  "http://standardterms.edqm.eu"^^xsd:anyURI ];
+                                                                      fhir:index           0
+                                                                    ]
+                                     ];
+                  fhir:index         0
+                ];
+        fhir:MedicationStatement.medicationReference
+                [ fhir:Reference.display    [ fhir:value  "Dovato 50 mg/300 mg (Dolutegravir/ Lamivudine) tablets" ];
+                  fhir:Reference.reference  [ fhir:value  "Medication/9d7be868-8264-4d94-ad04-ef04ecc92e52" ]
+                ];
+        fhir:MedicationStatement.status
+                [ fhir:value  "active" ];
+        fhir:MedicationStatement.subject
+                [ fhir:Reference.display    [ fhir:value  "Pedro Gravitate" ];
+                  fhir:Reference.reference  [ fhir:value  "Patient/pedro-patient" ]
+                ];
+        fhir:Resource.id               [ fhir:value
+                          "pedro-med-stat-1" ];
+        fhir:Resource.meta             [ fhir:Meta.lastUpdated  [ fhir:value  "2026-02-12T01:25:00.607+00:00"^^xsd:dateTime ];
+                                         fhir:Meta.source       [ fhir:value  "#f5db19e6-920c-9f"^^xsd:anyURI ];
+                                         fhir:Meta.versionId    [ fhir:value  "1" ]
+                                       ] .
+
+<urn:uuid:ff95a9f2-0ac6-4834-9ba9-7a14e5718e0e>
+        rdf:type                   fhir:Organization;
+        fhir:Organization.address  [ fhir:Address.city        [ fhir:value  "Nicosia" ];
+                                     fhir:Address.country     [ fhir:value  "CY" ];
+                                     fhir:Address.line        [ fhir:index  0;
+                                                                fhir:value  "1 University Avenue"
+                                                              ];
+                                     fhir:Address.postalCode  [ fhir:value  "2109" ];
+                                     fhir:index               0
+                                   ];
+        fhir:Organization.name     [ fhir:value  "eHealthLab - University of Cyprus" ] .
+
+<https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Condition/pedro-cond-3/_history/1>
+        rdf:type                       fhir:Condition;
+        fhir:Condition.clinicalStatus  [ fhir:CodeableConcept.coding  [ fhir:Coding.code    [ fhir:value  "active" ];
+                                                                        fhir:Coding.system  [ fhir:value  "http://terminology.hl7.org/CodeSystem/condition-clinical"^^xsd:anyURI ];
+                                                                        fhir:index          0
+                                                                      ]
+                                       ];
+        fhir:Condition.code            [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "10743008" ];
+                                                                        fhir:Coding.display  [ fhir:value  "Irritable bowel syndrome" ];
+                                                                        fhir:Coding.system   [ fhir:value  "http://snomed.info/sct"^^xsd:anyURI ];
+                                                                        fhir:index           0
+                                                                      ];
+                                         fhir:CodeableConcept.text    [ fhir:value
+                                                           "Irritable bowel syndrome" ]
+                                       ];
+        fhir:Condition.subject         [ fhir:Reference.display    [ fhir:value  "Pedro Gravitate" ];
+                                         fhir:Reference.reference  [ fhir:value  "Patient/pedro-patient" ]
+                                       ];
+        fhir:Condition.verificationStatus
+                [ fhir:CodeableConcept.coding  [ fhir:Coding.code  [ fhir:value  "confirmed" ];
+                                                 fhir:index        0
+                                               ]
+                ];
+        fhir:DomainResource.extension  [ fhir:Extension.url       [ fhir:value  "http://hl7.org/fhir/StructureDefinition/narrativeLink"^^xsd:anyURI ];
+                                         fhir:Extension.valueUrl  [ fhir:value  "urn:uuid:a0ee862b-a285-41e4-a284-c5449827b045#Condition-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Condition/pedro-cond-3/_history/1" ];
+                                         fhir:index               0
+                                       ];
+        fhir:Resource.id               [ fhir:value
+                          "pedro-cond-3" ];
+        fhir:Resource.meta             [ fhir:Meta.lastUpdated  [ fhir:value  "2026-02-12T01:24:32.951+00:00"^^xsd:dateTime ];
+                                         fhir:Meta.profile      [ fhir:index  0;
+                                                                  fhir:value  "http://hl7.org/fhir/uv/ips/StructureDefinition/Condition-uv-ips"
+                                                                ];
+                                         fhir:Meta.source       [ fhir:value  "#c4fc7b05-e9f7-94"^^xsd:anyURI ];
+                                         fhir:Meta.versionId    [ fhir:value  "1" ]
+                                       ] .
+
+<https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Condition/pedro-cond-2/_history/1>
+        rdf:type                       fhir:Condition;
+        fhir:Condition.asserter        [ fhir:Reference.display  [ fhir:value  "Dr. Xavier García" ]
+                                       ];
+        fhir:Condition.clinicalStatus  [ fhir:CodeableConcept.coding  [ fhir:Coding.code    [ fhir:value  "active" ];
+                                                                        fhir:Coding.system  [ fhir:value  "http://terminology.hl7.org/CodeSystem/condition-clinical"^^xsd:anyURI ];
+                                                                        fhir:index          0
+                                                                      ]
+                                       ];
+        fhir:Condition.code            [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "86406008" ];
+                                                                        fhir:Coding.display  [ fhir:value  "Human immunodeficiency virus infection" ];
+                                                                        fhir:Coding.system   [ fhir:value  "http://snomed.info/sct"^^xsd:anyURI ];
+                                                                        fhir:index           0
+                                                                      ];
+                                         fhir:CodeableConcept.text    [ fhir:value
+                                                           "Human immunodeficiency virus infection" ]
+                                       ];
+        fhir:Condition.onsetDateTime   [ fhir:value
+                          "2018"^^xsd:gYear ];
+        fhir:Condition.subject         [ fhir:Reference.display    [ fhir:value  "Pedro Gravitate" ];
+                                         fhir:Reference.reference  [ fhir:value  "Patient/pedro-patient" ]
+                                       ];
+        fhir:Condition.verificationStatus
+                [ fhir:CodeableConcept.coding  [ fhir:Coding.code  [ fhir:value  "confirmed" ];
+                                                 fhir:index        0
+                                               ]
+                ];
+        fhir:DomainResource.extension  [ fhir:Extension.url       [ fhir:value  "http://hl7.org/fhir/StructureDefinition/narrativeLink"^^xsd:anyURI ];
+                                         fhir:Extension.valueUrl  [ fhir:value  "urn:uuid:a0ee862b-a285-41e4-a284-c5449827b045#Condition-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Condition/pedro-cond-2/_history/1" ];
+                                         fhir:index               0
+                                       ];
+        fhir:Resource.id               [ fhir:value
+                          "pedro-cond-2" ];
+        fhir:Resource.meta             [ fhir:Meta.lastUpdated  [ fhir:value  "2026-02-12T01:24:32.791+00:00"^^xsd:dateTime ];
+                                         fhir:Meta.profile      [ fhir:index  0;
+                                                                  fhir:value  "http://hl7.org/fhir/uv/ips/StructureDefinition/Condition-uv-ips"
+                                                                ];
+                                         fhir:Meta.source       [ fhir:value  "#f31281d6-b66c-95"^^xsd:anyURI ];
+                                         fhir:Meta.versionId    [ fhir:value  "1" ]
+                                       ] .
+
+<https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Condition/pedro-cond-1/_history/1>
+        rdf:type                       fhir:Condition;
+        fhir:Condition.clinicalStatus  [ fhir:CodeableConcept.coding  [ fhir:Coding.code    [ fhir:value  "active" ];
+                                                                        fhir:Coding.system  [ fhir:value  "http://terminology.hl7.org/CodeSystem/condition-clinical"^^xsd:anyURI ];
+                                                                        fhir:index          0
+                                                                      ]
+                                       ];
+        fhir:Condition.code            [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "35489007" ];
+                                                                        fhir:Coding.display  [ fhir:value  "Depressive disorder (disorder)" ];
+                                                                        fhir:Coding.system   [ fhir:value  "http://snomed.info/sct"^^xsd:anyURI ];
+                                                                        fhir:index           0
+                                                                      ];
+                                         fhir:CodeableConcept.text    [ fhir:value
+                                                           "Depressive disorder (disorder)" ]
+                                       ];
+        fhir:Condition.subject         [ fhir:Reference.display    [ fhir:value  "Pedro Gravitate" ];
+                                         fhir:Reference.reference  [ fhir:value  "Patient/pedro-patient" ]
+                                       ];
+        fhir:Condition.verificationStatus
+                [ fhir:CodeableConcept.coding  [ fhir:Coding.code  [ fhir:value  "confirmed" ];
+                                                 fhir:index        0
+                                               ]
+                ];
+        fhir:DomainResource.extension  [ fhir:Extension.url       [ fhir:value  "http://hl7.org/fhir/StructureDefinition/narrativeLink"^^xsd:anyURI ];
+                                         fhir:Extension.valueUrl  [ fhir:value  "urn:uuid:a0ee862b-a285-41e4-a284-c5449827b045#Condition-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Condition/pedro-cond-1/_history/1" ];
+                                         fhir:index               0
+                                       ];
+        fhir:Resource.id               [ fhir:value
+                          "pedro-cond-1" ];
+        fhir:Resource.meta             [ fhir:Meta.lastUpdated  [ fhir:value  "2026-02-12T01:24:32.736+00:00"^^xsd:dateTime ];
+                                         fhir:Meta.profile      [ fhir:index  0;
+                                                                  fhir:value  "http://hl7.org/fhir/uv/ips/StructureDefinition/Condition-uv-ips"
+                                                                ];
+                                         fhir:Meta.source       [ fhir:value  "#c1d489bf-5b82-9c"^^xsd:anyURI ];
+                                         fhir:Meta.versionId    [ fhir:value  "1" ]
+                                       ] .
+
+<https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77854/_history/1>
+        rdf:type                    fhir:Medication;
+        fhir:Medication.code        [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "A03FA08" ];
+                                                                     fhir:Coding.display  [ fhir:value  "Cinitapride" ];
+                                                                     fhir:Coding.system   [ fhir:value  "http://www.whocc.no/atc"^^xsd:anyURI ];
+                                                                     fhir:index           2
+                                                                   ];
+                                      fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "0xbb82cd10ab2add752b2b9224931077b2" ];
+                                                                     fhir:Coding.display  [ fhir:value  "cinitrapide 1 mg tablet" ];
+                                                                     fhir:Coding.system   [ fhir:value  "https://www.who-umc.org/phpid"^^xsd:anyURI ];
+                                                                     fhir:index           1
+                                                                   ];
+                                      fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "59.032" ];
+                                                                     fhir:Coding.display  [ fhir:value  "BLASTON 1 mg tablets" ];
+                                                                     fhir:Coding.system   [ fhir:value  "https://spor.ema.europa.eu/pmswi"^^xsd:anyURI ];
+                                                                     fhir:index           0
+                                                                   ]
+                                    ];
+        fhir:Medication.form        [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "10219000" ];
+                                                                     fhir:Coding.display  [ fhir:value  "Tablet" ];
+                                                                     fhir:Coding.system   [ fhir:value  "http://standardterms.edqm.eu"^^xsd:anyURI ];
+                                                                     fhir:index           0
+                                                                   ];
+                                      fhir:CodeableConcept.text    [ fhir:value
+                                                        "Tablet" ]
+                                    ];
+        fhir:Medication.ingredient  [ fhir:Medication.ingredient.itemCodeableConcept
+                                              [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "R8I97I2L24" ];
+                                                                               fhir:Coding.display  [ fhir:value  "CINITAPRIDE" ];
+                                                                               fhir:Coding.system   [ fhir:value  "http://fdasis.nlm.nih.gov"^^xsd:anyURI ];
+                                                                               fhir:index           0
+                                                                             ];
+                                                fhir:CodeableConcept.text    [ fhir:value
+                                                                  "CINITAPRIDE" ]
+                                              ];
+                                      fhir:Medication.ingredient.strength
+                                              [ fhir:Ratio.denominator  [ fhir:Quantity.code    [ fhir:value  "15054000" ];
+                                                                          fhir:Quantity.system  [ fhir:value  "http://standardterms.edqm.eu"^^xsd:anyURI ];
+                                                                          fhir:Quantity.unit    [ fhir:value  "Tablet" ];
+                                                                          fhir:Quantity.value   [ fhir:value  "1"^^xsd:decimal ]
+                                                                        ];
+                                                fhir:Ratio.numerator    [ fhir:Quantity.code    [ fhir:value  "mg" ];
+                                                                          fhir:Quantity.system  [ fhir:value  "http://unitsofmeasure.org"^^xsd:anyURI ];
+                                                                          fhir:Quantity.value   [ fhir:value  "1"^^xsd:decimal ]
+                                                                        ]
+                                              ];
+                                      fhir:index  0
+                                    ];
+        fhir:Resource.id            [ fhir:value  "6f4151e9-91f6-4f1e-adc3-fb94dda77854" ];
+        fhir:Resource.meta          [ fhir:Meta.lastUpdated  [ fhir:value  "2026-02-12T01:24:40.924+00:00"^^xsd:dateTime ];
+                                      fhir:Meta.source       [ fhir:value  "#87f6d4ce-1a29-9d"^^xsd:anyURI ];
+                                      fhir:Meta.versionId    [ fhir:value  "1" ]
+                                    ] .
+
+<urn:uuid:a0ee862b-a285-41e4-a284-c5449827b045>
+        rdf:type                  fhir:Composition;
+        fhir:Composition.author   [ fhir:Reference.reference  [ fhir:value  "urn:uuid:ff95a9f2-0ac6-4834-9ba9-7a14e5718e0e" ];
+                                    fhir:index                0
+                                  ];
+        fhir:Composition.confidentiality
+                [ fhir:value  "N" ];
+        fhir:Composition.date     [ fhir:value  "2026-02-13T00:36:45.715+00:00"^^xsd:dateTime ];
+        fhir:Composition.section  [ fhir:Composition.section.code   [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "10160-0" ];
+                                                                                                     fhir:Coding.display  [ fhir:value  "History of Medication use Narrative" ];
+                                                                                                     fhir:Coding.system   [ fhir:value  "http://loinc.org"^^xsd:anyURI ];
+                                                                                                     fhir:index           0
+                                                                                                   ]
+                                                                    ];
+                                    fhir:Composition.section.entry  [ fhir:Reference.reference  [ fhir:value  "MedicationStatement/pedro-med-stat-3" ];
+                                                                      fhir:index                2
+                                                                    ];
+                                    fhir:Composition.section.entry  [ fhir:Reference.reference  [ fhir:value  "MedicationStatement/pedro-med-stat-5" ];
+                                                                      fhir:index                4
+                                                                    ];
+                                    fhir:Composition.section.entry  [ fhir:Reference.reference  [ fhir:value  "MedicationStatement/pedro-med-stat-2" ];
+                                                                      fhir:index                1
+                                                                    ];
+                                    fhir:Composition.section.entry  [ fhir:Reference.reference  [ fhir:value  "MedicationStatement/pedro-med-stat-7" ];
+                                                                      fhir:index                6
+                                                                    ];
+                                    fhir:Composition.section.entry  [ fhir:Reference.reference  [ fhir:value  "MedicationStatement/pedro-med-stat-4" ];
+                                                                      fhir:index                3
+                                                                    ];
+                                    fhir:Composition.section.entry  [ fhir:Reference.reference  [ fhir:value  "MedicationStatement/pedro-med-stat-1" ];
+                                                                      fhir:index                0
+                                                                    ];
+                                    fhir:Composition.section.entry  [ fhir:Reference.reference  [ fhir:value  "MedicationStatement/pedro-med-stat-6" ];
+                                                                      fhir:index                5
+                                                                    ];
+                                    fhir:Composition.section.text   [ fhir:Narrative.div     "<div xmlns=\"http://www.w3.org/1999/xhtml\"><h1>International Patient Summary Document</h1></div>";
+                                                                      fhir:Narrative.status  [ fhir:value  "generated" ]
+                                                                    ];
+                                    fhir:Composition.section.title  [ fhir:value
+                                                      "Medication List" ];
+                                    fhir:index                      1
+                                  ];
+        fhir:Composition.section  [ fhir:Composition.section.code   [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "48765-2" ];
+                                                                                                     fhir:Coding.display  [ fhir:value  "Allergies and adverse reactions Document" ];
+                                                                                                     fhir:Coding.system   [ fhir:value  "http://loinc.org"^^xsd:anyURI ];
+                                                                                                     fhir:index           0
+                                                                                                   ]
+                                                                    ];
+                                    fhir:Composition.section.entry  [ fhir:Reference.reference  [ fhir:value  "urn:uuid:1595d90e-556c-4c06-a2bc-aff8f085c606" ];
+                                                                      fhir:index                0
+                                                                    ];
+                                    fhir:Composition.section.text   [ fhir:Narrative.div     "<div xmlns=\"http://www.w3.org/1999/xhtml\"><h1>International Patient Summary Document</h1></div>";
+                                                                      fhir:Narrative.status  [ fhir:value  "generated" ]
+                                                                    ];
+                                    fhir:Composition.section.title  [ fhir:value
+                                                      "Allergies and Intolerances" ];
+                                    fhir:index                      0
+                                  ];
+        fhir:Composition.section  [ fhir:Composition.section.code   [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "11450-4" ];
+                                                                                                     fhir:Coding.display  [ fhir:value  "Problem list - Reported" ];
+                                                                                                     fhir:Coding.system   [ fhir:value  "http://loinc.org"^^xsd:anyURI ];
+                                                                                                     fhir:index           0
+                                                                                                   ]
+                                                                    ];
+                                    fhir:Composition.section.entry  [ fhir:Reference.reference  [ fhir:value  "Condition/pedro-cond-3" ];
+                                                                      fhir:index                2
+                                                                    ];
+                                    fhir:Composition.section.entry  [ fhir:Reference.reference  [ fhir:value  "Condition/pedro-cond-2" ];
+                                                                      fhir:index                1
+                                                                    ];
+                                    fhir:Composition.section.entry  [ fhir:Reference.reference  [ fhir:value  "Condition/pedro-cond-1" ];
+                                                                      fhir:index                0
+                                                                    ];
+                                    fhir:Composition.section.text   [ fhir:Narrative.div     "<div xmlns=\"http://www.w3.org/1999/xhtml\"><h1>International Patient Summary Document</h1></div>";
+                                                                      fhir:Narrative.status  [ fhir:value  "generated" ]
+                                                                    ];
+                                    fhir:Composition.section.title  [ fhir:value
+                                                      "Problem List" ];
+                                    fhir:index                      2
+                                  ];
+        fhir:Composition.status   [ fhir:value  "final" ];
+        fhir:Composition.subject  [ fhir:Reference.reference  [ fhir:value  "Patient/pedro-patient" ]
+                                  ];
+        fhir:Composition.title    [ fhir:value  "Patient Summary as of 02/13/2026" ];
+        fhir:Composition.type     [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "60591-5" ];
+                                                                   fhir:Coding.display  [ fhir:value  "Patient Summary Document" ];
+                                                                   fhir:Coding.system   [ fhir:value  "http://loinc.org"^^xsd:anyURI ];
+                                                                   fhir:index           0
+                                                                 ]
+                                  ];
+        fhir:DomainResource.text  [ fhir:Narrative.div     "<div xmlns=\"http://www.w3.org/1999/xhtml\"><h1>International Patient Summary Document</h1></div>";
+                                    fhir:Narrative.status  [ fhir:value  "generated" ]
+                                  ] .
+
+<https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-5/_history/1>
+        rdf:type                       fhir:MedicationStatement;
+        fhir:DomainResource.extension  [ fhir:Extension.url       [ fhir:value  "http://hl7.org/fhir/StructureDefinition/narrativeLink"^^xsd:anyURI ];
+                                         fhir:Extension.valueUrl  [ fhir:value  "urn:uuid:a0ee862b-a285-41e4-a284-c5449827b045#MedicationStatement-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-5/_history/1" ];
+                                         fhir:index               0
+                                       ];
+        fhir:MedicationStatement.dosage
+                [ fhir:Dosage.route  [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "20053000" ];
+                                                                      fhir:Coding.display  [ fhir:value  "Oral use" ];
+                                                                      fhir:Coding.system   [ fhir:value  "http://standardterms.edqm.eu"^^xsd:anyURI ];
+                                                                      fhir:index           0
+                                                                    ]
+                                     ];
+                  fhir:index         0
+                ];
+        fhir:MedicationStatement.medicationReference
+                [ fhir:Reference.display    [ fhir:value  "Collagen and magnesium supplements" ];
+                  fhir:Reference.reference  [ fhir:value  "Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77855" ]
+                ];
+        fhir:MedicationStatement.status
+                [ fhir:value  "active" ];
+        fhir:MedicationStatement.subject
+                [ fhir:Reference.display    [ fhir:value  "Pedro Gravitate" ];
+                  fhir:Reference.reference  [ fhir:value  "Patient/pedro-patient" ]
+                ];
+        fhir:Resource.id               [ fhir:value
+                          "pedro-med-stat-5" ];
+        fhir:Resource.meta             [ fhir:Meta.lastUpdated  [ fhir:value  "2026-02-12T01:25:00.856+00:00"^^xsd:dateTime ];
+                                         fhir:Meta.source       [ fhir:value  "#ce34c977-7b52-90"^^xsd:anyURI ];
+                                         fhir:Meta.versionId    [ fhir:value  "1" ]
+                                       ] .
+
+<https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-4/_history/1>
+        rdf:type                       fhir:MedicationStatement;
+        fhir:DomainResource.extension  [ fhir:Extension.url       [ fhir:value  "http://hl7.org/fhir/StructureDefinition/narrativeLink"^^xsd:anyURI ];
+                                         fhir:Extension.valueUrl  [ fhir:value  "urn:uuid:a0ee862b-a285-41e4-a284-c5449827b045#MedicationStatement-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-4/_history/1" ];
+                                         fhir:index               0
+                                       ];
+        fhir:MedicationStatement.dosage
+                [ fhir:Dosage.route  [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "20053000" ];
+                                                                      fhir:Coding.display  [ fhir:value  "Oral use" ];
+                                                                      fhir:Coding.system   [ fhir:value  "http://standardterms.edqm.eu"^^xsd:anyURI ];
+                                                                      fhir:index           0
+                                                                    ]
+                                     ];
+                  fhir:index         0
+                ];
+        fhir:MedicationStatement.medicationReference
+                [ fhir:Reference.display    [ fhir:value  "cinitrapide 1 mg" ];
+                  fhir:Reference.reference  [ fhir:value  "Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77854" ]
+                ];
+        fhir:MedicationStatement.status
+                [ fhir:value  "active" ];
+        fhir:MedicationStatement.subject
+                [ fhir:Reference.display    [ fhir:value  "Pedro Gravitate" ];
+                  fhir:Reference.reference  [ fhir:value  "Patient/pedro-patient" ]
+                ];
+        fhir:Resource.id               [ fhir:value
+                          "pedro-med-stat-4" ];
+        fhir:Resource.meta             [ fhir:Meta.lastUpdated  [ fhir:value  "2026-02-12T01:25:00.774+00:00"^^xsd:dateTime ];
+                                         fhir:Meta.source       [ fhir:value  "#ced23093-11ed-9e"^^xsd:anyURI ];
+                                         fhir:Meta.versionId    [ fhir:value  "1" ]
+                                       ] .
+
+<https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-3/_history/1>
+        rdf:type                       fhir:MedicationStatement;
+        fhir:DomainResource.extension  [ fhir:Extension.url       [ fhir:value  "http://hl7.org/fhir/StructureDefinition/narrativeLink"^^xsd:anyURI ];
+                                         fhir:Extension.valueUrl  [ fhir:value  "urn:uuid:a0ee862b-a285-41e4-a284-c5449827b045#MedicationStatement-https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/MedicationStatement/pedro-med-stat-3/_history/1" ];
+                                         fhir:index               0
+                                       ];
+        fhir:MedicationStatement.dosage
+                [ fhir:Dosage.route  [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "20053000" ];
+                                                                      fhir:Coding.display  [ fhir:value  "Oral use" ];
+                                                                      fhir:Coding.system   [ fhir:value  "http://standardterms.edqm.eu"^^xsd:anyURI ];
+                                                                      fhir:index           0
+                                                                    ]
+                                     ];
+                  fhir:index         0
+                ];
+        fhir:MedicationStatement.medicationReference
+                [ fhir:Reference.display    [ fhir:value  "CALCIO/VITAMINA D3 ROVI 1000 mg/880 UI COMPRIMIDOS EFERVESCENTES" ];
+                  fhir:Reference.reference  [ fhir:value  "Medication/6f4151e9-91f6-4f1e-adc3-fb94dda7785g" ]
+                ];
+        fhir:MedicationStatement.status
+                [ fhir:value  "active" ];
+        fhir:MedicationStatement.subject
+                [ fhir:Reference.display    [ fhir:value  "Pedro Gravitate" ];
+                  fhir:Reference.reference  [ fhir:value  "Patient/pedro-patient" ]
+                ];
+        fhir:Resource.id               [ fhir:value
+                          "pedro-med-stat-3" ];
+        fhir:Resource.meta             [ fhir:Meta.lastUpdated  [ fhir:value  "2026-02-12T01:25:00.721+00:00"^^xsd:dateTime ];
+                                         fhir:Meta.source       [ fhir:value  "#a6716a8d-a083-90"^^xsd:anyURI ];
+                                         fhir:Meta.versionId    [ fhir:value  "1" ]
+                                       ] .
+
+<https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Patient/pedro-patient/_history/1>
+        rdf:type                       fhir:Patient;
+        fhir:DomainResource.extension  [ fhir:Element.extension  [ fhir:Extension.url  [ fhir:value  "code"^^xsd:anyURI ];
+                                                                   fhir:Extension.valueCodeableConcept
+                                                                           [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "ES" ];
+                                                                                                            fhir:Coding.display  [ fhir:value  "Spain" ];
+                                                                                                            fhir:Coding.system   [ fhir:value  "urn:iso:std:iso:3166"^^xsd:anyURI ];
+                                                                                                            fhir:index           0
+                                                                                                          ]
+                                                                           ];
+                                                                   fhir:index          0
+                                                                 ];
+                                         fhir:Extension.url      [ fhir:value  "http://hl7.org/fhir/StructureDefinition/patient-citizenship"^^xsd:anyURI ];
+                                         fhir:index              0
+                                       ];
+        fhir:DomainResource.text       [ fhir:Narrative.div     "<div xmlns=\"http://www.w3.org/1999/xhtml\">Age: 42 years. I live alone, single. Electronics store salesperson Smoker since the age of 20 Interests: cultural events and concerts. I enjoy mountain activities, skiing in winter and hiking the rest of the year. Health Conditions HIV (diagnosed with 38 years) Depression</div>";
+                                         fhir:Narrative.status  [ fhir:value  "generated" ]
+                                       ];
+        fhir:Patient.active            [ fhir:value
+                          true ];
+        fhir:Patient.birthDate         [ fhir:value
+                          "1980-10-05"^^xsd:date ];
+        fhir:Patient.gender            [ fhir:value
+                          "male" ];
+        fhir:Patient.identifier        [ fhir:Identifier.system  [ fhir:value  "keycloak-id"^^xsd:anyURI ];
+                                         fhir:Identifier.value   [ fhir:value  "b17f0a96-cb4a-45cd-be09-cbadbe428948" ];
+                                         fhir:index              1
+                                       ];
+        fhir:Patient.identifier        [ fhir:Identifier.system  [ fhir:value  "https://www.gravitatehealth.eu/sid/doc"^^xsd:anyURI ];
+                                         fhir:Identifier.value   [ fhir:value  "Pedro-1" ];
+                                         fhir:index              0
+                                       ];
+        fhir:Patient.name              [ fhir:HumanName.family  [ fhir:value  "Gravitate" ];
+                                         fhir:HumanName.given   [ fhir:index  0;
+                                                                  fhir:value  "Pedro"
+                                                                ];
+                                         fhir:index             0
+                                       ];
+        fhir:Resource.id               [ fhir:value
+                          "pedro-patient" ];
+        fhir:Resource.meta             [ fhir:Meta.lastUpdated  [ fhir:value  "2026-02-12T01:24:28.721+00:00"^^xsd:dateTime ];
+                                         fhir:Meta.source       [ fhir:value  "#a8408131-cd76-91"^^xsd:anyURI ];
+                                         fhir:Meta.versionId    [ fhir:value  "1" ]
+                                       ] .
+
+<https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77857/_history/1>
+        rdf:type                    fhir:Medication;
+        fhir:Medication.code        [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "0x81bb4f17d1ea7aabcd39383d33a4f2d6" ];
+                                                                     fhir:Coding.display  [ fhir:value  "NATURES PLUS SPIRU-TEIN BATIDO PROTEINA SABOR COOKIES 525GR" ];
+                                                                     fhir:Coding.system   [ fhir:value  "https://spor.ema.europa.eu/pmswi"^^xsd:anyURI ];
+                                                                     fhir:index           0
+                                                                   ]
+                                    ];
+        fhir:Medication.form        [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "10201000" ];
+                                                                     fhir:Coding.display  [ fhir:value  "Oral powder" ];
+                                                                     fhir:Coding.system   [ fhir:value  "http://standardterms.edqm.eu"^^xsd:anyURI ];
+                                                                     fhir:index           0
+                                                                   ];
+                                      fhir:CodeableConcept.text    [ fhir:value
+                                                        "Oral powder" ]
+                                    ];
+        fhir:Medication.ingredient  [ fhir:Medication.ingredient.itemCodeableConcept
+                                              [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "R44IWB3RN5" ];
+                                                                               fhir:Coding.display  [ fhir:value  "SOY PROTEIN" ];
+                                                                               fhir:Coding.system   [ fhir:value  "http://fdasis.nlm.nih.gov"^^xsd:anyURI ];
+                                                                               fhir:index           0
+                                                                             ];
+                                                fhir:CodeableConcept.text    [ fhir:value
+                                                                  "SOY PROTEIN" ]
+                                              ];
+                                      fhir:index  0
+                                    ];
+        fhir:Resource.id            [ fhir:value  "6f4151e9-91f6-4f1e-adc3-fb94dda77857" ];
+        fhir:Resource.meta          [ fhir:Meta.lastUpdated  [ fhir:value  "2026-02-12T01:24:41.060+00:00"^^xsd:dateTime ];
+                                      fhir:Meta.source       [ fhir:value  "#d0c79ce8-b0ad-90"^^xsd:anyURI ];
+                                      fhir:Meta.versionId    [ fhir:value  "1" ]
+                                    ] .
+
+<https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77856/_history/1>
+        rdf:type                    fhir:Medication;
+        fhir:Medication.code        [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "A11GA01" ];
+                                                                     fhir:Coding.display  [ fhir:value  "ascorbic acid (vit C)" ];
+                                                                     fhir:Coding.system   [ fhir:value  "http://www.whocc.no/atc"^^xsd:anyURI ];
+                                                                     fhir:index           1
+                                                                   ];
+                                      fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "0x173fdc0ef097ed4dbe3915fba2e90586" ];
+                                                                     fhir:Coding.display  [ fhir:value  "SORIA NATURAL VITAMINA C 36 COMPRIMIDOS" ];
+                                                                     fhir:Coding.system   [ fhir:value  "https://spor.ema.europa.eu/pmswi"^^xsd:anyURI ];
+                                                                     fhir:index           0
+                                                                   ]
+                                    ];
+        fhir:Medication.form        [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "10227000" ];
+                                                                     fhir:Coding.display  [ fhir:value  "Modified-release tablet" ];
+                                                                     fhir:Coding.system   [ fhir:value  "http://standardterms.edqm.eu"^^xsd:anyURI ];
+                                                                     fhir:index           0
+                                                                   ];
+                                      fhir:CodeableConcept.text    [ fhir:value
+                                                        "Modified-release tablet" ]
+                                    ];
+        fhir:Medication.ingredient  [ fhir:Medication.ingredient.itemCodeableConcept
+                                              [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "PQ6CK8PD0R" ];
+                                                                               fhir:Coding.display  [ fhir:value  "ASCORBIC ACID" ];
+                                                                               fhir:Coding.system   [ fhir:value  "http://fdasis.nlm.nih.gov"^^xsd:anyURI ];
+                                                                               fhir:index           0
+                                                                             ];
+                                                fhir:CodeableConcept.text    [ fhir:value
+                                                                  "Vitamin C" ]
+                                              ];
+                                      fhir:index  0
+                                    ];
+        fhir:Resource.id            [ fhir:value  "6f4151e9-91f6-4f1e-adc3-fb94dda77856" ];
+        fhir:Resource.meta          [ fhir:Meta.lastUpdated  [ fhir:value  "2026-02-12T01:24:41.025+00:00"^^xsd:dateTime ];
+                                      fhir:Meta.source       [ fhir:value  "#224268a0-775b-9e"^^xsd:anyURI ];
+                                      fhir:Meta.versionId    [ fhir:value  "1" ]
+                                    ] .
+
+<https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/6f4151e9-91f6-4f1e-adc3-fb94dda77855/_history/1>
+        rdf:type                    fhir:Medication;
+        fhir:Medication.code        [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "0xb9846396e9e1eedc4a344e7b64d57107" ];
+                                                                     fhir:Coding.display  [ fhir:value  "AQUILEA ARTICULACIONES COLAGENO Y MAGNESIO 375GR" ];
+                                                                     fhir:Coding.system   [ fhir:value  "https://spor.ema.europa.eu/pmswi"^^xsd:anyURI ];
+                                                                     fhir:index           0
+                                                                   ]
+                                    ];
+        fhir:Medication.form        [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "10201000" ];
+                                                                     fhir:Coding.display  [ fhir:value  "Oral powder" ];
+                                                                     fhir:Coding.system   [ fhir:value  "http://standardterms.edqm.eu"^^xsd:anyURI ];
+                                                                     fhir:index           0
+                                                                   ];
+                                      fhir:CodeableConcept.text    [ fhir:value
+                                                        "Oral powder" ]
+                                    ];
+        fhir:Medication.ingredient  [ fhir:Medication.ingredient.itemCodeableConcept
+                                              [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "PT3TGI7OIP" ];
+                                                                               fhir:Coding.display  [ fhir:value  "HUMAN TYPE I COLLAGEN" ];
+                                                                               fhir:Coding.system   [ fhir:value  "http://fdasis.nlm.nih.gov"^^xsd:anyURI ];
+                                                                               fhir:index           0
+                                                                             ];
+                                                fhir:CodeableConcept.text    [ fhir:value
+                                                                  "HUMAN TYPE I COLLAGEN" ]
+                                              ];
+                                      fhir:index  2
+                                    ];
+        fhir:Medication.ingredient  [ fhir:Medication.ingredient.itemCodeableConcept
+                                              [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "S270N0TRQY" ];
+                                                                               fhir:Coding.display  [ fhir:value  "HYALURONIC ACID" ];
+                                                                               fhir:Coding.system   [ fhir:value  "http://fdasis.nlm.nih.gov"^^xsd:anyURI ];
+                                                                               fhir:index           0
+                                                                             ];
+                                                fhir:CodeableConcept.text    [ fhir:value
+                                                                  "HYALURONIC ACID" ]
+                                              ];
+                                      fhir:index  1
+                                    ];
+        fhir:Medication.ingredient  [ fhir:Medication.ingredient.itemCodeableConcept
+                                              [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "I38ZP9992A" ];
+                                                                               fhir:Coding.display  [ fhir:value  "MAGNESIUM" ];
+                                                                               fhir:Coding.system   [ fhir:value  "http://fdasis.nlm.nih.gov"^^xsd:anyURI ];
+                                                                               fhir:index           0
+                                                                             ];
+                                                fhir:CodeableConcept.text    [ fhir:value
+                                                                  "MAGNESIUM" ]
+                                              ];
+                                      fhir:index  0
+                                    ];
+        fhir:Resource.id            [ fhir:value  "6f4151e9-91f6-4f1e-adc3-fb94dda77855" ];
+        fhir:Resource.meta          [ fhir:Meta.lastUpdated  [ fhir:value  "2026-02-12T01:24:40.967+00:00"^^xsd:dateTime ];
+                                      fhir:Meta.source       [ fhir:value  "#edc2025e-ad1e-99"^^xsd:anyURI ];
+                                      fhir:Meta.versionId    [ fhir:value  "1" ]
+                                    ] .
+
+<https://gravitate-health.lst.tfo.upm.es/ips/api/fhir/Medication/9d7be868-8264-4d94-ad04-ef04ecc92e52/_history/1>
+        rdf:type                    fhir:Medication;
+        fhir:Medication.code        [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "J05AR25" ];
+                                                                     fhir:Coding.display  [ fhir:value  "lamivudine and dolutegravir" ];
+                                                                     fhir:Coding.system   [ fhir:value  "http://www.whocc.no/atc"^^xsd:anyURI ];
+                                                                     fhir:index           3
+                                                                   ];
+                                      fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "787165000" ];
+                                                                     fhir:Coding.display  [ fhir:value  "Dolutegravir- and lamivudine-containing product in oral dose form" ];
+                                                                     fhir:Coding.system   [ fhir:value  "http://snomed.info/sct"^^xsd:anyURI ];
+                                                                     fhir:index           2
+                                                                   ];
+                                      fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "0x073AF2E5B92AE19E8B67635AFFB3D6CA" ];
+                                                                     fhir:Coding.display  [ fhir:value  "lamivudine and dolutegravir, 300 mg/50 mg, tablets" ];
+                                                                     fhir:Coding.system   [ fhir:value  "https://www.who-umc.org/phpid"^^xsd:anyURI ];
+                                                                     fhir:index           1
+                                                                   ];
+                                      fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "EU/1/19/1370/001" ];
+                                                                     fhir:Coding.display  [ fhir:value  "Dovato 50 mg/300 mg 30 tablets" ];
+                                                                     fhir:Coding.system   [ fhir:value  "https://spor.ema.europa.eu/pmswi"^^xsd:anyURI ];
+                                                                     fhir:index           0
+                                                                   ]
+                                    ];
+        fhir:Medication.form        [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "10220000" ];
+                                                                     fhir:Coding.display  [ fhir:value  "Coated tablet" ];
+                                                                     fhir:Coding.system   [ fhir:value  "http://standardterms.edqm.eu"^^xsd:anyURI ];
+                                                                     fhir:index           0
+                                                                   ]
+                                    ];
+        fhir:Medication.ingredient  [ fhir:Medication.ingredient.itemCodeableConcept
+                                              [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "DKO1W9H7M1" ];
+                                                                               fhir:Coding.display  [ fhir:value  "dolutegravir" ];
+                                                                               fhir:Coding.system   [ fhir:value  "http://fdasis.nlm.nih.gov"^^xsd:anyURI ];
+                                                                               fhir:index           0
+                                                                             ];
+                                                fhir:CodeableConcept.text    [ fhir:value
+                                                                  "dolutegravir" ]
+                                              ];
+                                      fhir:Medication.ingredient.strength
+                                              [ fhir:Ratio.denominator  [ fhir:Quantity.code    [ fhir:value  "15054000" ];
+                                                                          fhir:Quantity.system  [ fhir:value  "http://standardterms.edqm.eu"^^xsd:anyURI ];
+                                                                          fhir:Quantity.unit    [ fhir:value  "Tablet" ];
+                                                                          fhir:Quantity.value   [ fhir:value  "1"^^xsd:decimal ]
+                                                                        ];
+                                                fhir:Ratio.numerator    [ fhir:Quantity.code    [ fhir:value  "mg" ];
+                                                                          fhir:Quantity.system  [ fhir:value  "http://unitsofmeasure.org"^^xsd:anyURI ];
+                                                                          fhir:Quantity.value   [ fhir:value  "50"^^xsd:decimal ]
+                                                                        ]
+                                              ];
+                                      fhir:index  1
+                                    ];
+        fhir:Medication.ingredient  [ fhir:Medication.ingredient.itemCodeableConcept
+                                              [ fhir:CodeableConcept.coding  [ fhir:Coding.code     [ fhir:value  "2T8Q726O95" ];
+                                                                               fhir:Coding.display  [ fhir:value  "lamivudine" ];
+                                                                               fhir:Coding.system   [ fhir:value  "http://fdasis.nlm.nih.gov"^^xsd:anyURI ];
+                                                                               fhir:index           0
+                                                                             ];
+                                                fhir:CodeableConcept.text    [ fhir:value
+                                                                  "lamivudine" ]
+                                              ];
+                                      fhir:Medication.ingredient.strength
+                                              [ fhir:Ratio.denominator  [ fhir:Quantity.code    [ fhir:value  "15054000" ];
+                                                                          fhir:Quantity.system  [ fhir:value  "http://standardterms.edqm.eu"^^xsd:anyURI ];
+                                                                          fhir:Quantity.unit    [ fhir:value  "Tablet" ];
+                                                                          fhir:Quantity.value   [ fhir:value  "1"^^xsd:decimal ]
+                                                                        ];
+                                                fhir:Ratio.numerator    [ fhir:Quantity.code    [ fhir:value  "mg" ];
+                                                                          fhir:Quantity.system  [ fhir:value  "http://unitsofmeasure.org"^^xsd:anyURI ];
+                                                                          fhir:Quantity.value   [ fhir:value  "300"^^xsd:decimal ]
+                                                                        ]
+                                              ];
+                                      fhir:index  0
+                                    ];
+        fhir:Resource.id            [ fhir:value  "9d7be868-8264-4d94-ad04-ef04ecc92e52" ];
+        fhir:Resource.meta          [ fhir:Meta.lastUpdated  [ fhir:value  "2026-02-12T01:24:40.808+00:00"^^xsd:dateTime ];
+                                      fhir:Meta.source       [ fhir:value  "#58f6fe1e-d265-91"^^xsd:anyURI ];
+                                      fhir:Meta.versionId    [ fhir:value  "1" ]
+                                    ] .

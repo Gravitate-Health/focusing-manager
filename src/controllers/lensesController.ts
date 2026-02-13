@@ -163,10 +163,12 @@ const getIps = async (req: Request, res: Response): Promise<any | null> => {
             Logger.logInfo("lensesController.ts", "getIps", `Got IPS with patientIdentifier: ${patientIdentifier} -- `)
             return ipsResponse.data
         } catch (error: any) {
-            if (error.status == 400 && error.body["issue"][0]["severity"] == "error") {
+            if (error.status == 400 && error.body?.["issue"]?.[0]?.["severity"] == "error") {
                 Logger.logInfo('lensesController.ts', "getIps", `More than one patient found for the provided identifier: ${patientIdentifier}`);
             }
-            res.status(error.statusCode).send(error.body.errorData)
+            const statusCode = error.statusCode || error.status || 500;
+            const errorData = error.body?.errorData || error.body || { error: error.message || 'Failed to fetch IPS' };
+            res.status(statusCode).send(errorData)
             return null
         }
     }
