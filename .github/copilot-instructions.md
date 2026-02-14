@@ -182,6 +182,44 @@ Four request patterns supported (see `baseRequest()` in `src/controllers/lensesC
 3. **ePI JSON + Patient Identifier**: `POST /focus?patientIdentifier=123` with `{epi: {...}}` body
 4. **ePI JSON + IPS JSON**: `POST /focus` with `{epi: {...}, ips: {...}}` body
 
+### Multipart/Form-Data Support (New in v1.38.0)
+
+The service now supports `multipart/form-data` requests for sending resources in different formats:
+
+**Request Format:**
+```
+POST /focus
+Content-Type: multipart/form-data
+
+--boundary
+Content-Disposition: form-data; name="epi"
+Content-Type: application/fhir+xml
+
+<Bundle xmlns="http://hl7.org/fhir">...</Bundle>
+
+--boundary
+Content-Disposition: form-data; name="ips"
+Content-Type: application/fhir+json
+
+{"resourceType": "Bundle", ...}
+
+--boundary--
+```
+
+**Implementation Details:**
+- Uses `multer` middleware configured in `src/index.ts` and `test/helpers/testApp.ts`
+- Middleware applied to `/focus` route before routing to controller
+- Accepts three fields: `epi`, `ips`, `pv` (PersonaVector optional)
+- Each field can have different `Content-Type` (JSON, XML, Turtle, N3)
+- `parseRequestResource()` checks `req.files` first, then falls back to `req.body`
+- Full backward compatibility maintained with JSON body requests
+
+**Benefits:**
+- Send XML ePI + JSON IPS in same request
+- Send Turtle ePI + JSON IPS in same request
+- Mix any FHIR format combinations
+- Clearer resource separation even for JSON+JSON
+
 Query parameters:
 - `lenses`: Comma-separated lens names (omit for all)
 - `preprocessors`: Comma-separated preprocessor names (omit for all)

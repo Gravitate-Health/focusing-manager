@@ -29,6 +29,28 @@ let personaVectorProvider = new PersonaVectorProvider(PERSONA_VECTOR_URL)
  * Returns Promise for RDF formats, synchronous value for JSON/XML
  */
 const parseRequestResource = async (req: Request, data: any, resourceName: string): Promise<any> => {
+    // Check if resource was sent via multipart/form-data
+    const files = (req as any).files;
+    if (files && files[resourceName] && files[resourceName][0]) {
+        const file = files[resourceName][0];
+        const content = file.buffer.toString('utf-8');
+        const format = getFhirFormatFromContentType(file.mimetype);
+        
+        Logger.logDebug("lensesController.ts", "parseRequestResource", 
+            `Parsing ${resourceName} from multipart (mimetype: ${file.mimetype}, format: ${format})`);
+        
+        try {
+            const result = parseFhirResource(content, format);
+            // Handle both sync (JSON/XML) and async (RDF) results
+            return await Promise.resolve(result);
+        } catch (error: any) {
+            Logger.logError("lensesController.ts", "parseRequestResource", 
+                `Failed to parse ${resourceName} from multipart: ${error.message}`);
+            throw new Error(`Invalid ${format.toUpperCase()} format for ${resourceName}`);
+        }
+    }
+    
+    // Fallback to original logic for JSON body
     const contentType = req.get('Content-Type');
     const format = getFhirFormatFromContentType(contentType);
     
@@ -116,6 +138,14 @@ const getPersonaVector = async (req: Request): Promise<any | null> => {
             return null
         }
     }
+    // Check for multipart file upload
+    else if ((req as any).files && (req as any).files.pv) {
+        return await parseRequestResource(req, null, 'pv');
+    }
+    // Check for multipart file upload
+    else if ((req as any).files && (req as any).files.pv) {
+        return await parseRequestResource(req, null, 'pv');
+    }
     // Otherwise, parse PersonaVector from request body based on Content-Type
     else if (req.body.pv) {
         return await parseRequestResource(req, req.body.pv, 'pv');
@@ -140,6 +170,10 @@ const getEpi = async (req: Request, res: Response): Promise<any | null> => {
             }
             return null
         }
+    }
+    // Check for multipart file upload
+    else if ((req as any).files && (req as any).files.epi) {
+        return await parseRequestResource(req, null, 'epi');
     }
     // Otherwise, parse ePI from request body based on Content-Type
     else if (req.body.epi) {
@@ -171,6 +205,10 @@ const getIps = async (req: Request, res: Response): Promise<any | null> => {
             res.status(statusCode).send(errorData)
             return null
         }
+    }
+    // Check for multipart file upload
+    else if ((req as any).files && (req as any).files.ips) {
+        return await parseRequestResource(req, null, 'ips');
     }
     // Otherwise, parse IPS from request body based on Content-Type
     else if (req.body.ips) {

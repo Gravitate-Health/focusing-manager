@@ -147,25 +147,56 @@ This service has 4 ways of focusing ePIs, depending on which parameters you use:
 
 ### FHIR Format Support
 
-The service accepts FHIR resources in multiple formats via the `Content-Type` header:
+The service accepts FHIR resources in multiple formats:
 
-**Supported Request Content Types:**
-- `application/fhir+json` or `application/json` - FHIR JSON format (default, i.e. if not set)
-- `application/fhir+xml` or `application/xml` - FHIR XML format
-- `application/fhir+turtle` or `text/turtle` - FHIR RDF Turtle format 
-- `text/n3` - FHIR N3 RDF format 
+#### Option 1: JSON Request Body (Backward Compatible)
 
-**Example XML Request:**
+Send all resources in JSON format within a single request body:
+
+**Supported Content Types:**
+- `application/fhir+json` or `application/json` - FHIR JSON format (default)
+
+**Example:**
 ```bash
 curl -X POST 'https://fosps.gravitatehealth.eu/focusing/focus' \
-  -H 'Content-Type: application/fhir+xml' \
+  -H 'Content-Type: application/json' \
   -H 'Accept: application/json' \
-  --data '<?xml version="1.0" encoding="UTF-8"?>
-<Bundle xmlns="http://hl7.org/fhir">
-  <resourceType value="Bundle"/>
-  <type value="document"/>
-  ...
-</Bundle>'
+  -d '{
+    "epi": { "resourceType": "Bundle", ... },
+    "ips": { "resourceType": "Bundle", ... }
+  }'
+```
+
+#### Option 2: Multipart/Form-Data (Mixed Format Support)
+
+**New in v1.38.0:** Send resources in different formats using multipart/form-data. This allows mixing JSON, XML, and Turtle formats in a single request.
+
+**Supported Field Content Types:**
+- `application/fhir+json` or `application/json` - FHIR JSON format
+- `application/fhir+xml` or `application/xml` - FHIR XML format
+- `application/fhir+turtle` or `text/turtle` - FHIR RDF Turtle format
+- `text/n3` - FHIR N3 RDF format
+
+**Example: XML ePI + JSON IPS**
+```bash
+curl -X POST 'https://fosps.gravitatehealth.eu/focusing/focus' \
+  -H 'Accept: application/json' \
+  -F 'epi=@epi.xml;type=application/fhir+xml' \
+  -F 'ips=@ips.json;type=application/fhir+json'
+```
+
+**Example: Turtle ePI + JSON IPS**
+```bash
+curl -X POST 'https://fosps.gravitatehealth.eu/focusing/focus' \
+  -H 'Accept: application/json' \
+  -F 'epi=@epi.ttl;type=text/turtle' \
+  -F 'ips=@ips.json;type=application/fhir+json'
+```
+
+**Multipart Fields:**
+- `epi` - ePI resource (any format)
+- `ips` - IPS resource (any format)
+- `pv` - PersonaVector resource (optional, any format)
 ```
 
 **Response Format:** Determined by the `Accept` header:

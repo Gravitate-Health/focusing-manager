@@ -4,6 +4,7 @@
  */
 
 import express, { Express } from 'express';
+import multer from 'multer';
 import { FocusingManagerRouter } from '../../src/routes/routes';
 
 /**
@@ -12,6 +13,19 @@ import { FocusingManagerRouter } from '../../src/routes/routes';
  */
 export function createTestApp(): Express {
   const app = express();
+  
+  // Configure multer for multipart/form-data support (matches production)
+  const upload = multer({ 
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 50 * 1024 * 1024 } // 50MB
+  });
+  
+  // Apply multer middleware to focus endpoint (matches production)
+  app.use("/focus", upload.fields([
+    { name: 'epi', maxCount: 1 },
+    { name: 'ips', maxCount: 1 },
+    { name: 'pv', maxCount: 1 }
+  ]));
   
   // Match production middleware
   app.use(express.json({ limit: '50mb' }));

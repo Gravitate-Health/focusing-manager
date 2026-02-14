@@ -73,18 +73,21 @@ paths:
 
         **FHIR Format Support:**
         
-        Request body supports multiple FHIR formats via Content-Type header:
-        - application/fhir+json (default)
-        - application/fhir+xml
-        - application/fhir+turtle (fully supported via N3.js)
-        - text/n3 (fully supported via N3.js)
+        Request body supports multiple FHIR formats:
+        - JSON body (backward compatible): application/fhir+json or application/json
+        - Multipart/form-data (new in v1.38.0): Send resources in different formats
+        
+        **Multipart Benefits:**
+        - Send ePI and IPS in different formats (e.g., XML ePI + JSON IPS)
+        - Clearer separation of resources
+        - Support for hybrid format combinations
         
         Desired response "Content-Type" (JSON or HTML) must be sent in the "Accept" header.
         The response contains the ePI with HTML tags and the following CSS classes: "highlight", "collapse".
         "Highlight" CSS class is used to remark information. It has precedence over the collapse class.
         "Collapse" CSS class is used to hide information.
       requestBody:
-        description: This could have an IPS JSON Document if you dont specify patientId
+        description: IPS resource - can be JSON body or multipart field
         content:
           application/fhir+json:
             schema:
@@ -92,14 +95,23 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/ipsFocusing"
-          application/fhir+xml:
+          multipart/form-data:
             schema:
-              type: string
-              example: "<?xml version=\"1.0\"?><Bundle xmlns=\"http://hl7.org/fhir\">...</Bundle>"
-          application/xml:
-            schema:
-              type: string
-              example: "<?xml version=\"1.0\"?><Bundle xmlns=\"http://hl7.org/fhir\">...</Bundle>"
+              type: object
+              properties:
+                ips:
+                  type: string
+                  format: binary
+                  description: "IPS resource in any FHIR format (JSON, XML, Turtle)"
+                pv:
+                  type: string
+                  format: binary
+                  description: "Optional PersonaVector resource in any FHIR format"
+            encoding:
+              ips:
+                contentType: application/fhir+json, application/fhir+xml, text/turtle, text/n3
+              pv:
+                contentType: application/fhir+json, application/fhir+xml, text/turtle, text/n3
       parameters:
         - $ref: "#/components/parameters/epiId"
         - $ref: "#/components/parameters/preprocessorsList"
@@ -130,18 +142,21 @@ paths:
         
         **FHIR Format Support:**
         
-        Request body supports multiple FHIR formats via Content-Type header:
-        - application/fhir+json (default)
-        - application/fhir+xml
-        - application/fhir+turtle (fully supported via N3.js)
-        - text/n3 (fully supported via N3.js)
+        Request body supports multiple FHIR formats:
+        - JSON body (backward compatible): Send { epi, ips, pv } as JSON
+        - Multipart/form-data (new in v1.38.0): Send resources in different formats
+        
+        **Multipart Benefits:**
+        - Send ePI, IPS, and PV in different formats (e.g., XML ePI + JSON IPS)
+        - Mix formats in single request (e.g., Turtle ePI + JSON IPS)
+        - Clearer resource separation and hybrid format support
         
         Desired response "Content-Type" (JSON or HTML) must be sent in the "Accept" header.
         The response contains the ePI with HTML tags and the following CSS classes: "highlight", "collapse".
         "Highlight" CSS class is used to remark information. It has precedence over the collapse class.
         "Collapse" CSS class is used to hide information.
       requestBody:
-        description: The body must have an ePI JSON Document, and could have an IPS JSON Document and/or a PersonaVector in case you dont specify them via query params. Body should be written with epi, ips, and/or pv fields. In case you write patientId or personaVectorId on query parameters, you can omit those fields from the body.
+        description: Resources can be sent as JSON body (backward compatible) or multipart/form-data (supports mixed formats)
         content:
           application/fhir+json:
             schema:
@@ -151,14 +166,31 @@ paths:
             schema:
               oneOf:
                 - $ref: "#/components/schemas/bodyWithIPSandEPI"
-          application/fhir+xml:
+          multipart/form-data:
             schema:
-              type: string
-              example: "<?xml version=\"1.0\"?><Bundle xmlns=\"http://hl7.org/fhir\">...</Bundle>"
-          application/xml:
-            schema:
-              type: string
-              example: "<?xml version=\"1.0\"?><Bundle xmlns=\"http://hl7.org/fhir\">...</Bundle>"
+              type: object
+              properties:
+                epi:
+                  type: string
+                  format: binary
+                  description: "ePI resource in any FHIR format (JSON, XML, Turtle, N3)"
+                ips:
+                  type: string
+                  format: binary
+                  description: "IPS resource in any FHIR format (JSON, XML, Turtle, N3)"
+                pv:
+                  type: string
+                  format: binary
+                  description: "Optional PersonaVector resource in any FHIR format"
+              required:
+                - epi
+            encoding:
+              epi:
+                contentType: application/fhir+json, application/fhir+xml, text/turtle, text/n3
+              ips:
+                contentType: application/fhir+json, application/fhir+xml, text/turtle, text/n3
+              pv:
+                contentType: application/fhir+json, application/fhir+xml, text/turtle, text/n3
       parameters:
         - $ref: "#/components/parameters/preprocessorsList"
         - $ref: "#/components/parameters/lensesList"

@@ -1000,15 +1000,7 @@ describe('Focusing Manager - Focus Endpoint', () => {
       }
     });
 
-    test.skip('should verify full pipeline with XML ePI format', async () => {
-      // NOTE: This test is skipped because the focusing manager API does not support
-      // sending XML ePI content inline with IPS. The API expects:
-      // - ePI ID (fetched from FHIR) OR ePI JSON object
-      // - Not ePI XML/TTL strings in request body
-      // To test XML format, would need to:
-      // 1. Send raw XML as request body (Content-Type: application/fhir+xml)
-      // 2. But then can't include IPS in same request
-      // This is a limitation of the current API design.
+    test('should verify full pipeline with XML ePI format via multipart', async () => {
       const epiXml = getEpiFixture('xml');
       
       // Mock preprocessing - returns preprocessed JSON
@@ -1018,7 +1010,6 @@ describe('Focusing Manager - Focus Endpoint', () => {
       )?.resource;
       
       if (composition) {
-        composition.test = 'preprocessed-xml';
         // Set category to "P" (preprocessed) so lenses will be executed
         if (composition.category && composition.category[0]?.coding) {
           composition.category[0].coding[0].code = 'P';
@@ -1043,26 +1034,31 @@ describe('Focusing Manager - Focus Endpoint', () => {
 
       const response = await request(app)
         .post('/focus')
-        .send({
-          epi: epiXml,
-          ips: ipsFixture
+        .attach('epi', Buffer.from(epiXml), {
+          filename: 'epi.xml',
+          contentType: 'application/fhir+xml'
         })
-        .set('Content-Type', 'application/json')
+        .attach('ips', Buffer.from(JSON.stringify(ipsFixture)), {
+          filename: 'ips.json',
+          contentType: 'application/fhir+json'
+        })
         .set('Accept', 'application/json');
 
-      // XML parsing may not be fully supported, accept various outcomes
-      expect([200, 500]).toContain(response.status);
+      expect(response.status).toBe(200);
       
-      if (response.status === 200) {
-        // If successful, verify stamp text
-        const responseText = JSON.stringify(response.body);
-        expect(responseText).toContain('This ePI has been enhanced with the stamp lens.');
-      }
+      // Verify category code is "E" (enhanced) after lens execution
+      const resultComposition = response.body.entry?.find(
+        (e: any) => e.resource?.resourceType === 'Composition'
+      )?.resource;
+      const categoryCode = resultComposition?.category?.[0]?.coding?.[0]?.code;
+      expect(categoryCode).toBe('E');
+      
+      // Verify stamp lens was applied
+      const responseText = JSON.stringify(response.body);
+      expect(responseText).toContain('This ePI has been enhanced with the stamp lens.');
     }, 10000);
 
-    test.skip('should verify full pipeline with TTL ePI format', async () => {
-      // NOTE: This test is skipped because the focusing manager API does not support
-      // sending TTL ePI content inline with IPS. See XML test above for details.
+    test('should verify full pipeline with TTL ePI format via multipart', async () => {
       const epiTtl = getEpiFixture('ttl');
       
       // Mock preprocessing - returns preprocessed JSON
@@ -1072,7 +1068,6 @@ describe('Focusing Manager - Focus Endpoint', () => {
       )?.resource;
       
       if (composition) {
-        composition.test = 'preprocessed-ttl';
         // Set category to "P" (preprocessed) so lenses will be executed
         if (composition.category && composition.category[0]?.coding) {
           composition.category[0].coding[0].code = 'P';
@@ -1097,21 +1092,28 @@ describe('Focusing Manager - Focus Endpoint', () => {
 
       const response = await request(app)
         .post('/focus')
-        .send({
-          epi: epiTtl,
-          ips: ipsFixture
+        .attach('epi', Buffer.from(epiTtl), {
+          filename: 'epi.ttl',
+          contentType: 'text/turtle'
         })
-        .set('Content-Type', 'application/json')
+        .attach('ips', Buffer.from(JSON.stringify(ipsFixture)), {
+          filename: 'ips.json',
+          contentType: 'application/fhir+json'
+        })
         .set('Accept', 'application/json');
 
-      // TTL parsing may not be fully supported, accept various outcomes
-      expect([200, 500]).toContain(response.status);
+      expect(response.status).toBe(200);
       
-      if (response.status === 200) {
-        // If successful, verify stamp text
-        const responseText = JSON.stringify(response.body);
-        expect(responseText).toContain('This ePI has been enhanced with the stamp lens.');
-      }
+      // Verify category code is "E" (enhanced) after lens execution
+      const resultComposition = response.body.entry?.find(
+        (e: any) => e.resource?.resourceType === 'Composition'
+      )?.resource;
+      const categoryCode = resultComposition?.category?.[0]?.coding?.[0]?.code;
+      expect(categoryCode).toBe('E');
+      
+      // Verify stamp lens was applied
+      const responseText = JSON.stringify(response.body);
+      expect(responseText).toContain('This ePI has been enhanced with the stamp lens.');
     }, 10000);
 
     test('should verify HTML output includes stamp lens text', async () => {
