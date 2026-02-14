@@ -1,0 +1,74 @@
+{
+  "contact": [
+    {
+      "name": "Gravitate Health",
+      "telecom": [
+        {
+          "system": "url",
+          "value": "https://www.gravitatehealth.eu/"
+        }
+      ]
+    }
+  ],
+  "content": [
+    {
+      "contentType": "application/javascript",
+      "data": "LyoKICBJbnB1dCBkYXRhCiAgICBUaGVzZSB2YXJpYWJsZXMgYXJlIGF1dG9tYXRpY2FsbHkgcG9wdWxhdGVkIGJ5IHRoZSBsZW5zIGV4ZWN1dGlvbiBlbnZpcm9ubWVudC4KKi8KLy8gZVBJIGRhdGEKbGV0IGVwaURhdGEgPSBlcGk7Ci8vIElQUyBkYXRhCmxldCBpcHNEYXRhID0gaXBzOwovLyBQViBkYXRhIChmb3IgZnV0dXJlIHVzZSkKbGV0IHB2RGF0YSA9IHB2OwovLyBPcmlnaW5hbCBIVE1MIGNvbnRlbnQgdG8gYmUgdHJhbnNmb3JtZWQKbGV0IGh0bWxEYXRhID0gaHRtbDsKCgovKiAKICAgIEVuaGFuY2UgZnVuY3Rpb246IFRyYW5zZm9ybXMgdGhlIG9yaWdpbmFsIGNvbnRlbnQgdG8gaGlnaGxpZ2h0IHNwZWNpZmljIHNlY3Rpb25zLgogICAgSW5wdXQ6IGh0bWxEYXRhIChzdHJpbmcpIC0gVGhlIG9yaWdpbmFsIHRleHQgY29udGVudC4KICAgICAgICAgICBpcHNEYXRhIChvYmplY3QpIC0gVGhlIElQUyByZXNvdXJjZSBkYXRhLgogICAgICAgICAgIHB2RGF0YSAob2JqZWN0KSAtIFRoZSBQViByZXNvdXJjZSBkYXRhLgogICAgICAgICAgIGVwaURhdGEgKG9iamVjdCkgLSBUaGUgZVBJIHJlc291cmNlIGRhdGEuCiAgICBPdXRwdXQ6IHRyYW5zZm9ybWVkQ29udGVudCAoc3RyaW5nKSAtIFRoZSBtb2RpZmllZCB0ZXh0IGNvbnRlbnQgd2l0aCBoaWdobGlnaHRzLgoqLwpmdW5jdGlvbiBlbmhhbmNlKCkgeyAKICAgIC8vIEZpbmQgdGhlIGxhc3QgY2xvc2luZyB0YWcgKHR5cGljYWxseSA8L2Rpdj4pIGFuZCBpbnNlcnQgc3RhbXAgYmVmb3JlIGl0CiAgICBjb25zdCBsYXN0Q2xvc2luZ1RhZ0luZGV4ID0gaHRtbERhdGEubGFzdEluZGV4T2YoJzwvJyk7CiAgICBpZiAobGFzdENsb3NpbmdUYWdJbmRleCAhPT0gLTEpIHsKICAgICAgICB0cmFuc2Zvcm1lZENvbnRlbnQgPSBodG1sRGF0YS5zdWJzdHJpbmcoMCwgbGFzdENsb3NpbmdUYWdJbmRleCkgKyAKICAgICAgICAgICAgICAgICAgICAgICAgICAgIjxwPlRoaXMgZVBJIGhhcyBiZWVuIGVuaGFuY2VkIHdpdGggdGhlIHN0YW1wIGxlbnMuPC9wPiIgKyAKICAgICAgICAgICAgICAgICAgICAgICAgICAgaHRtbERhdGEuc3Vic3RyaW5nKGxhc3RDbG9zaW5nVGFnSW5kZXgpOwogICAgfSBlbHNlIHsKICAgICAgICAvLyBGYWxsYmFjazogaWYgbm8gY2xvc2luZyB0YWcgZm91bmQsIGp1c3QgYXBwZW5kCiAgICAgICAgdHJhbnNmb3JtZWRDb250ZW50ID0gaHRtbERhdGEgKyAiPHA+VGhpcyBlUEkgaGFzIGJlZW4gZW5oYW5jZWQgd2l0aCB0aGUgc3RhbXAgbGVucy48L3A+IjsKICAgIH0KICAgIHJldHVybiB0cmFuc2Zvcm1lZENvbnRlbnQ7Cn0KCi8qIAogICAgRXhwbGFuYXRpb24gZnVuY3Rpb246IFByb3ZpZGVzIGFuIGV4cGxhbmF0aW9uIGZvciB0aGUgbGVucydzIGJlaGF2aW9yLgogICAgT3V0cHV0OiBleHBsYW5hdGlvblRleHQgKHN0cmluZykgLSBBIHRleHR1YWwgZXhwbGFuYXRpb24uCiovCmZ1bmN0aW9uIGV4cGxhbmF0aW9uKCkgewogICAgLy8gWW91ciBleHBsYW5hdGlvbiBsb2dpYyBoZXJlCiAgICB2YXIgZXhwbGFuYXRpb25UZXh0ID0gIkFkZGVkIGEgc3RhbXAgdG8gaW5kaWNhdGUgdGhhdCB0aGlzIGVQSSBoYXMgYmVlbiBlbmhhbmNlZCB3aXRoIHRoZSBzdGFtcCBsZW5zLiI7CiAgICByZXR1cm4gZXhwbGFuYXRpb25UZXh0Owp9CgpyZXR1cm4gewogICAgZW5oYW5jZTogZW5oYW5jZSwKICAgIGV4cGxhbmF0aW9uOiBleHBsYW5hdGlvbgp9Ow=="
+    }
+  ],
+  "copyright": "© 2024 Gravitate Health",
+  "date": "2026-02-14T02:41:14.615Z",
+  "description": "test lens that adds some text so execution of lens can be verified.",
+  "experimental": true,
+  "extension": [
+    {
+      "url": "http://hl7.eu/fhir/ig/gravitate-health/StructureDefinition/lee-version",
+      "valueString": "dev"
+    }
+  ],
+  "id": "stamp-lens",
+  "identifier": [
+    {
+      "system": "http://gravitate-health.lst.tfo.upm.es",
+      "value": "stamp-lens"
+    }
+  ],
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "code": "US",
+          "system": "urn:iso:std:iso:3166"
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "profile": [
+      "http://hl7.eu/fhir/ig/gravitate-health/StructureDefinition/lens"
+    ]
+  },
+  "name": "stamp-lens",
+  "parameter": [
+    {
+      "documentation": "parameter if it exists",
+      "type": "CodeableConcept",
+      "use": "in"
+    }
+  ],
+  "publisher": "Gravitate Health Project - UPM Team",
+  "purpose": "Software Testing.",
+  "resourceType": "Library",
+  "status": "draft",
+  "title": "stamp-lens",
+  "type": {
+    "coding": [
+      {
+        "code": "logical-library"
+      }
+    ]
+  },
+  "url": "http://hl7.eu/fhir/ig/gravitate-health/Library/mock-lib",
+  "usage": "Testing pipelines of focusing.",
+  "version": "0.0.1"
+}

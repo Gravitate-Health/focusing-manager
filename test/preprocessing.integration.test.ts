@@ -120,6 +120,9 @@ describe('Focusing Manager - Preprocessing Endpoint', () => {
             }
           ]
         });
+        
+        // Add test attribute to verify preprocessing executed
+        composition.test = 'preprocessed';
       }
 
       // Mock preprocessing service
@@ -140,10 +143,19 @@ describe('Focusing Manager - Preprocessing Endpoint', () => {
       )?.resource;
       
       expect(resultComposition).toBeDefined();
+      expect(resultComposition.test).toBe('preprocessed');
     });
 
     test('should preprocess ePI with specific preprocessor', async () => {
       const preprocessedEpi = JSON.parse(JSON.stringify(epiFixtureJson));
+      const composition = preprocessedEpi.entry?.find(
+        (e: any) => e.resource?.resourceType === 'Composition'
+      )?.resource;
+      
+      if (composition) {
+        // Add test attribute to verify preprocessing executed
+        composition.test = 'preprocessed-specific';
+      }
       
       // Mock specific preprocessing service
       nock('http://mock-preprocessing-service.test')
@@ -157,6 +169,12 @@ describe('Focusing Manager - Preprocessing Endpoint', () => {
 
       expect(response.status).toBe(200);
       expect(response.body).toBeDefined();
+      
+      // Verify preprocessing was applied
+      const resultComposition = response.body.entry?.find(
+        (e: any) => e.resource?.resourceType === 'Composition'
+      )?.resource;
+      expect(resultComposition?.test).toBe('preprocessed-specific');
     });
 
     test('should return HTML when Accept header is text/html', async () => {
@@ -243,6 +261,13 @@ describe('Focusing Manager - Preprocessing Endpoint', () => {
   describe('Preprocessing Cache Behavior', () => {
     test('should cache preprocessing results (first call - cache miss)', async () => {
       const preprocessedEpi = JSON.parse(JSON.stringify(epiFixtureJson));
+      const composition = preprocessedEpi.entry?.find(
+        (e: any) => e.resource?.resourceType === 'Composition'
+      )?.resource;
+      
+      if (composition) {
+        composition.test = 'preprocessed-cached';
+      }
       
       // Mock preprocessing service
       nock('http://mock-preprocessing-service.test')
@@ -275,6 +300,13 @@ describe('Focusing Manager - Preprocessing Endpoint', () => {
 
     test('should use cache for repeated preprocessing calls (cache hit)', async () => {
       const preprocessedEpi = JSON.parse(JSON.stringify(epiFixtureJson));
+      const composition = preprocessedEpi.entry?.find(
+        (e: any) => e.resource?.resourceType === 'Composition'
+      )?.resource;
+      
+      if (composition) {
+        composition.test = 'preprocessed-cache-hit';
+      }
       
       // Mock preprocessing service - should only be called once
       nock('http://mock-preprocessing-service.test')
@@ -417,6 +449,93 @@ describe('Focusing Manager - Preprocessing Endpoint', () => {
       expect([200, 500]).toContain(response.status);
     });
 
+    test('should handle preprocessor timeout with fast delay', async () => {
+      // Mock service that times out (short delay for testing)
+      nock('http://mock-preprocessing-service.test')
+        .post('/preprocess')
+        .delayConnection(100) // Short delay for testing
+        .reply(200, epiFixtureJson);
+
+      try {
+        const response = await request(app)
+          .post(`/preprocessing/${epiId}`)
+          .set('Accept', 'application/json')
+          .timeout(50); // Set client timeout lower than delay
+
+        // If it doesn't timeout, it should return gracefully
+        expect([200, 500, 504]).toContain(response.status);
+      } catch (error: any) {
+        // Timeout error is expected
+        expect(error.message).toMatch(/timeout|Timeout/i);
+      }
+    }, 10000);
+
+    test('should handle preprocessor not found (404)', async () => {
+      // Mock service returns 404
+      nock('http://mock-preprocessing-service.test')
+        .post('/preprocess')
+        .reply(404, { error: 'Not Found' });
+
+      const response = await request(app)
+        .post(`/preprocessing/${epiId}`)
+        .set('Accept', 'application/json');
+
+      // Should handle 404 gracefully
+      expect([200, 500]).toContain(response.status);
+    });
+
+    test('should handle preprocessor service not responding', async () => {
+      // Mock service that never responds (simulate connection refused)
+      nock('http://mock-preprocessing-service.test')
+        .post('/preprocess')
+        .replyWithError({
+          code: 'ECONNREFUSED',
+          message: 'Connection refused'
+        });
+
+      const response = await request(app)
+        .post(`/preprocessing/${epiId}`)
+        .set('Accept', 'application/json');
+
+      // Should handle connection error gracefully
+      expect([200, 500]).toContain(response.status);
+    });
+
+    test('should handle preprocessor URL exists but service unavailable', async () => {
+      // IServiceClient returns URL but service returns 503 Service Unavailable
+      nock('http://mock-preprocessing-service.test')
+        .post('/preprocess')
+        .reply(503, { error: 'Service Temporarily Unavailable' });
+
+      const response = await request(app)
+        .post(`/preprocessing/${epiId}`)
+        .set('Accept', 'application/json');
+
+      // Should handle service unavailable gracefully
+      expect([200, 500, 503]).toContain(response.status);
+    });
+
+    test('should handle preprocessor timeout on slow response', async () => {
+      // Mock very slow preprocessor (uses nock delay)
+      nock('http://mock-preprocessing-service.test')
+        .post('/preprocess')
+        .delay(5000) // 5 second delay
+        .reply(200, epiFixtureJson);
+
+      try {
+        const response = await request(app)
+          .post(`/preprocessing/${epiId}`)
+          .set('Accept', 'application/json')
+          .timeout(100); // Client timeout of 100ms
+
+        // If it doesn't timeout, it should return gracefully
+        expect([200, 500, 504]).toContain(response.status);
+      } catch (error: any) {
+        // Timeout error is expected
+        expect(error.message).toMatch(/timeout|Timeout/i);
+      }
+    }, 10000);
+
     test('should handle malformed preprocessor response', async () => {
       // Mock malformed response
       nock('http://mock-preprocessing-service.test')
@@ -453,7 +572,22 @@ describe('Focusing Manager - Preprocessing Endpoint', () => {
   describe('Preprocessing with Multiple Preprocessors', () => {
     test('should process ePI through multiple preprocessors in sequence', async () => {
       const preprocessedEpi1 = JSON.parse(JSON.stringify(epiFixtureJson));
+      const composition1 = preprocessedEpi1.entry?.find(
+        (e: any) => e.resource?.resourceType === 'Composition'
+      )?.resource;
+      
+      if (composition1) {
+        composition1.test = 'preprocessed-step1';
+      }
+      
       const preprocessedEpi2 = JSON.parse(JSON.stringify(epiFixtureJson));
+      const composition2 = preprocessedEpi2.entry?.find(
+        (e: any) => e.resource?.resourceType === 'Composition'
+      )?.resource;
+      
+      if (composition2) {
+        composition2.test = 'preprocessed-step2';
+      }
       
       // Mock two sequential preprocessing calls
       nock('http://mock-preprocessing-service.test')
@@ -472,6 +606,14 @@ describe('Focusing Manager - Preprocessing Endpoint', () => {
         .set('Accept', 'application/json');
 
       expect([200, 500]).toContain(response.status);
+      
+      if (response.status === 200) {
+        const resultComposition = response.body.entry?.find(
+          (e: any) => e.resource?.resourceType === 'Composition'
+        )?.resource;
+        // Should have the attribute from the last preprocessor
+        expect(resultComposition?.test).toBe('preprocessed-step2');
+      }
     });
 
     test('should set category code to "P" after preprocessing', async () => {

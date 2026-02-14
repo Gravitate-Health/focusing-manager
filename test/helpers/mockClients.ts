@@ -119,7 +119,7 @@ export function getPvFixture(format: 'json' | 'xml' | 'ttl' = 'json') {
 /**
  * Get lens fixture by name
  */
-export function getLensFixture(lensName: 'pregnancy' | 'conditions') {
+export function getLensFixture(lensName: 'pregnancy' | 'conditions' | 'stamp') {
   return loadFixture(`lenses/${lensName}-lens.json`);
 }
 
