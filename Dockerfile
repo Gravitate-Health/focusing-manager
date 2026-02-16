@@ -19,5 +19,5 @@ RUN npm install --production
 
 EXPOSE ${PORT}
 
-CMD ["node", "index.js" ]
+CMD ["node", "src/index.js" ]
 
