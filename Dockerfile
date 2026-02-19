@@ -1,4 +1,4 @@
-FROM node:16-slim AS buildstage
+FROM node:22-slim AS buildstage
 
 WORKDIR /usr/src/app
 
@@ -7,7 +7,7 @@ RUN npm install
 COPY --chown=node . .
 RUN npm run build
 
-FROM node:19-slim 
+FROM node:22-slim 
 
 ENV PORT=3000 
 USER root
