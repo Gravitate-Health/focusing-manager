@@ -40,11 +40,11 @@ spec:
         - name: FOCUSING_LABEL_SELECTOR
           value: eu.gravitate-health.fosps.focusing=true
         - name: FHIR_IPS_URL
-          value: https://gravitate-health.lst.tfo.upm.es/ips/api/fhir
+          value: http://ips-fhir-server:8080/api/fhir
         - name: FHIR_EPI_URL
-          value: https://gravitate-health.lst.tfo.upm.es/epi/api/fhir
+          value: http://epi-fhir-server:8080/api/fhir
         - name: PERSONA_VECTOR_URL
-          value: https://gravitate-health.lst.tfo.upm.es/personas
+          value: http://epi-fhir-server:8080/api/fhir
         - name: PREPROCESSING_TIMEOUT
           value: "20000"
         - name: PREPROCESSING_CACHE_BACKEND
