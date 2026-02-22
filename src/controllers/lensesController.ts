@@ -282,6 +282,29 @@ const logAndSendResponseWithHeaders = (res: Response, responseMessage: any, stat
         res.set('GH-Focusing-Warnings', JSON.stringify(focusingWarnings))
     }
 
+    // check accept header to decide response format
+    // if client accepts XML, set content type to XML and convert epi to XML string if it's an object
+    if (res.req.accepts('xml') == 'xml') { 
+        res.set('Content-Type', 'application/xml')
+        // Convert epi to XML string if needed (assuming epi is in JSON format)
+        if (typeof epi === 'object') {
+            const json2xml = require('json2xml');
+            epi = json2xml(epi);
+        }
+    }
+    // if client accepts turtle, set content type to turtle and convert epi to turtle string if it's an object
+    else if (res.req.accepts('text/turtle') == 'text/turtle') {
+        res.set('Content-Type', 'text/turtle')
+        // Convert epi to turtle string if needed (assuming epi is in JSON format)
+        if (typeof epi === 'object') {
+            const json2rdf = require('json2rdf');
+            epi = json2rdf(epi, { format: 'turtle' });
+        }
+    // default to JSON response
+    }else {
+        res.set('Content-Type', 'application/json')
+    }
+
     // Send response independent of the result
     res.status(statusCode).send(epi)
 }
