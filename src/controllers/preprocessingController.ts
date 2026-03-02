@@ -26,6 +26,8 @@ export const getPreprocessingServices = async (_req: Request, res: Response) => 
     `Found the following preprocessing services: ${preprocessingServiceList}`
   );
 
+  // Allow caching by clients and network devices for 1 hour
+  res.set("Cache-Control", "public, max-age=3600");
   res.status(HttpStatusCode.Ok).send({
     preprocessors: preprocessingServiceList
   })
@@ -34,11 +36,14 @@ export const getPreprocessingServices = async (_req: Request, res: Response) => 
 export const getCacheStats = async (_req: Request, res: Response) => {
   try {
     const stats = preprocessingProvider.getCacheStats();
+    // Disable caching for cache stats endpoint - should always return fresh data
+    res.set("Cache-Control", "no-cache, no-store, must-revalidate");
     res.status(HttpStatusCode.Ok).send({
       cacheStats: stats
     });
   } catch (error) {
     Logger.logError("preprocessingController.ts", "getCacheStats", `Error: ${error}`);
+    res.set("Cache-Control", "no-cache, no-store, must-revalidate");
     res.status(HttpStatusCode.InternalServerError).send({
       error: "Failed to get cache statistics"
     });
@@ -93,6 +98,10 @@ export const preprocess = async (req: Request, res: Response) => {
       preprocessedEpi = epi
     }
   }
+
+  // Allow caching by clients and network devices for 1 hour
+  // Preprocessed output is deterministic - same input produces same output
+  res.set("Cache-Control", "public, max-age=3600");
 
   // Send response in requested format using shared ePI response formatter
   await sendEpiFormattedResponse(req, res, preprocessedEpi, HttpStatusCode.Ok, "preprocessingController.ts")

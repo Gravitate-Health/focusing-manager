@@ -229,7 +229,25 @@ Response format controlled by `Accept` header (`application/json` or `text/html`
 ### Discovery Endpoints
 
 - `GET /preprocessing` - List available preprocessors
+  - Returns: `{ preprocessors: ['name1', 'name2'] }`
+  - Cache header: `Cache-Control: public, max-age=3600` (1 hour)
 - `GET /lenses` - List available lenses
+  - Returns: `{ lenses: ['lens-id-1', 'lens-id-2'] }`
+  - Cache header: `Cache-Control: public, max-age=3600` (1 hour)
+- `POST /preprocessing/:epiId` - Execute preprocessing on an ePI
+  - Returns: Enhanced ePI in requested format (JSON/HTML)
+  - Cache header: `Cache-Control: public, max-age=3600` (1 hour)
+  - Output is deterministic - same input produces same output
+- `GET /preprocessing/cache/stats` - Get preprocessing cache statistics
+  - Returns: `{ cacheStats: {...} }` with hits, misses, sets, errors
+  - Cache header: `Cache-Control: no-cache, no-store, must-revalidate` (no caching)
+
+**HTTP Caching Strategy:**
+- Discovery endpoints (`/preprocessing`, `/lenses`) are cacheable for 1 hour by clients, CDNs, and proxies
+- Preprocessing endpoint output is cacheable for 1 hour (deterministic results)
+- Cache stats endpoint is never cached (always returns fresh data)
+- Focus endpoints have no explicit cache headers (patient-specific, potentially changing data)
+- Error responses include `Cache-Control: no-cache, no-store, must-revalidate` to prevent caching of errors
 
 ## Code Organization & Key Files
 

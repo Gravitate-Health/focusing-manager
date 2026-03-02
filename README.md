@@ -101,7 +101,30 @@ Cache behavior:
 - Cache keys include ePI content hash + ordered list of preprocessing steps
 - Multi-level caches: reads check L1→L2→...→LN, writes propagate to all levels, hits promote to upper levels
 
-**5. Kubernetes Dev**
+**5. HTTP Response Caching**
+
+The service sets appropriate HTTP cache headers to enable client-side and network-level caching:
+
+- **Discovery Endpoints** (`GET /preprocessing`, `GET /lenses`):
+    - `Cache-Control: public, max-age=3600`
+    - Cacheable for 1 hour by clients, CDNs, and proxies
+    - Services are relatively stable and rarely change
+
+- **Preprocessing Endpoint** (`POST /preprocessing/:epiId`):
+    - `Cache-Control: public, max-age=3600`
+    - Cacheable for 1 hour by clients and intermediaries
+    - Output is deterministic - same input produces same output
+    - Reduces load on preprocessing services for repeated requests
+
+- **Cache Stats Endpoint** (`GET /preprocessing/cache/stats`):
+    - `Cache-Control: no-cache, no-store, must-revalidate`
+    - Not cacheable - always returns fresh statistics
+
+- **Focus Endpoints** (`POST /focus`, `POST /focus/:epiId`):
+    - No explicit cache headers (application handles caching internally)
+    - Output depends on patient-specific data and may change
+
+**6. Kubernetes Dev**
 *Optional* In production, the service uses the service account to query the cluster. Outside the cluster this is not possible. To develop this service outside the cluster, set the the following enviornment variables (or create a `.env` file) so the kubernetes client can connect to the cluster:
 
 - `ENVIRONMENT`: "dev"

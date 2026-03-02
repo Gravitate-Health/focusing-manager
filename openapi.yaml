@@ -15,6 +15,12 @@ paths:
       responses:
         "200":
           description: OK
+          headers:
+            Cache-Control:
+              description: Allows client and network caching for 1 hour
+              schema:
+                type: string
+                example: "public, max-age=3600"
           content:
             application/json:
               schema:
@@ -35,12 +41,17 @@ paths:
         - text/n3 (fully supported via N3.js)
         
         Desired response "Content-Type" (JSON or HTML) must be sent in the "Accept" header.
+        
+        **Caching:**
+        
+        Preprocessing output is deterministic (same input produces same output) and is cached
+        for 1 hour by clients and network intermediaries.
       parameters:
         - $ref: "#/components/parameters/epiId"
         - $ref: "#/components/parameters/preprocessorsList"
       responses:
         "200":
-          $ref: "#/components/responses/200focus"
+          $ref: "#/components/responses/200focusWithCache"
         "422":
           $ref: "#/components/responses/422InvalidData"
   /focusing/lenses:
@@ -51,6 +62,12 @@ paths:
       responses:
         "200":
           description: OK
+          headers:
+            Cache-Control:
+              description: Allows client and network caching for 1 hour
+              schema:
+                type: string
+                example: "public, max-age=3600"
           content:
             application/json:
               schema:
@@ -306,6 +323,21 @@ components:
   responses:
     200focus:
       description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ePI-json"
+        text/html:
+          schema:
+            $ref: "#/components/schemas/ePI-html"
+    200focusWithCache:
+      description: OK
+      headers:
+        Cache-Control:
+          description: Allows client and network caching for 1 hour. Preprocessing output is deterministic.
+          schema:
+            type: string
+            example: "public, max-age=3600"
       content:
         application/json:
           schema:
