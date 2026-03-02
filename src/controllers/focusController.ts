@@ -7,7 +7,8 @@ import { FhirIpsProvider } from "../providers/fhirIps.provider";
 import { LensesProvider } from "../providers/lenses.provider";
 import { PersonaVectorProvider } from "../providers/personaVector.provider";
 import { Liquid } from "liquidjs";
-import { readFileSync } from "fs";
+import { readFileSync, existsSync } from "fs";
+import { join } from "path";
 import { applyLenses, LensExecutionConfig } from "@gravitate-health/lens-execution-environment";
 import { getLeeLoggingConfig } from "../utils/leeLogging";
 import { getFhirFormatFromContentType, parseFhirResource } from "../utils/fhirParser";
@@ -22,6 +23,16 @@ let lensesProvider = new LensesProvider("")
 let fhirEpiProvider = new FhirEpiProvider(FHIR_EPI_URL)
 let fhirIpsProvider = new FhirIpsProvider(FHIR_IPS_URL)
 let personaVectorProvider = new PersonaVectorProvider(PERSONA_VECTOR_URL)
+
+/**
+ * Get template file path from configured template directory
+ * Uses TEMPLATE_DIR environment variable at runtime, defaults to build/templates
+ * Checked at runtime (not module load time) to support testing
+ */
+const getTemplatePath = (templateName: string): string => {
+    const templateDir = process.env.TEMPLATE_DIR || join(process.cwd(), 'build', 'templates');
+    return join(templateDir, templateName);
+}
 
 /**
  * Parse FHIR resource from request body based on Content-Type header
@@ -248,7 +259,7 @@ const getLensesAndPreprocessors = async (req: Request, res: Response) => {
     }
 }
 
-const logAndSendResponseWithHeaders = (res: Response, responseMessage: any, statusCode: number = HttpStatusCode.Ok) => {
+const logAndSendResponseWithHeaders = async (req: Request, res: Response, responseMessage: any, statusCode: number = HttpStatusCode.Ok) => {
     console.log("________________")
     console.log("Sending response")
     console.log("________________")
@@ -267,26 +278,109 @@ const logAndSendResponseWithHeaders = (res: Response, responseMessage: any, stat
         res.set('GH-Focusing-Warnings', JSON.stringify(focusingWarnings))
     }
 
-    // check accept header to decide response format
-    // if client accepts XML, set content type to XML and convert epi to XML string if it's an object
-    if (res.req.accepts('xml') == 'xml') { 
+    // Determine if client explicitly provided an Accept header
+    const hasAcceptHeader = req.headers.accept && req.headers.accept.trim().length > 0;
+    
+    // If no Accept header, default to HTML (no need to check specific formats)
+    if (!hasAcceptHeader) {
+        try {
+            console.log("Converting to html (no Accept header - using default)")
+            const templatePath = getTemplatePath('epi.liquid');
+            
+            if (!existsSync(templatePath)) {
+                Logger.logWarn("focusController.ts", "logAndSendResponseWithHeaders", `Template file not found: ${templatePath}`);
+                res.set('Content-Type', 'application/json')
+                res.status(HttpStatusCode.InternalServerError).send(epi)
+                return
+            }
+            
+            const epiTemplate = readFileSync(templatePath, "utf-8")
+            const engine = new Liquid()
+            const html = await engine.parseAndRender(epiTemplate, epi)
+            res.set('Content-Type', 'text/html')
+            res.status(statusCode).send(html)
+            return
+        } catch (error) {
+            Logger.logError("focusController.ts", "logAndSendResponseWithHeaders", `Error converting to html: ${error}`)
+            res.set('Content-Type', 'application/json')
+            res.status(HttpStatusCode.InternalServerError).send(epi)
+            return
+        }
+    }
+
+    // Client has explicit Accept header - check for specific formats
+    // Check for explicit format requests (before HTML default)
+    // if client accepts XML, set content type to XML
+    if (req.accepts('xml') === 'xml') { 
         res.set('Content-Type', 'application/xml')
         // Convert epi to XML string if needed (assuming epi is in JSON format)
         if (typeof epi === 'object') {
-            const json2xml = require('json2xml');
-            epi = json2xml(epi);
+            try {
+                const json2xml = require('json2xml');
+                epi = json2xml(epi);
+            } catch (error) {
+                Logger.logWarn("focusController.ts", "logAndSendResponseWithHeaders", "Failed to convert to XML, returning JSON");
+                res.set('Content-Type', 'application/json');
+            }
         }
     }
-    // if client accepts turtle, set content type to turtle and convert epi to turtle string if it's an object
-    else if (res.req.accepts('text/turtle') == 'text/turtle') {
+    // if client accepts turtle, set content type to turtle
+    else if (req.accepts('text/turtle') === 'text/turtle' || req.accepts('turtle') === 'turtle') {
         res.set('Content-Type', 'text/turtle')
         // Convert epi to turtle string if needed (assuming epi is in JSON format)
         if (typeof epi === 'object') {
-            const json2rdf = require('json2rdf');
-            epi = json2rdf(epi, { format: 'turtle' });
+            try {
+                // Simple conversion: convert JSON to N-Triples/Turtle-like format
+                const turtleLines: string[] = [];
+                turtleLines.push('@prefix ex: <http://example.com/> .');
+                turtleLines.push('');
+                
+                const subject = 'ex:epi';
+                if (typeof epi === 'object' && epi !== null) {
+                    for (const [key, value] of Object.entries(epi)) {
+                        if (value !== null && value !== undefined) {
+                            const predicate = `ex:${key}`;
+                            const val = typeof value === 'string' ? `"${value}"` : String(value);
+                            turtleLines.push(`${subject} ${predicate} ${val} .`);
+                        }
+                    }
+                }
+                
+                epi = turtleLines.join('\n');
+            } catch (error) {
+                Logger.logWarn("focusController.ts", "logAndSendResponseWithHeaders", "Failed to convert to Turtle, returning JSON");
+                res.set('Content-Type', 'application/json');
+            }
         }
+    }
+    // if client accepts HTML, render using Liquid template
+    else if (req.accepts('html') === 'html') {
+        try {
+            console.log("Converting to html (explicit Accept header)")
+            const templatePath = getTemplatePath('epi.liquid');
+            
+            if (!existsSync(templatePath)) {
+                Logger.logWarn("focusController.ts", "logAndSendResponseWithHeaders", `Template file not found: ${templatePath}`);
+                res.set('Content-Type', 'application/json')
+                res.status(HttpStatusCode.InternalServerError).send(epi)
+                return
+            }
+            
+            const epiTemplate = readFileSync(templatePath, "utf-8")
+            const engine = new Liquid()
+            const html = await engine.parseAndRender(epiTemplate, epi)
+            res.set('Content-Type', 'text/html')
+            res.status(statusCode).send(html)
+            return
+        } catch (error) {
+            Logger.logError("focusController.ts", "logAndSendResponseWithHeaders", `Error converting to html: ${error}`)
+            res.set('Content-Type', 'application/json')
+            res.status(HttpStatusCode.InternalServerError).send(epi)
+            return
+        }
+    }
     // default to JSON response
-    }else {
+    else {
         res.set('Content-Type', 'application/json')
     }
 
@@ -359,31 +453,6 @@ const focusProccess = async (req: Request, res: Response, epi: any, ips: any, pv
 
     responseMessage.response = epi;
 
-
-    //Check if is HTML response
-    if (req.accepts('html') == 'html') {
-        try {
-            console.log("Converting to html")
-            const epiTemplate = readFileSync(`${process.cwd()}/templates/epi.liquid`, "utf-8")
-
-            const engine = new Liquid()
-            engine.parseAndRender(epiTemplate, epi)
-                .then(html => {
-                    res.set('Content-Type', 'text/html')
-                    responseMessage.response = html
-                    logAndSendResponseWithHeaders(res, responseMessage, HttpStatusCode.Ok)
-                    return
-                });
-
-        } catch (error) {
-            Logger.logError("focusController.ts", "focusProcess", `Error converting to html`)
-            console.log(error);
-            logAndSendResponseWithHeaders(res, responseMessage, HttpStatusCode.InternalServerError)
-            return
-        }
-    }
-    else {//Response with e(ePi)
-        logAndSendResponseWithHeaders(res, responseMessage, HttpStatusCode.Ok)
-        return
-    }
+    // Send response with all format negotiation handled in logAndSendResponseWithHeaders
+    await logAndSendResponseWithHeaders(req, res, responseMessage, HttpStatusCode.Ok)
 }
