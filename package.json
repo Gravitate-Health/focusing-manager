@@ -12,7 +12,7 @@
     "test:debug": "jest --detectOpenHandles --runInBand",
     "lint": "tsc --noEmit",
     "dev": "ts-node-dev ./src/index.ts",
-    "build": "if [ -d \"$PWD/build\" ]; then rm -r \"$PWD/build\"; fi && tsc --incremental && cp -r ./src/templates ./build",
+    "build": "node build.js",
     "start": "node build/index.js"
   },
   "repository": {
