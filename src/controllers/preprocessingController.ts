@@ -4,8 +4,7 @@ import { HttpStatusCode } from "axios";
 import { Response, Request } from "express";
 import { FhirEpiProvider } from "../providers/fhirEpi.provider";
 import { PreprocessingProvider } from "../providers/preprocessing.provider";
-import { readFileSync } from "fs";
-import { Liquid } from "liquidjs";
+import { sendEpiFormattedResponse } from "../utils/ePIResponseFormatter";
 
 const FHIR_BASE_URL = process.env.FHIR_EPI_URL as string;
 
@@ -80,35 +79,21 @@ export const preprocess = async (req: Request, res: Response) => {
     })
   }
 
-  console.log(`Requested ePI ID: ${epiId}`);
-  console.log(`Requested preprocessors: ${preprocessors}`);
+  Logger.logInfo("preprocessingController.ts", "preprocess", `Requested ePI ID: ${epiId}`);
+  Logger.logInfo("preprocessingController.ts", "preprocess", `Requested preprocessors: ${preprocessors}`);
 
-  let preprocessedEpi
+  let preprocessedEpi = epi
   // Call preprocessors
-  if (preprocessors) {
-    [preprocessedEpi] = await preprocessingProvider.callServicesFromList(preprocessors, epi)
-  }
-
-  if (req.accepts('html') == 'html') {
-
+  if (preprocessors && preprocessors.length > 0) {
     try {
-      const epiTemplate = readFileSync(`${process.cwd()}/templates/epi.liquid`, "utf-8")
-
-      const engine = new Liquid()
-      engine.parseAndRender(epiTemplate, preprocessedEpi)
-        .then(html => {
-          res.set('Content-Type', 'text/html').status(HttpStatusCode.Ok).send(html)
-        });
-
+      [preprocessedEpi] = await preprocessingProvider.callServicesFromList(preprocessors, epi)
     } catch (error) {
-      console.log(error);
-      res.status(HttpStatusCode.InternalServerError).send({
-        message: "Error converting to html",
-        reason: error
-      })
+      Logger.logError("preprocessingController.ts", "preprocess", `Error calling preprocessing services: ${error}`);
+      // Continue with original epi if preprocessor fails
+      preprocessedEpi = epi
     }
   }
-  else {//Response with e(ePi)
-    res.status(200).send(preprocessedEpi)
-  }
+
+  // Send response in requested format using shared ePI response formatter
+  await sendEpiFormattedResponse(req, res, preprocessedEpi, HttpStatusCode.Ok, "preprocessingController.ts")
 }

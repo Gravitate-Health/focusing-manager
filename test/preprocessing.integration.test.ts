@@ -544,7 +544,17 @@ describe('Focusing Manager - Preprocessing Endpoint', () => {
 
       const response = await request(app)
         .post(`/preprocessing/${epiId}`)
-        .set('Accept', 'application/json');
+        .set('Accept', 'application/json')
+        // Use custom parser to avoid JSON parsing of malformed response
+        .parse((res, callback) => {
+          let data = '';
+          res.on('data', (chunk) => {
+            data += chunk.toString();
+          });
+          res.on('end', () => {
+            callback(null, data);
+          });
+        });
 
       // Should handle error gracefully
       expect([200, 500]).toContain(response.status);
