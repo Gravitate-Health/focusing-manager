@@ -226,6 +226,18 @@ export class LensesProvider extends AxiosController {
         // Ensure lensNameMap is populated by querying all selectors
         const lensSelectorList = await this.getLensSelectors()
         
+        // Clean up stale entries - remove lenses from selectors that no longer exist
+        const validSelectors = new Set(lensSelectorList)
+        for (const key of Object.keys(this.lensNameMap)) {
+            const lensInfo = this.lensNameMap[key]
+            if (!validSelectors.has(lensInfo.selectorName)) {
+                Logger.logDebug('lenses.provider.ts', 'getAllAvailableLenses',
+                    `Removing stale lens entry: ${key} (selector ${lensInfo.selectorName} no longer exists)`
+                )
+                delete this.lensNameMap[key]
+            }
+        }
+        
         for (const lensSelectorName of lensSelectorList) {
             try {
                 await this.getLensSelectorAvailableLenses(lensSelectorName)

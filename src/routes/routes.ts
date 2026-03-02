@@ -8,5 +8,6 @@ FocusingManagerRouter.get("/preprocessing", preprocessingController.getPreproces
 FocusingManagerRouter.get("/preprocessing/cache/stats", preprocessingController.getCacheStats);
 FocusingManagerRouter.post("/preprocessing/:epiId", preprocessingController.preprocess);
 FocusingManagerRouter.get("/lenses", lensesController.getLensesNames);
+FocusingManagerRouter.get("/lenses/:lensId", lensesController.getLensById);
 FocusingManagerRouter.post("/focus/:epiId", focusController.focus);
 FocusingManagerRouter.post("/focus", focusController.focus);

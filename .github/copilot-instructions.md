@@ -234,6 +234,16 @@ Response format controlled by `Accept` header (`application/json` or `text/html`
 - `GET /lenses` - List available lenses
   - Returns: `{ lenses: ['lens-id-1', 'lens-id-2'] }`
   - Cache header: `Cache-Control: public, max-age=3600` (1 hour)
+- `GET /lenses/:lensId` - Get a specific lens by ID
+  - Returns: Lens in requested format based on `Accept` header
+  - Formats:
+    - `application/fhir+json` (default): Complete FHIR Library resource as JSON
+    - `application/fhir+xml`: Complete FHIR Library resource as XML
+    - `application/fhir+turtle` or `text/turtle`: Complete FHIR Library resource as Turtle
+    - `text/n3`: Complete FHIR Library resource as N3
+    - `application/javascript` or `text/javascript`: Only the lens JavaScript code (base64 decoded)
+  - Cache header: `Cache-Control: public, max-age=3600` (1 hour)
+  - Errors: 400 (no ID), 404 (not found), 500 (server error)
 - `POST /preprocessing/:epiId` - Execute preprocessing on an ePI
   - Returns: Enhanced ePI in requested format (JSON/HTML)
   - Cache header: `Cache-Control: public, max-age=3600` (1 hour)

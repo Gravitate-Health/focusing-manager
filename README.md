@@ -251,10 +251,27 @@ Monitoring endpoints:
 - `GET /focusing/preprocessing` - List available preprocessing services
 - `GET /focusing/preprocessing/cache/stats` - Get cache statistics (hits, misses, sets, errors)
 - `GET /focusing/lenses` - List available lenses
+- `GET /focusing/lenses/{lensId}` - Get a specific lens by ID
+  - Returns the lens in the format specified by the `Accept` header:
+    - `application/fhir+json` (default): Complete FHIR Library resource as JSON
+    - `application/fhir+xml`: Complete FHIR Library resource as XML
+    - `application/fhir+turtle` or `text/turtle`: Complete FHIR Library resource as Turtle
+    - `text/n3`: Complete FHIR Library resource as N3
+    - `application/javascript` or `text/javascript`: Only the lens JavaScript code (extracted and decoded)
 
 Example:
-```
+```bash
+# Focus an ePI with patient data and specific lenses
 curl 'https://fosps.gravitatehealth.eu/focusing/focus/epi123?patientIdentifier=patient456&personaVectorId=pv789&lenses=lens1,lens2'
+
+# Get a specific lens as FHIR JSON (default)
+curl 'https://fosps.gravitatehealth.eu/focusing/lenses/lens-id-1'
+
+# Get a specific lens as XML
+curl -H 'Accept: application/fhir+xml' 'https://fosps.gravitatehealth.eu/focusing/lenses/lens-id-1'
+
+# Get only the lens JavaScript code
+curl -H 'Accept: application/javascript' 'https://fosps.gravitatehealth.eu/focusing/lenses/lens-id-1'
 ```
 Getting help
 ------------

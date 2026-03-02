@@ -214,4 +214,115 @@ describe('Focusing Manager - Lenses Endpoint', () => {
       expect([200]).toContain(response.status);
     });
   });
+
+  describe('GET /lenses/:lensId', () => {
+    test('should return lens in JSON format by default', async () => {
+      // Mock lens discovery
+      nock('http://mock-lens-service.test')
+        .get('/lenses')
+        .reply(200, { lenses: [pregnancyLens.id] });
+
+      // Mock individual lens fetch
+      nock('http://mock-lens-service.test')
+        .get(`/lenses/${pregnancyLens.id}`)
+        .reply(200, pregnancyLens);
+
+      const response = await request(app)
+        .get(`/lenses/${pregnancyLens.id}`)
+        .set('Accept', 'application/fhir+json');
+
+      expect(response.status).toBe(200);
+      expect(response.type).toMatch(/json/);
+      const parsed = typeof response.body === 'string' ? JSON.parse(response.body) : response.body;
+      expect(parsed.resourceType).toBe('Library');
+      expect(parsed.id).toBe(pregnancyLens.id);
+    });
+
+    test('should return lens in XML format when requested', async () => {
+      nock('http://mock-lens-service.test')
+        .get('/lenses')
+        .reply(200, { lenses: [pregnancyLens.id] });
+
+      nock('http://mock-lens-service.test')
+        .get(`/lenses/${pregnancyLens.id}`)
+        .reply(200, pregnancyLens);
+
+      const response = await request(app)
+        .get(`/lenses/${pregnancyLens.id}`)
+        .set('Accept', 'application/fhir+xml');
+
+      expect(response.status).toBe(200);
+      expect(response.type).toMatch(/xml/);
+      expect(response.text).toContain('<?xml');
+      expect(response.text).toContain('<Library');
+    });
+
+    test('should return lens code in JavaScript format when requested', async () => {
+      nock('http://mock-lens-service.test')
+        .get('/lenses')
+        .reply(200, { lenses: [pregnancyLens.id] });
+
+      nock('http://mock-lens-service.test')
+        .get(`/lenses/${pregnancyLens.id}`)
+        .reply(200, pregnancyLens);
+
+      const response = await request(app)
+        .get(`/lenses/${pregnancyLens.id}`)
+        .set('Accept', 'application/javascript');
+
+      expect(response.status).toBe(200);
+      expect(response.type).toMatch(/javascript/);
+      // The response should be JavaScript code (decoded from base64)
+      expect(response.text).toBeTruthy();
+      // Check for JavaScript code patterns
+      expect(response.text.length).toBeGreaterThan(0);
+    });
+
+    test('should return 404 for non-existent lens', async () => {
+      nock('http://mock-lens-service.test')
+        .get('/lenses')
+        .reply(200, { lenses: [pregnancyLens.id] });
+
+      const response = await request(app)
+        .get('/lenses/non-existent-lens')
+        .set('Accept', 'application/json');
+
+      expect(response.status).toBe(404);
+      expect(response.body.error).toBeTruthy();
+    });
+
+    test('should return 404 when lens fetch fails', async () => {
+      nock('http://mock-lens-service.test')
+        .get('/lenses')
+        .reply(200, { lenses: [pregnancyLens.id] });
+
+      nock('http://mock-lens-service.test')
+        .get(`/lenses/${pregnancyLens.id}`)
+        .reply(404, { error: 'Lens not found' });
+
+      const response = await request(app)
+        .get(`/lenses/${pregnancyLens.id}`)
+        .set('Accept', 'application/json');
+
+      expect(response.status).toBe(404);
+      expect(response.body.error).toBeTruthy();
+    });
+
+    test('should handle network errors gracefully', async () => {
+      nock('http://mock-lens-service.test')
+        .get('/lenses')
+        .reply(200, { lenses: [pregnancyLens.id] });
+
+      nock('http://mock-lens-service.test')
+        .get(`/lenses/${pregnancyLens.id}`)
+        .replyWithError('Network error');
+
+      const response = await request(app)
+        .get(`/lenses/${pregnancyLens.id}`)
+        .set('Accept', 'application/json');
+
+      expect(response.status).toBe(404);
+      expect(response.body.error).toBeTruthy();
+    });
+  });
 });
