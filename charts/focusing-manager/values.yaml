@@ -1,0 +1,286 @@
+# Copyright 2022 Universidad Politécnica de Madrid
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+## Focusing Manager Helm Chart Values
+## This file contains the default configuration for the Gravitate-Health Focusing Manager service.
+
+## Number of replicas for the Focusing Manager deployment
+replicaCount: 1
+
+## Container image configuration
+image:
+  ## Image repository
+  repository: ghcr.io/gravitate-health/focusing-manager
+  ## Image pull policy
+  pullPolicy: Always
+  ## Overrides the image tag whose default is the chart appVersion
+  tag: "v1.40.0"
+
+## Image pull secrets for private registries
+imagePullSecrets:
+  - name: image-pull-secret
+
+## Override chart name
+nameOverride: ""
+## Override full release name
+fullnameOverride: ""
+
+## Service account configuration
+serviceAccount:
+  ## Specifies whether a service account should be created
+  create: true
+  ## Annotations to add to the service account
+  annotations: {}
+  ## The name of the service account to use.
+  ## If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+## RBAC configuration
+rbac:
+  ## Specifies whether RBAC resources should be created
+  create: true
+
+## Pod annotations
+podAnnotations: {}
+
+## Pod security context
+podSecurityContext: {}
+  # fsGroup: 2000
+
+## Security context for the container
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+## Service configuration
+service:
+  ## Service type
+  type: ClusterIP
+  ## Service port
+  port: 3000
+  ## Node port (only used if service.type is NodePort)
+  nodePort: null
+  ## Service annotations
+  annotations: {}
+
+## Application configuration (environment variables)
+## These values are injected into the ConfigMap
+config:
+  ## Server port (internal container port)
+  serverPort: 3000
+  
+  ## Deployment environment (prod, standalone, dev)
+  environment: "prod"
+  
+  ## Label selectors for service discovery
+  preprocessingLabelSelector: "eu.gravitate-health.fosps.preprocessing=true"
+  focusingLabelSelector: "eu.gravitate-health.fosps.focusing=true"
+  
+  ## FHIR server URLs
+  fhirIpsUrl: "http://fhir-server-ips:8080/ips/api/fhir"
+  fhirEpiUrl: "http://fhir-server-epi:8080/epi/api/fhir"
+  personaVectorUrl: "http://fhir-server-epi:8080/epi/api/fhir"
+  
+  ## Timeout settings (in milliseconds)
+  preprocessingTimeout: "20000"
+  lensExecutionTimeout: "1000"
+  
+  ## Logging configuration
+  leeLogLevel: "INFO"
+  leeLoggingEnabled: "true"
+  lensLoggingEnabled: "true"
+  
+  ## Preprocessing cache configuration
+  ## Options: "memory", "redis", or "memory<redis" (composite with memory L1, redis L2)
+  preprocessingCacheBackend: "memory<redis"
+  preprocessingCacheTtlMs: "1200000"  # 20 minutes
+  preprocessingCacheMaxItems: "1000"
+  preprocessingCacheCompress: ""  # Set to "true" to enable compression
+
+## Additional environment variables (optional)
+## Add any extra environment variables here
+extraEnvVars: []
+  # - name: CUSTOM_VAR
+  #   value: "custom-value"
+
+## Liveness probe configuration
+livenessProbe:
+  enabled: false
+  path: /focusing/lenses
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+## Readiness probe configuration
+readinessProbe:
+  enabled: false
+  path: /focusing/lenses
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+## Resource limits and requests
+resources: {}
+  # limits:
+  #   cpu: 500m
+  #   memory: 512Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+## Node selector for pod assignment
+nodeSelector: {}
+
+## Tolerations for pod assignment
+tolerations: []
+
+## Affinity for pod assignment
+affinity: {}
+
+## Horizontal Pod Autoscaler (HPA) configuration
+## WARNING: When autoscaling is enabled with multiple replicas, you should use
+## a distributed cache backend (redis or memory<redis) instead of memory-only cache
+## to avoid cache fragmentation and inconsistent responses across pods.
+autoscaling:
+  ## Enable horizontal pod autoscaling
+  enabled: false
+  ## Minimum number of replicas
+  minReplicas: 1
+  ## Maximum number of replicas
+  maxReplicas: 10
+  ## Target CPU utilization percentage (set to null to disable CPU-based scaling)
+  targetCPUUtilizationPercentage: 80
+  ## Target memory utilization percentage (set to null to disable memory-based scaling)
+  targetMemoryUtilizationPercentage: null
+  ## Custom scaling behavior (optional)
+  behavior: {}
+    # scaleDown:
+    #   stabilizationWindowSeconds: 300
+    #   policies:
+    #   - type: Percent
+    #     value: 50
+    #     periodSeconds: 15
+    # scaleUp:
+    #   stabilizationWindowSeconds: 0
+    #   policies:
+    #   - type: Percent
+    #     value: 100
+    #     periodSeconds: 15
+    #   - type: Pods
+    #     value: 2
+    #     periodSeconds: 15
+    #   selectPolicy: Max
+
+## Networking configuration
+## This section controls how the service is exposed externally
+networking:
+  ## Type of networking: "istio", "ingress", or "none"
+  ## - istio: Uses Istio VirtualService (recommended for service mesh environments)
+  ## - ingress: Uses standard Kubernetes Ingress
+  ## - none: No external networking (ClusterIP only)
+  type: "istio"
+  
+  ## Istio VirtualService configuration (used when networking.type is "istio")
+  istio:
+    ## Hosts that the VirtualService applies to
+    hosts:
+      - "*"
+    
+    ## Gateways to attach the VirtualService to
+    gateways:
+      - gh-gateway
+    
+    ## Path prefix for routing
+    pathPrefix: "/focusing/"
+    
+    ## URI rewrite configuration
+    rewrite:
+      enabled: true
+      uri: "/"
+    
+    ## CORS policy configuration
+    corsPolicy:
+      enabled: true
+      allowMethods:
+        - GET
+        - POST
+        - OPTIONS
+      allowOrigins:
+        - exact: "*"
+      allowHeaders:
+        - "content-type"
+        - "Accept"
+  
+  ## Kubernetes Ingress configuration (used when networking.type is "ingress")
+  ingress:
+    ## Ingress class name
+    className: ""
+    
+    ## Ingress annotations
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # cert-manager.io/cluster-issuer: letsencrypt-prod
+      # nginx.ingress.kubernetes.io/rewrite-target: /
+    
+    ## Ingress hosts configuration
+    hosts:
+      - host: focusing-manager.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+    
+    ## TLS configuration
+    tls: []
+      # - secretName: focusing-manager-tls
+      #   hosts:
+      #     - focusing-manager.example.com
+
+## Redis cache configuration
+## Redis is optional and provides distributed caching for preprocessing results
+redis:
+  ## Enable Redis deployment
+  enabled: true
+  
+  ## Number of Redis replicas
+  replicaCount: 1
+  
+  ## Redis image configuration
+  image:
+    repository: redis
+    tag: "7-alpine"
+    pullPolicy: IfNotPresent
+  
+  ## Redis resource limits and requests
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  
+  ## Redis persistence configuration
+  persistence:
+    ## Enable persistent storage for Redis
+    enabled: false
+    ## Storage class (leave empty for default)
+    storageClass: ""
+    ## Storage size
+    size: "1Gi"

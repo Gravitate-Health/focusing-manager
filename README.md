@@ -149,6 +149,158 @@ And try querying the focusing manager:
 curl --location 'https://fosps.gravitatehealth.eu/focusing'
 ```
 
+### Helm Chart Deployment
+
+The Focusing Manager can be deployed using Helm charts, which provide a more flexible and maintainable approach to Kubernetes deployments.
+
+#### Deploy via Helm (OCI)
+
+**No repository cloning needed!** Deploy directly from GitHub Container Registry:
+
+```bash
+# Login to registry (if private)
+helm registry login ghcr.io -u <your-github-username>
+
+# Install using OCI artifact
+helm install focusing-manager oci://ghcr.io/gravitate-health/charts/focusing-manager --version 0.1.0
+
+# Or with custom values
+helm install focusing-manager oci://ghcr.io/gravitate-health/charts/focusing-manager \
+  --version 0.1.0 \
+  --set image.tag=v1.40.0 \
+  --set config.fhirEpiUrl=http://my-fhir-server:8080/fhir
+
+# Upgrade an existing release
+helm upgrade focusing-manager oci://ghcr.io/gravitate-health/charts/focusing-manager \
+  --version 0.1.0 \
+  --reuse-values
+
+# Uninstall
+helm uninstall focusing-manager
+```
+
+#### Deploy from Local Chart
+
+If you've cloned the repository:
+
+```bash
+# Install from local chart directory
+helm install focusing-manager ./charts/focusing-manager
+
+# With custom values file
+helm install focusing-manager ./charts/focusing-manager -f my-values.yaml
+```
+
+#### Configuration
+
+The Helm chart supports extensive configuration through `values.yaml`. Key configuration options:
+
+**Networking Type (Istio vs Ingress):**
+
+The chart supports both Istio and standard Kubernetes Ingress. Configure via `networking.type`:
+
+```yaml
+# For Istio environments (default)
+networking:
+  type: "istio"
+  istio:
+    hosts:
+      - "*"
+    gateways:
+      - gh-gateway
+    pathPrefix: "/focusing/"
+
+# For standard Kubernetes Ingress
+networking:
+  type: "ingress"
+  ingress:
+    className: "nginx"
+    hosts:
+      - host: focusing-manager.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: focusing-manager-tls
+        hosts:
+          - focusing-manager.example.com
+
+# For no external networking (ClusterIP only)
+networking:
+  type: "none"
+```
+
+**Redis Cache (Optional):**
+
+```yaml
+# Enable Redis for distributed caching
+redis:
+  enabled: true
+  replicaCount: 1
+  persistence:
+    enabled: true
+    size: "1Gi"
+
+# Update cache backend to use Redis
+config:
+  preprocessingCacheBackend: "memory<redis"  # Two-level cache
+```
+
+**Resource Limits:**
+
+```yaml
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+```
+
+**Horizontal Pod Autoscaling:**
+
+```yaml
+# Enable autoscaling based on CPU/memory utilization
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# ⚠️ Important: When using autoscaling, enable Redis for distributed caching
+redis:
+  enabled: true
+config:
+  preprocessingCacheBackend: "memory<redis"
+```
+
+**Note:** When autoscaling is enabled, the chart automatically disables the static `replicaCount` value. The HPA will manage replica count dynamically based on resource utilization.
+
+**Complete values reference:** See [charts/focusing-manager/values.yaml](charts/focusing-manager/values.yaml) for all available options.
+
+#### Local Development with Helm
+
+Validate and test the chart locally:
+
+```bash
+# Lint the chart
+helm lint ./charts/focusing-manager
+
+# Dry-run to see generated manifests
+helm install focusing-manager ./charts/focusing-manager --dry-run --debug
+
+# Template the chart (useful for CI/CD pipelines)
+helm template focusing-manager ./charts/focusing-manager > manifests.yaml
+
+# Template with custom values
+helm template focusing-manager ./charts/focusing-manager -f my-values.yaml
+
+# Show computed values
+helm show values ./charts/focusing-manager
+```
+
 ## Development
 
 The service can be executed listening for changes under the `src` directory with:

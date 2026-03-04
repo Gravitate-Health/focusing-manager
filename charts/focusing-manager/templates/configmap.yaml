@@ -1,0 +1,42 @@
+{{/*
+Copyright 2022 Universidad Politécnica de Madrid
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "focusing-manager.fullname" . }}-config
+  labels:
+    {{- include "focusing-manager.labels" . | nindent 4 }}
+data:
+  ENVIRONMENT: {{ .Values.config.environment | quote }}
+  PREPROCESSING_LABEL_SELECTOR: {{ .Values.config.preprocessingLabelSelector | quote }}
+  FOCUSING_LABEL_SELECTOR: {{ .Values.config.focusingLabelSelector | quote }}
+  FHIR_IPS_URL: {{ .Values.config.fhirIpsUrl | quote }}
+  FHIR_EPI_URL: {{ .Values.config.fhirEpiUrl | quote }}
+  PERSONA_VECTOR_URL: {{ .Values.config.personaVectorUrl | quote }}
+  PREPROCESSING_TIMEOUT: {{ .Values.config.preprocessingTimeout | quote }}
+  LENS_EXECUTION_TIMEOUT: {{ .Values.config.lensExecutionTimeout | quote }}
+  LEE_LOG_LEVEL: {{ .Values.config.leeLogLevel | quote }}
+  LEE_LOGGING_ENABLED: {{ .Values.config.leeLoggingEnabled | quote }}
+  LENS_LOGGING_ENABLED: {{ .Values.config.lensLoggingEnabled | quote }}
+  PREPROCESSING_CACHE_BACKEND: {{ .Values.config.preprocessingCacheBackend | quote }}
+  PREPROCESSING_CACHE_TTL_MS: {{ .Values.config.preprocessingCacheTtlMs | quote }}
+  PREPROCESSING_CACHE_MAX_ITEMS: {{ .Values.config.preprocessingCacheMaxItems | quote }}
+  {{- if .Values.redis.enabled }}
+  PREPROCESSING_CACHE_REDIS_URL: "redis://{{ include "focusing-manager.redis.fullname" . }}:6379"
+  {{- end }}
+  {{- if .Values.config.preprocessingCacheCompress }}
+  PREPROCESSING_CACHE_COMPRESS: {{ .Values.config.preprocessingCacheCompress | quote }}
+  {{- end }}

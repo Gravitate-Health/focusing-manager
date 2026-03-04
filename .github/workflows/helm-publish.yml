@@ -1,0 +1,21 @@
+name: Publish Helm Chart
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+
+jobs:
+  publish-helm:
+    uses: Gravitate-Health/reusable-workflows/.github/workflows/helm-publish.yml@main
+    secrets: inherit  # Pass secrets from calling workflow
+    permissions:
+      contents: read
+      packages: write
+    # with:
+    #   # Path to your Chart.yaml directory (default to  'charts/${{ github.event.repository.name }}')
+    #   chart_path: charts/my-service
+    #   # Optional: namespace in GHCR (defaults to 'charts')
+    #   registry_namespace: charts
