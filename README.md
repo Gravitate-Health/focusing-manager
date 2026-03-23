@@ -162,17 +162,17 @@ The Focusing Manager can be deployed using Helm charts, which provide a more fle
 helm registry login ghcr.io -u <your-github-username>
 
 # Install using OCI artifact
-helm install focusing-manager oci://ghcr.io/gravitate-health/charts/focusing-manager --version 0.1.0
+helm install focusing-manager oci://ghcr.io/gravitate-health/charts/focusing-manager --version 0.1.1
 
 # Or with custom values
 helm install focusing-manager oci://ghcr.io/gravitate-health/charts/focusing-manager \
-  --version 0.1.0 \
-  --set image.tag=v1.40.0 \
+  --version 0.1.1 \
+  --set image.tag=v1.40.1 \
   --set config.fhirEpiUrl=http://my-fhir-server:8080/fhir
 
 # Upgrade an existing release
 helm upgrade focusing-manager oci://ghcr.io/gravitate-health/charts/focusing-manager \
-  --version 0.1.0 \
+  --version 0.1.1 \
   --reuse-values
 
 # Uninstall

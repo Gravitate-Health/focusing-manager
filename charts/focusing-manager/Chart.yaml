@@ -16,8 +16,8 @@ apiVersion: v2
 name: focusing-manager
 description: A Helm chart for deploying the Gravitate-Health Focusing Manager service
 type: application
-version: 0.1.0
-appVersion: "1.40.0"
+version: 0.1.1
+appVersion: "1.40.1"
 keywords:
   - gravitate-health
   - focusing

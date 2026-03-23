@@ -1,6 +1,6 @@
 {
   "name": "focusing-manager",
-  "version": "1.40.0",
+  "version": "1.40.1",
   "description": "Gravitate-Health Focusing Manager",
   "main": "build/index.js",
   "scripts": {
@@ -51,8 +51,8 @@
     "fs": "^0.0.1-security",
     "jsdom": "^22.1.0",
     "json2xml": "^0.1.3",
-    "liquidjs": "^10.7.1",
-    "multer": "^2.0.2",
+    "liquidjs": "^10.25.0",
+    "multer": "^2.0.4",
     "n3": "^2.0.1",
     "redis": "^4.7.1"
   }
