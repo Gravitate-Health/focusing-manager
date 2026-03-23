@@ -424,10 +424,7 @@ Follow this comprehensive checklist when preparing a new release:
    npm test
    ```
    
-   ✅ **All 79 tests must pass** before release:
-   - 36 focus integration tests (including 10 edge cases)
-   - 19 preprocessing tests (including cache functionality)
-   - 24 lenses tests (including error scenarios)
+   ✅ **All tests must pass** before release
    
    If tests fail:
    - Review test output for specific failures
@@ -476,7 +473,13 @@ If all pre-release checks pass:
    - Create a git commit with message "v{version}"
    - Create a git tag "v{version}"
 
-9. **Push to repository**
+9. **Update versions in Kubernetes manifests and chart** 
+   
+   If there are changes to environment variables, resource limits, or other deployment-related configurations, update the Kubernetes manifests in `kubernetes/base/` and in the chart templates and specifications in `charts` accordingly. Ensure any new environment variables are added to the Deployment manifest.
+   
+   Update the image tag in the Deployment manifest and chart templates/default values to point to the new version that will be released (e.g., `ghcr.io/gravitate-health/focusing-manager:{version}`).
+
+10. **Push to repository**
    ```bash
    git push && git push --tags
    ```
@@ -485,7 +488,7 @@ If all pre-release checks pass:
 
 ### Automated Post-Release
 
-10. **Docker image publishing**
+11. **Docker image publishing**
    
    **Automatic**: GitHub Actions workflow will detect the new tag and automatically:
    - Build the Docker image
