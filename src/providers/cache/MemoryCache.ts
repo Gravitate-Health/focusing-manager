@@ -70,8 +70,13 @@ export class MemoryCache implements IPreprocessingCache {
                             `Cache PARTIAL HIT: ${i}/${steps.length} steps matched`);
                     }
 
+                    // Return a deep clone so that mutations performed by the
+                    // caller (e.g. lens execution adding extensions) do NOT
+                    // corrupt the cached entry.  Without this, the first lens
+                    // run would modify the cached object in place and every
+                    // subsequent cache hit would return an already-enhanced ePI.
                     return {
-                        value: entry.value,
+                        value: JSON.parse(JSON.stringify(entry.value)),
                         matchedSteps: i
                     };
                 }

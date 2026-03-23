@@ -3,6 +3,26 @@ import { PipelineStep } from './IPreprocessingCache';
 import { Logger } from '../../utils/Logger';
 
 /**
+ * Recursively sort object keys for a deterministic JSON representation.
+ * Arrays are preserved in their original order; only object key ordering is
+ * normalised so that the same logical document always produces the same string
+ * regardless of the key-insertion order used by the JSON parser.
+ */
+function sortObjectKeysRecursively(obj: any): any {
+    if (Array.isArray(obj)) {
+        return obj.map(sortObjectKeysRecursively);
+    }
+    if (obj !== null && typeof obj === 'object') {
+        const sorted: any = {};
+        Object.keys(obj).sort().forEach(key => {
+            sorted[key] = sortObjectKeysRecursively(obj[key]);
+        });
+        return sorted;
+    }
+    return obj;
+}
+
+/**
  * Generate a deterministic hash for an ePI document
  * Uses the Composition.section content as the canonical representation
  */
@@ -24,8 +44,15 @@ export function generateEpiKey(epi: any): string {
         // Extract sections for hashing (these contain the content to be preprocessed)
         const sections = composition.section || [];
         
-        // Create deterministic JSON string (sorted keys, no whitespace)
-        const canonical = JSON.stringify(sections, Object.keys(sections).sort());
+        // Create deterministic JSON string with recursively sorted keys.
+        // NOTE: JSON.stringify(sections, Object.keys(sections).sort()) was the
+        // previous implementation but it is incorrect: Object.keys() on an array
+        // returns index strings ("0","1",...) which, when used as the replacer
+        // whitelist, filter OUT all real section properties ("title","text",…)
+        // because none of them are named "0" or "1". Every section therefore
+        // serialised as {} and all ePIs with the same section count produced the
+        // same hash, causing unrelated ePIs to share a cache entry.
+        const canonical = JSON.stringify(sortObjectKeysRecursively(sections));
         
         // Generate SHA-256 hash
         const hash = createHash('sha256').update(canonical).digest('hex');
