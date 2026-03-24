@@ -1,6 +1,6 @@
 {
   "name": "focusing-manager",
-  "version": "1.41.2",
+  "version": "1.41.3",
   "description": "Gravitate-Health Focusing Manager",
   "main": "build/index.js",
   "scripts": {
@@ -43,7 +43,7 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@gravitate-health/lens-execution-environment": "^1.4.0",
+    "@gravitate-health/lens-execution-environment": "^1.5.0",
     "@kubernetes/client-node": "^1.4.0",
     "axios": "^1.3.5",
     "dotenv": "^16.0.3",
