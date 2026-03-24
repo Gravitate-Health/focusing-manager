@@ -167,7 +167,7 @@ helm install focusing-manager oci://ghcr.io/gravitate-health/charts/focusing-man
 # Or with custom values
 helm install focusing-manager oci://ghcr.io/gravitate-health/charts/focusing-manager \
   --version 0.1.1 \
-  --set image.tag=v1.40.1 \
+  --set image.tag=v1.41.0 \
   --set config.fhirEpiUrl=http://my-fhir-server:8080/fhir
 
 # Upgrade an existing release
