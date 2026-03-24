@@ -8,7 +8,7 @@ import {
   getIpsFixture,
   getPvFixture,
   getLensFixture,
-  
+  getLensIdentifierFromFixture,
   getEpiIdFromFixture,
   getPatientIdFromIpsFixture,
 } from './helpers/mockClients';
@@ -39,6 +39,9 @@ describe('Focusing Manager - Focus Endpoint', () => {
     pregnancyLens = getLensFixture('pregnancy');
     conditionsLens = getLensFixture('conditions');
     stampLens = getLensFixture('stamp');
+    pregnancyLens.id = getLensIdentifierFromFixture(pregnancyLens);
+    conditionsLens.id = getLensIdentifierFromFixture(conditionsLens);
+    stampLens.id = getLensIdentifierFromFixture(stampLens);
     
     // Extract IDs from fixtures
     epiId = getEpiIdFromFixture(epiFixtureJson);
@@ -395,7 +398,7 @@ describe('Focusing Manager - Focus Endpoint', () => {
         // Call the actual API endpoint with lens filter
         const response = await request(app)
           .post('/focus')
-          .query({ lenses: 'pregnancy' }) // Client filters to specific lens
+          .query({ lenses: pregnancyLens.id })
           .send({
             epi: epiFixtureJson,
             ips: ipsFixture
@@ -426,7 +429,7 @@ describe('Focusing Manager - Focus Endpoint', () => {
         // Call the actual API endpoint with multiple lenses
         const response = await request(app)
           .post('/focus')
-          .query({ lenses: 'pregnancy,conditions' })
+          .query({ lenses: `${pregnancyLens.id},${conditionsLens.id}` })
           .send({
             epi: epiFixtureJson,
             ips: ipsFixture

@@ -4,7 +4,7 @@ import { Express } from 'express';
 import {
   MockServiceClient,
   getLensFixture,
-  
+  getLensIdentifierFromFixture,
 } from './helpers/mockClients';
 import { ServiceClientFactory } from '../src/utils/ServiceClientFactory';
 import { createTestApp } from './helpers/testApp';
@@ -13,6 +13,8 @@ describe('Focusing Manager - Lenses Endpoint', () => {
   let app: Express;
   let pregnancyLens: any;
   let conditionsLens: any;
+  let pregnancyLensIdentifier: string;
+  let conditionsLensIdentifier: string;
   let mockServiceClient: MockServiceClient;
 
   beforeAll(() => {
@@ -22,6 +24,8 @@ describe('Focusing Manager - Lenses Endpoint', () => {
     // Load fixtures
     pregnancyLens = getLensFixture('pregnancy');
     conditionsLens = getLensFixture('conditions');
+    pregnancyLensIdentifier = getLensIdentifierFromFixture(pregnancyLens);
+    conditionsLensIdentifier = getLensIdentifierFromFixture(conditionsLens);
     
     // Create mock client
     mockServiceClient = new MockServiceClient();
@@ -57,7 +61,7 @@ describe('Focusing Manager - Lenses Endpoint', () => {
       // Mock lens selector discovery
       nock('http://mock-lens-service.test')
         .get('/lenses')
-        .reply(200, { lenses: [pregnancyLens.id, conditionsLens.id] });
+        .reply(200, { lenses: [pregnancyLensIdentifier, conditionsLensIdentifier] });
 
       const response = await request(app)
         .get('/lenses')
@@ -100,7 +104,7 @@ describe('Focusing Manager - Lenses Endpoint', () => {
       expect([200]).toContain(response.status);
     });
 
-    test('should return unique lens names from multiple selectors', async () => {
+    test('should return unique lens identifiers from multiple selectors', async () => {
       // Create mock with multiple lens services
       const multiLensClient = new MockServiceClient({
         lensUrls: [
@@ -114,11 +118,11 @@ describe('Focusing Manager - Lenses Endpoint', () => {
       // Mock both lens services
       nock('http://mock-lens-service-1.test')
         .get('/lenses')
-        .reply(200, { lenses: [pregnancyLens.id] });
+        .reply(200, { lenses: [pregnancyLensIdentifier] });
       
       nock('http://mock-lens-service-2.test')
         .get('/lenses')
-        .reply(200, { lenses: [conditionsLens.id] });
+        .reply(200, { lenses: [conditionsLensIdentifier] });
 
       const response = await request(app)
         .get('/lenses')
@@ -133,7 +137,7 @@ describe('Focusing Manager - Lenses Endpoint', () => {
       nock('http://mock-lens-service.test')
         .get('/lenses')
         .delayConnection(30000)
-        .reply(200, { lenses: [pregnancyLens.id] });
+        .reply(200, { lenses: [pregnancyLensIdentifier] });
 
       const response = await request(app)
         .get('/lenses')
@@ -149,7 +153,7 @@ describe('Focusing Manager - Lenses Endpoint', () => {
       // Mock lens list
       nock('http://mock-lens-service.test')
         .get('/lenses')
-        .reply(200, { lenses: [pregnancyLens.id] });
+        .reply(200, { lenses: [pregnancyLensIdentifier] });
 
       const listResponse = await request(app)
         .get('/lenses')
@@ -166,10 +170,10 @@ describe('Focusing Manager - Lenses Endpoint', () => {
 
       nock('http://mock-lens-service.test')
         .get('/lenses')
-        .reply(200, { lenses: [invalidLens.id] });
+        .reply(200, { lenses: [getLensIdentifierFromFixture(invalidLens)] });
 
       nock('http://mock-lens-service.test')
-        .get(`/lenses/${invalidLens.id}`)
+        .get(`/lenses/${getLensIdentifierFromFixture(invalidLens)}`)
         .reply(200, { code: '' });
 
       const response = await request(app)
@@ -183,10 +187,10 @@ describe('Focusing Manager - Lenses Endpoint', () => {
     test('should handle lens with invalid base64 encoding', async () => {
       nock('http://mock-lens-service.test')
         .get('/lenses')
-        .reply(200, { lenses: [pregnancyLens.id] });
+        .reply(200, { lenses: [pregnancyLensIdentifier] });
 
       nock('http://mock-lens-service.test')
-        .get(`/lenses/${pregnancyLens.id}`)
+        .get(`/lenses/${pregnancyLensIdentifier}`)
         .reply(200, { code: 'not-valid-base64!' });
 
       const response = await request(app)
@@ -200,10 +204,10 @@ describe('Focusing Manager - Lenses Endpoint', () => {
     test('should handle lens fetch failure for individual lens', async () => {
       nock('http://mock-lens-service.test')
         .get('/lenses')
-        .reply(200, { lenses: [pregnancyLens.id] });
+        .reply(200, { lenses: [pregnancyLensIdentifier] });
 
       nock('http://mock-lens-service.test')
-        .get(`/lenses/${pregnancyLens.id}`)
+        .get(`/lenses/${pregnancyLensIdentifier}`)
         .reply(404, { error: 'Lens not found' });
 
       const response = await request(app)
@@ -220,15 +224,15 @@ describe('Focusing Manager - Lenses Endpoint', () => {
       // Mock lens discovery
       nock('http://mock-lens-service.test')
         .get('/lenses')
-        .reply(200, { lenses: [pregnancyLens.id] });
+        .reply(200, { lenses: [pregnancyLensIdentifier] });
 
       // Mock individual lens fetch
       nock('http://mock-lens-service.test')
-        .get(`/lenses/${pregnancyLens.id}`)
+        .get(`/lenses/${pregnancyLensIdentifier}`)
         .reply(200, pregnancyLens);
 
       const response = await request(app)
-        .get(`/lenses/${pregnancyLens.id}`)
+        .get(`/lenses/${pregnancyLensIdentifier}`)
         .set('Accept', 'application/fhir+json');
 
       expect(response.status).toBe(200);
@@ -241,14 +245,14 @@ describe('Focusing Manager - Lenses Endpoint', () => {
     test('should return lens in XML format when requested', async () => {
       nock('http://mock-lens-service.test')
         .get('/lenses')
-        .reply(200, { lenses: [pregnancyLens.id] });
+        .reply(200, { lenses: [pregnancyLensIdentifier] });
 
       nock('http://mock-lens-service.test')
-        .get(`/lenses/${pregnancyLens.id}`)
+        .get(`/lenses/${pregnancyLensIdentifier}`)
         .reply(200, pregnancyLens);
 
       const response = await request(app)
-        .get(`/lenses/${pregnancyLens.id}`)
+        .get(`/lenses/${pregnancyLensIdentifier}`)
         .set('Accept', 'application/fhir+xml');
 
       expect(response.status).toBe(200);
@@ -260,14 +264,14 @@ describe('Focusing Manager - Lenses Endpoint', () => {
     test('should return lens code in JavaScript format when requested', async () => {
       nock('http://mock-lens-service.test')
         .get('/lenses')
-        .reply(200, { lenses: [pregnancyLens.id] });
+        .reply(200, { lenses: [pregnancyLensIdentifier] });
 
       nock('http://mock-lens-service.test')
-        .get(`/lenses/${pregnancyLens.id}`)
+        .get(`/lenses/${pregnancyLensIdentifier}`)
         .reply(200, pregnancyLens);
 
       const response = await request(app)
-        .get(`/lenses/${pregnancyLens.id}`)
+        .get(`/lenses/${pregnancyLensIdentifier}`)
         .set('Accept', 'application/javascript');
 
       expect(response.status).toBe(200);
@@ -281,7 +285,7 @@ describe('Focusing Manager - Lenses Endpoint', () => {
     test('should return 404 for non-existent lens', async () => {
       nock('http://mock-lens-service.test')
         .get('/lenses')
-        .reply(200, { lenses: [pregnancyLens.id] });
+        .reply(200, { lenses: [pregnancyLensIdentifier] });
 
       const response = await request(app)
         .get('/lenses/non-existent-lens')
@@ -294,14 +298,14 @@ describe('Focusing Manager - Lenses Endpoint', () => {
     test('should return 404 when lens fetch fails', async () => {
       nock('http://mock-lens-service.test')
         .get('/lenses')
-        .reply(200, { lenses: [pregnancyLens.id] });
+        .reply(200, { lenses: [pregnancyLensIdentifier] });
 
       nock('http://mock-lens-service.test')
-        .get(`/lenses/${pregnancyLens.id}`)
+        .get(`/lenses/${pregnancyLensIdentifier}`)
         .reply(404, { error: 'Lens not found' });
 
       const response = await request(app)
-        .get(`/lenses/${pregnancyLens.id}`)
+        .get(`/lenses/${pregnancyLensIdentifier}`)
         .set('Accept', 'application/json');
 
       expect(response.status).toBe(404);
@@ -311,14 +315,14 @@ describe('Focusing Manager - Lenses Endpoint', () => {
     test('should handle network errors gracefully', async () => {
       nock('http://mock-lens-service.test')
         .get('/lenses')
-        .reply(200, { lenses: [pregnancyLens.id] });
+        .reply(200, { lenses: [pregnancyLensIdentifier] });
 
       nock('http://mock-lens-service.test')
-        .get(`/lenses/${pregnancyLens.id}`)
+        .get(`/lenses/${pregnancyLensIdentifier}`)
         .replyWithError('Network error');
 
       const response = await request(app)
-        .get(`/lenses/${pregnancyLens.id}`)
+        .get(`/lenses/${pregnancyLensIdentifier}`)
         .set('Accept', 'application/json');
 
       expect(response.status).toBe(404);

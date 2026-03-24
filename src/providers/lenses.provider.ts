@@ -6,7 +6,7 @@ const FOCUSING_LABEL_SELECTOR = process.env.FOCUSING_LABEL_SELECTOR || "eu.gravi
 
 export class LensesProvider extends AxiosController {
     private lensSelectorMap: Record<string, string> = {}
-    private lensNameMap: Record<string, { selectorName: string, actualLensName: string }> = {}
+    private lensIdentifierMap: Record<string, { selectorName: string, actualLensIdentifier: string }> = {}
     private isRefreshing: boolean = false; // Prevent concurrent refreshes
     private refreshPromise: Promise<Record<string, string>> | null = null; // Share refresh promise
 
@@ -54,41 +54,49 @@ export class LensesProvider extends AxiosController {
         try {
             let response = await this.request.get(url)
 
-            // Refresh lensNameMap for this selector: remove old entries for this selector
+            // Refresh identifier map for this selector: remove old entries for this selector
             try {
-                for (const key of Object.keys(this.lensNameMap)) {
-                    if (this.lensNameMap[key].selectorName === lensSelectorName) {
-                        delete this.lensNameMap[key]
+                for (const key of Object.keys(this.lensIdentifierMap)) {
+                    if (this.lensIdentifierMap[key].selectorName === lensSelectorName) {
+                        delete this.lensIdentifierMap[key]
                     }
                 }
 
                 const lensesList: string[] = response.data?.lenses || []
-                for (const rawLens of lensesList) {
-                    let lens = rawLens
-                    if (lens.endsWith('.js')) {
-                        lens = lens.slice(0, lens.length - 3)
+                for (const rawIdentifier of lensesList) {
+                    let lensIdentifier = rawIdentifier
+                    if (lensIdentifier.endsWith('.js')) {
+                        lensIdentifier = lensIdentifier.slice(0, lensIdentifier.length - 3)
                     }
 
-                    let key = lens
-                    if (!this.lensNameMap[key]) {
-                        this.lensNameMap[key] = { selectorName: lensSelectorName, actualLensName: lens }
-                    } else if (this.lensNameMap[key].selectorName === lensSelectorName) {
-                        // same selector and key already present - overwrite to be safe
-                        this.lensNameMap[key] = { selectorName: lensSelectorName, actualLensName: lens }
-                    } else {
-                        // collision with another selector: create unique key
-                        let newKey = `${lens}`
-                        let count = 2;
-                        // ensure uniqueness (in rare case length key exists)
-                        while (this.lensNameMap[newKey]) {
-                            newKey = `${lens}${count ++}`
+                    let key = lensIdentifier
+                    if (!this.lensIdentifierMap[key]) {
+                        this.lensIdentifierMap[key] = {
+                            selectorName: lensSelectorName,
+                            actualLensIdentifier: lensIdentifier
                         }
-                        this.lensNameMap[newKey] = { selectorName: lensSelectorName, actualLensName: lens }
+                    } else if (this.lensIdentifierMap[key].selectorName === lensSelectorName) {
+                        // same selector and key already present - overwrite to be safe
+                        this.lensIdentifierMap[key] = {
+                            selectorName: lensSelectorName,
+                            actualLensIdentifier: lensIdentifier
+                        }
+                    } else {
+                        // Collision should be rare now that selectors return FHIR identifiers.
+                        let newKey = `${lensIdentifier}`
+                        let count = 2;
+                        while (this.lensIdentifierMap[newKey]) {
+                            newKey = `${lensIdentifier}${count ++}`
+                        }
+                        this.lensIdentifierMap[newKey] = {
+                            selectorName: lensSelectorName,
+                            actualLensIdentifier: lensIdentifier
+                        }
                     }
                 }
             } catch (err) {
                 // Log but don't fail the main response
-                Logger.logError('lenses.provider.ts', 'getLensSelectorAvailableLenses', `Error updating lensNameMap for selector ${lensSelectorName}: ${err}`)
+                Logger.logError('lenses.provider.ts', 'getLensSelectorAvailableLenses', `Error updating lensIdentifierMap for selector ${lensSelectorName}: ${err}`)
             }
 
             return response.data
@@ -173,26 +181,28 @@ export class LensesProvider extends AxiosController {
         return newMap
     }
 
-    // filter lensNameMap with given lenses
+    // Filter the identifier map with the requested lens identifiers.
     parseLenses = async (lensesToParse: string[] | string) => {
         let parsedLenses: any[] = []
         if (typeof lensesToParse === "string") {
-            // Express converts a single item array into a string, so we must convert again into array
-            lensesToParse = [lensesToParse]
+            lensesToParse = lensesToParse
+                .split(",")
+                .map((lensIdentifier) => lensIdentifier.trim())
+                .filter(Boolean)
         } else if (typeof lensesToParse === "undefined") {
             throw new Error("No lenses were selected.")
         }
         
-        // Ensure lensNameMap is populated
+        // Ensure identifier map is populated.
         await this.getAllAvailableLenses()
 
-        // Find lensname in map to provide selector and actual lens name
+        // Find the lens identifier in the map to provide selector and actual identifier.
         lensesToParse.forEach((lensToParse: string) => {
-            let lensInfo = this.lensNameMap[lensToParse]
+            let lensInfo = this.lensIdentifierMap[lensToParse]
             if (lensInfo) {
                 parsedLenses.push({
                     lensSelector: lensInfo.selectorName,
-                    lensName: lensInfo.actualLensName
+                    lensIdentifier: lensInfo.actualLensIdentifier
                 })
             } else {
                 Logger.logWarn('lenses.provider.ts', 'parseLenses', `Lens not found: ${lensToParse}`)
@@ -201,21 +211,21 @@ export class LensesProvider extends AxiosController {
         return parsedLenses
     }
 
-    getCompleteLenses = async (parsedLenses: Array<{ lensSelector: string, lensName: string }>) => {
+    getCompleteLenses = async (parsedLenses: Array<{ lensSelector: string, lensIdentifier: string }>) => {
         const completeLenses: any[] = []
-        const errors: Array<{ lensName: string, error: string }> = []
+        const errors: Array<{ lensIdentifier: string, error: string }> = []
 
         for (const lensObj of parsedLenses) {
             try {
-                const lens = await this.getLensFromSelector(lensObj.lensSelector, lensObj.lensName)
+                const lens = await this.getLensFromSelector(lensObj.lensSelector, lensObj.lensIdentifier)
                 completeLenses.push(lens)
                 Logger.logInfo('lenses.provider.ts', 'getCompleteLenses', 
-                    `Retrieved lens: ${lensObj.lensName} from selector: ${lensObj.lensSelector}`)
+                    `Retrieved lens: ${lensObj.lensIdentifier} from selector: ${lensObj.lensSelector}`)
             } catch (error: any) {
                 const errorMsg = error?.message || String(error)
                 Logger.logError('lenses.provider.ts', 'getCompleteLenses', 
-                    `Failed to retrieve lens: ${lensObj.lensName} from selector: ${lensObj.lensSelector}. Error: ${errorMsg}`)
-                errors.push({ lensName: `${lensObj.lensSelector}/${lensObj.lensName}`, error: errorMsg })
+                    `Failed to retrieve lens: ${lensObj.lensIdentifier} from selector: ${lensObj.lensSelector}. Error: ${errorMsg}`)
+                errors.push({ lensIdentifier: `${lensObj.lensSelector}/${lensObj.lensIdentifier}`, error: errorMsg })
             }
         }
 
@@ -223,18 +233,18 @@ export class LensesProvider extends AxiosController {
     }
 
     getAllAvailableLenses = async (): Promise<string[]> => {
-        // Ensure lensNameMap is populated by querying all selectors
+        // Ensure identifier map is populated by querying all selectors.
         const lensSelectorList = await this.getLensSelectors()
         
         // Clean up stale entries - remove lenses from selectors that no longer exist
         const validSelectors = new Set(lensSelectorList)
-        for (const key of Object.keys(this.lensNameMap)) {
-            const lensInfo = this.lensNameMap[key]
+        for (const key of Object.keys(this.lensIdentifierMap)) {
+            const lensInfo = this.lensIdentifierMap[key]
             if (!validSelectors.has(lensInfo.selectorName)) {
                 Logger.logDebug('lenses.provider.ts', 'getAllAvailableLenses',
                     `Removing stale lens entry: ${key} (selector ${lensInfo.selectorName} no longer exists)`
                 )
-                delete this.lensNameMap[key]
+                delete this.lensIdentifierMap[key]
             }
         }
         
@@ -248,7 +258,6 @@ export class LensesProvider extends AxiosController {
             }
         }
         
-        // Return all lens names (keys from the map)
-        return Object.keys(this.lensNameMap)
+        return Object.keys(this.lensIdentifierMap)
     }
 }

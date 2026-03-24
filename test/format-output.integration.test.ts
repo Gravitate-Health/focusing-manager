@@ -9,6 +9,7 @@ import {
   getIpsFixture,
   getPvFixture,
   getLensFixture,
+  getLensIdentifierFromFixture,
 } from './helpers/mockClients';
 import { ServiceClientFactory } from '../src/utils/ServiceClientFactory';
 import { createTestApp } from './helpers/testApp';
@@ -56,6 +57,7 @@ describe('Focusing Manager - Output Format Feature', () => {
     ipsFixture = getIpsFixture();
     pvFixtureJson = getPvFixture('json');
     pregnancyLens = getLensFixture('pregnancy');
+    pregnancyLens.id = getLensIdentifierFromFixture(pregnancyLens);
   });
 
   beforeEach(() => {

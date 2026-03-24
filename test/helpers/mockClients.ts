@@ -123,6 +123,14 @@ export function getLensFixture(lensName: 'pregnancy' | 'conditions' | 'stamp') {
   return loadFixture(`lenses/${lensName}-lens.json`);
 }
 
+export function getLensIdentifierFromFixture(lensFixture: any): string {
+  const identifier = lensFixture?.identifier?.find(
+    (entry: any) => typeof entry?.value === 'string' && entry.value.trim().length > 0
+  );
+
+  return identifier?.value || lensFixture?.id || 'mock-lens-id';
+}
+
 /**
  * Extract lens code from lens fixture
  */

@@ -84,6 +84,17 @@ const getAllPreprocessorNames = async (): Promise<string[]> => {
     return preprocessors
 }
 
+const normalizeQuerySelection = (value: string[] | string): string[] => {
+    if (typeof value === "string") {
+        return value.split(",").map((item) => item.trim()).filter(Boolean)
+    }
+
+    return value
+        .flatMap((item) => item.split(","))
+        .map((item) => item.trim())
+        .filter(Boolean)
+}
+
 export const focus = async (req: Request, res: Response) => {
     console.log("_________________________________________")
     Logger.logInfo("focusController.ts", "focus", "\n\n\n_____________ POST /focusing/focus ____________");
@@ -217,10 +228,7 @@ const getLensesAndPreprocessors = async (req: Request, res: Response) => {
             lensNames = await lensesProvider.getAllAvailableLenses();
         }
 
-        // Normalize to array (Express converts single-item arrays to strings)
-        if (typeof lensNames === "string") {
-            lensNames = [lensNames];
-        }
+        lensNames = normalizeQuerySelection(lensNames)
 
         // Parse lenses using provider to get selector info
         const parsedLenses = await lensesProvider.parseLenses(lensNames);
@@ -228,11 +236,7 @@ const getLensesAndPreprocessors = async (req: Request, res: Response) => {
         // Get preprocessor names from query or all available
         let preprocessors: string[];
         if (req.query.preprocessors) {
-            preprocessors = req.query.preprocessors as string[];
-            // Normalize to array (Express converts single-item arrays to strings)
-            if (typeof preprocessors === "string") {
-                preprocessors = [preprocessors];
-            }
+            preprocessors = normalizeQuerySelection(req.query.preprocessors as string[] | string);
         } else {
             preprocessors = await getAllPreprocessorNames();
         }
