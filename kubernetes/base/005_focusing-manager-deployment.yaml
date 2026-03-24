@@ -30,7 +30,7 @@ spec:
       serviceAccountName: focusing-manager-serviceaccount
       containers:
       - name: focusing-manager
-        image: ghcr.io/gravitate-health/focusing-manager:v1.41.1
+        image: ghcr.io/gravitate-health/focusing-manager:v1.41.2
         imagePullPolicy: Always
         env:
         - name: ENVIRONMENT
