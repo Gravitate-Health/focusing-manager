@@ -3,6 +3,7 @@ import { ServiceClientFactory } from '../utils/ServiceClientFactory';
 import { Logger } from "../utils/Logger";
 
 const FOCUSING_LABEL_SELECTOR = process.env.FOCUSING_LABEL_SELECTOR || "eu.gravitate-health.fosps.focusing=True";
+const LENSES_EXTERNAL_ENDPOINTS = process.env.LENSES_EXTERNAL_ENDPOINTS || ""; // Comma-separated list of lens selector base URLs
 
 export class LensesProvider extends AxiosController {
     private lensSelectorMap: Record<string, string> = {}
@@ -160,22 +161,46 @@ export class LensesProvider extends AxiosController {
         }
     }
 
-    private _performRefresh = async (): Promise<Record<string, string>> => {
-        const services = await (await ServiceClientFactory.getClient()).getServiceBaseUrlsByLabel(FOCUSING_LABEL_SELECTOR)
-        const newMap: Record<string, string> = {}
-        if (services && services instanceof Array) {
-            services.forEach((s: string) => {
-                try {
-                    const parsed = new URL(s)
-                    const domain = parsed.hostname
-                    newMap[domain] = s
-                } catch (err) {
-                    // fallback: strip protocol and path
-                    const domain = (s || '').replace(/(^\w+:|^)\/\//, '').split('/')[0]
-                    newMap[domain] = s
-                }
-            })
+    private parseExternalEndpoints = (): string[] => {
+        if (!LENSES_EXTERNAL_ENDPOINTS || LENSES_EXTERNAL_ENDPOINTS.trim() === "") {
+            return [];
         }
+
+        const endpoints = LENSES_EXTERNAL_ENDPOINTS.split(',')
+            .map(url => url.trim())
+            .filter(url => url.length > 0);
+
+        Logger.logDebug("lenses.provider.ts", "parseExternalEndpoints",
+            `Found ${endpoints.length} external lens endpoint(s) in ENV`);
+
+        return endpoints;
+    }
+
+    private _performRefresh = async (): Promise<Record<string, string>> => {
+        // Get discovered services
+        const discoveredServices = await (await ServiceClientFactory.getClient()).getServiceBaseUrlsByLabel(FOCUSING_LABEL_SELECTOR)
+
+        // Get external endpoints from ENV
+        const externalServices = this.parseExternalEndpoints();
+
+        // Combine both sources
+        const allServices = [...discoveredServices, ...externalServices];
+
+        Logger.logDebug("lenses.provider.ts", "_performRefresh",
+            `Total lens selectors: ${allServices.length} (${discoveredServices.length} discovered, ${externalServices.length} external)`);
+
+        const newMap: Record<string, string> = {}
+        allServices.forEach((s: string) => {
+            try {
+                const parsed = new URL(s)
+                const domain = parsed.hostname
+                newMap[domain] = s
+            } catch (err) {
+                // fallback: strip protocol and path
+                const domain = (s || '').replace(/(^\w+:|^)\/\//, '').split('/')[0]
+                newMap[domain] = s
+            }
+        })
         // Atomic replacement of the selector map
         this.lensSelectorMap = newMap
         return newMap

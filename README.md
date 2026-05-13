@@ -45,12 +45,21 @@ These URLs *may* point to the same FHIR server.
 
 **2. Service Discovery**
 
-- `ENVIRONMENT`: Deployment environment (`production` for kubernetes or `standalone` for Docker)
+- `ENVIRONMENT`: Deployment environment
+    - `production`: Kubernetes cluster (in-cluster service account)
+    - `standalone`: Docker (discovers services via Docker API)
+    - `none`: No infrastructure — service discovery disabled. Use with `PREPROCESSING_EXTERNAL_ENDPOINTS` and `LENSES_EXTERNAL_ENDPOINTS` to configure services statically (e.g. bare-metal VM or local Node.js)
+    - `dev`: Kubernetes cluster from outside the cluster (requires additional kubeconfig env vars)
 - `FOCUSING_LABEL_SELECTOR`: The focusing label selector. Kubernetes cluster (or Docker) will filter the services with this label selector. (defaults to `eu.gravitate-health.fosps.focusing=True`)
 - `PREPROCESSING_LABEL_SELECTOR`: The preprocessing label selector. Kubernetes cluster (or Docker) will filter the services with this label selector. (defaults to `eu.gravitate-health.fosps.preprocessing=True`)
 - `PREPROCESSING_EXTERNAL_ENDPOINTS`: *Optional* comma-separated list of *external* preprocessing service base URLs
     - Example: `http://preprocessor1.example.com:8080,http://preprocessor2.example.com:9090`
     - Note: Do not include the `/preprocess` path
+    - Combined with any services discovered via `ENVIRONMENT` (additive)
+- `LENSES_EXTERNAL_ENDPOINTS`: *Optional* comma-separated list of *external* lens selector service base URLs
+    - Example: `http://lens-selector.example.com:9000,http://lens-selector2.example.com:9001`
+    - Required when `ENVIRONMENT=none` and lens services must be available
+    - Combined with any services discovered via `ENVIRONMENT` (additive)
 - `PREPROCESSING_TIMEOUT`: *Optional* timeout in milliseconds for preprocessing service calls (defaults to `20000` - 20 seconds)
     - Example: `30000` for 30 seconds
     - Preprocessing services can take significant time to process ePIs with semantic annotations
