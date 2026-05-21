@@ -241,9 +241,9 @@ networking:
     
     ## Ingress hosts configuration
     hosts:
-      - host: focusing-manager.example.com
+      - host: ""
         paths:
-          - path: /
+          - path: /focusing/
             pathType: Prefix
     
     ## TLS configuration
