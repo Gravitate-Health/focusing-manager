@@ -227,7 +227,7 @@ networking:
     hosts:
       - host: focusing-manager.example.com
         paths:
-          - path: /
+          - path: /focusing/
             pathType: Prefix
     tls:
       - secretName: focusing-manager-tls

@@ -6,8 +6,37 @@ import multer from "multer";
 import { FocusingManagerRouter } from "./routes/routes";
 
 const PORT = parseInt(process.env.SERVER_PORT as string) || 3000;
+const BASE_PATH = normalizeBasePath(process.env.BASE_PATH || "");
 
 const app = express();
+
+function normalizeBasePath(basePath: string): string {
+  const trimmedPath = basePath.trim();
+
+  if (!trimmedPath || trimmedPath === "/") {
+    return "";
+  }
+
+  const prefixedPath = trimmedPath.startsWith("/") ? trimmedPath : `/${trimmedPath}`;
+  return prefixedPath.endsWith("/") ? prefixedPath.slice(0, -1) : prefixedPath;
+}
+
+function shouldStripBasePath(url: string, basePath: string): boolean {
+  if (!basePath || !url.startsWith(basePath)) {
+    return false;
+  }
+
+  return url.length === basePath.length || url.charAt(basePath.length) === "/";
+}
+
+// Strip external base path prefix before middleware/route matching.
+app.use((req, _res, next) => {
+  if (shouldStripBasePath(req.url, BASE_PATH)) {
+    req.url = req.url.slice(BASE_PATH.length) || "/";
+  }
+
+  next();
+});
 
 // Configure multer for in-memory storage (multipart/form-data support)
 const upload = multer({ 
