@@ -20,9 +20,9 @@ metadata:
   labels:
     {{- include "focusing-manager.labels" . | nindent 4 }}
 data:
-{{- if eq .Values.networking.type "ingress" -}}
+  {{- if eq .Values.networking.type "ingress" }}
   BASE_PATH: {{ (index (index .Values.networking.ingress.hosts 0).paths 0).path | quote }}
-{{- end }}
+  {{- end }}
   ENVIRONMENT: {{ .Values.config.environment | quote }}
   PREPROCESSING_LABEL_SELECTOR: {{ .Values.config.preprocessingLabelSelector | quote }}
   FOCUSING_LABEL_SELECTOR: {{ .Values.config.focusingLabelSelector | quote }}
